@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeadAI Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07080d;--bg2:#0e0f17;--bg3:#151622;--bg4:#1c1d2e;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);--border3:rgba(255,255,255,0.16);
+  --accent:#4f6ef7;--accent2:#7c96ff;--accent3:#00e5c0;
+  --text:#eef0ff;--text2:#8b8daa;--text3:#4a4c65;
+  --hot:#ff6b35;--warm:#f7c948;--cold:#4f6ef7;
+  --success:#00d084;--danger:#ff4d6a;--warn:#f7c948;
+  --font:'Bricolage Grotesque',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r:10px;--rl:14px;--rxl:18px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:auto;}
+.app{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sb{width:240px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border)}
+.sb-logo-mark{font-size:20px;font-weight:800;letter-spacing:-0.5px;line-height:1}
+.sb-logo-mark span{color:var(--accent2)}
+.sb-logo-tag{font-size:10px;font-family:var(--mono);color:var(--text3);margin-top:3px;letter-spacing:1.5px;text-transform:uppercase}
+.sb-nav{flex:1;padding:10px 0;}
+.sb-section{font-size:9px;font-family:var(--mono);letter-spacing:2px;color:var(--text3);padding:14px 18px 5px;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);transition:all .15s;border-left:2px solid transparent;user-select:none}
+.sb-item:hover{color:var(--text);background:rgba(79,110,247,.06)}
+.sb-item.active{color:var(--accent2);border-left-color:var(--accent);background:rgba(79,110,247,.1)}
+.sb-item svg{width:15px;height:15px;flex-shrink:0;opacity:.7}
+.sb-item.active svg{opacity:1}
+.sb-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:700;font-family:var(--mono);padding:1px 7px;border-radius:20px}
+.sb-foot{padding:14px 18px;border-top:1px solid var(--border)}
+.sb-gmail{display:flex;align-items:center;gap:7px;font-size:11px;font-family:var(--mono);color:var(--text3)}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--success);animation:pulse 2.5s ease infinite;flex-shrink:0}
+.pulse.off{background:var(--text3);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:15px 26px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;position:sticky;top:0;z-index:10;}
+.tb-title{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.tb-sub{font-size:11px;color:var(--text2);font-family:var(--mono);margin-top:2px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.page{padding:22px 26px;padding-bottom:60px;}
+
+/* BUTTONS */
+.btn{background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+.btn:hover:not(:disabled){background:#3a56d4;transform:translateY(-1px);box-shadow:0 4px 20px rgba(79,110,247,.3)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-sm{padding:7px 13px;font-size:12px}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border2);border-radius:var(--r);padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-ghost:hover:not(:disabled){border-color:var(--accent2);color:var(--accent2)}
+.btn-ghost:disabled{opacity:.4;cursor:not-allowed}
+.btn-success{background:rgba(0,208,132,.12);color:var(--success);border:1px solid rgba(0,208,132,.25);border-radius:var(--r);padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;display:inline-flex;align-items:center;gap:7px}
+.btn-success:hover:not(:disabled){background:rgba(0,208,132,.2)}
+.btn-success:disabled{opacity:.4;cursor:not-allowed}
+.btn-danger{background:rgba(255,77,106,.1);color:var(--danger);border:1px solid rgba(255,77,106,.2);border-radius:var(--r);padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s}
+.btn-danger:hover{background:rgba(255,77,106,.18)}
+
+/* FORM */
+label{display:block;font-size:10px;font-family:var(--mono);letter-spacing:1.2px;color:var(--text3);margin-bottom:5px;text-transform:uppercase}
+input,select,textarea{background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r);padding:9px 12px;font-size:13px;font-family:var(--font);width:100%;transition:border-color .15s;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);background:var(--bg4)}
+input::placeholder,textarea::placeholder{color:var(--text3)}
+select option{background:var(--bg3)}
+textarea{resize:vertical;line-height:1.65}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:20px 22px}
+.card-sm{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px}
+
+/* SECTION TITLE */
+.st{font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:12px;margin-top:22px}
+.st:first-child{margin-top:0}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px;transition:border-color .2s}
+.stat:hover{border-color:var(--border2)}
+.stat-label{font-size:10px;font-family:var(--mono);letter-spacing:1px;color:var(--text3);text-transform:uppercase}
+.stat-val{font-size:32px;font-weight:800;letter-spacing:-2px;margin:5px 0 2px;line-height:1}
+.stat-sub{font-size:11px;font-family:var(--mono);color:var(--text2)}
+
+/* PIPELINE */
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.pipe-col{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:14px;min-height:160px}
+.pipe-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.pipe-lbl{font-size:10px;font-weight:700;font-family:var(--mono);letter-spacing:1.2px;text-transform:uppercase}
+.pipe-cnt{font-size:10px;font-family:var(--mono);background:var(--bg3);border:1px solid var(--border2);padding:2px 7px;border-radius:10px;color:var(--text2)}
+.pipe-empty{font-size:11px;font-family:var(--mono);color:var(--text3);text-align:center;padding:18px 0}
+
+/* LEAD CARD */
+.lc{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.lc:hover{border-color:var(--accent);background:rgba(79,110,247,.05)}
+.lc:last-child{margin-bottom:0}
+.lc-name{font-size:13px;font-weight:600;margin-bottom:1px}
+.lc-co{font-size:11px;color:var(--text2);font-family:var(--mono)}
+.lc-email{font-size:11px;color:var(--accent3);font-family:var(--mono);margin-top:3px}
+.lc-foot{display:flex;align-items:center;gap:6px;margin-top:7px;flex-wrap:wrap}
+
+/* BADGES */
+.badge{font-size:10px;font-family:var(--mono);font-weight:500;padding:2px 8px;border-radius:5px}
+.b-hot{background:rgba(255,107,53,.12);color:var(--hot);border:1px solid rgba(255,107,53,.25)}
+.b-warm{background:rgba(247,201,72,.1);color:var(--warm);border:1px solid rgba(247,201,72,.22)}
+.b-cold{background:rgba(79,110,247,.1);color:var(--cold);border:1px solid rgba(79,110,247,.2)}
+.b-new{background:rgba(0,229,192,.08);color:var(--accent3);border:1px solid rgba(0,229,192,.18)}
+.b-contacted{background:rgba(0,208,132,.1);color:var(--success);border:1px solid rgba(0,208,132,.2)}
+.b-draft{background:rgba(247,201,72,.08);color:var(--warn);border:1px solid rgba(247,201,72,.18)}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:8px 12px;font-size:10px;font-family:var(--mono);letter-spacing:1px;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border2);white-space:nowrap}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover td{background:rgba(79,110,247,.03);cursor:pointer}
+.td-name{font-weight:600}
+.td-mono{font-family:var(--mono);font-size:11px;color:var(--text2)}
+.td-email{font-family:var(--mono);font-size:11px;color:var(--accent3)}
+.td-right{text-align:right;white-space:nowrap}
+
+/* SCORE BAR */
+.score-bar{display:flex;align-items:center;gap:8px}
+.score-dots{display:flex;gap:3px}
+.score-dot{width:8px;height:8px;border-radius:50%;background:var(--border2)}
+.score-dot.filled-hot{background:var(--hot)}
+.score-dot.filled-warm{background:var(--warn)}
+.score-dot.filled-cold{background:var(--cold)}
+
+/* AI SCORE PANEL */
+.ai-score{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;margin-top:10px}
+.ai-score-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ai-chip{font-size:10px;font-family:var(--mono);background:rgba(0,229,192,.08);color:var(--accent3);border:1px solid rgba(0,229,192,.18);padding:2px 8px;border-radius:20px}
+
+/* EMAIL COMPOSER */
+.compose-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.email-hdr{display:grid;grid-template-columns:65px 1fr;align-items:center;gap:8px;margin-bottom:8px}
+.email-fld-lbl{font-size:11px;font-family:var(--mono);color:var(--text3);text-transform:uppercase}
+.email-body{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px;font-size:13px;font-family:var(--mono);line-height:1.75;color:var(--text);min-height:200px;outline:none;transition:border-color .15s;white-space:pre-wrap;overflow-y:auto;max-height:320px}
+.email-body:focus{border-color:var(--accent)}
+.email-body.ph{color:var(--text3);font-style:italic}
+
+/* SENT ROW */
+.sent-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;transition:border-color .15s}
+.sent-row:hover{border-color:var(--border2)}
+.sent-to{font-size:13px;font-weight:500}
+.sent-meta{font-size:11px;color:var(--text2);font-family:var(--mono);margin-top:2px}
+
+/* SETUP STEPS */
+.setup-step{display:flex;gap:14px;padding:16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px}
+.step-n{width:28px;height:28px;border-radius:50%;background:rgba(79,110,247,.15);border:1px solid rgba(79,110,247,.3);color:var(--accent2);font-size:12px;font-weight:700;font-family:var(--mono);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-t{font-size:13px;font-weight:600;margin-bottom:4px}
+.step-d{font-size:12px;color:var(--text2);font-family:var(--mono);line-height:1.65}
+.code-b{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:9px 13px;font-family:var(--mono);font-size:11px;color:var(--accent3);margin-top:8px;line-height:1.7;word-break:break-all}
+
+/* INFO BOXES */
+.info-box{background:rgba(0,229,192,.05);border:1px solid rgba(0,229,192,.14);border-radius:var(--r);padding:12px 14px;font-size:12px;font-family:var(--mono);color:var(--accent3);line-height:1.7}
+.warn-box{background:rgba(247,201,72,.05);border:1px solid rgba(247,201,72,.14);border-radius:var(--r);padding:12px 14px;font-size:12px;font-family:var(--mono);color:var(--warn);line-height:1.7}
+.err-box{background:rgba(255,77,106,.05);border:1px solid rgba(255,77,106,.14);border-radius:var(--r);padding:12px 14px;font-size:12px;font-family:var(--mono);color:var(--danger);line-height:1.7}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:300;opacity:0;pointer-events:none;transition:opacity .2s}
+.overlay.open{opacity:1;pointer-events:auto}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rxl);padding:26px 28px;width:560px;max-width:95vw;max-height:88vh;overflow-y:auto;transform:translateY(8px);transition:transform .2s;position:relative}
+.overlay.open .modal{transform:translateY(0)}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:3px}
+.modal-sub{font-size:12px;font-family:var(--mono);color:var(--text2);margin-bottom:18px}
+.modal-x{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:color .15s;font-family:var(--font)}
+.modal-x:hover{color:var(--text)}
+
+/* SPINNER */
+.spin{display:inline-flex;gap:4px;align-items:center}
+.spin span{width:5px;height:5px;border-radius:50%;background:currentColor;animation:sp 1.1s ease infinite}
+.spin span:nth-child(2){animation-delay:.18s}
+.spin span:nth-child(3){animation-delay:.36s}
+@keyframes sp{0%,100%{opacity:.2;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;padding:11px 18px;border-radius:var(--r);font-size:13px;font-family:var(--mono);font-weight:500;z-index:999;opacity:0;transform:translateY(6px) scale(.98);transition:all .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0) scale(1)}
+.toast.ok{background:var(--bg2);border:1px solid rgba(0,208,132,.35);color:var(--success)}
+.toast.err{background:var(--bg2);border:1px solid rgba(255,77,106,.35);color:var(--danger)}
+.toast.info{background:var(--bg2);border:1px solid var(--border2);color:var(--text2)}
+
+/* GMAIL BADGE */
+.g-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-family:var(--mono);font-weight:500;padding:5px 11px;border-radius:20px}
+.g-badge.on{background:rgba(0,208,132,.08);color:var(--success);border:1px solid rgba(0,208,132,.2)}
+.g-badge.off{background:rgba(255,77,106,.08);color:var(--danger);border:1px solid rgba(255,77,106,.2)}
+
+/* UTILS */
+hr{border:none;border-top:1px solid var(--border);margin:16px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.flex{display:flex}.aic{align-items:center}.jcb{justify-content:space-between}.gap8{gap:8px}.gap12{gap:12px}
+.fw6{font-weight:600}.mono{font-family:var(--mono)}.dim{color:var(--text3)}.muted{color:var(--text2)}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--text3);border-radius:4px}::-webkit-scrollbar-thumb:hover{background:var(--text2)}
+
+/* PROGRESS BAR */
+.prog-wrap{background:var(--bg3);border-radius:4px;height:5px;overflow:hidden;margin-top:6px}
+.prog-bar{height:100%;border-radius:4px;transition:width .4s ease}
+.prog-hot{background:var(--hot)}
+.prog-warm{background:var(--warn)}
+.prog-cold{background:var(--cold)}
+
+/* ACTIVITY */
+.act-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.act-item:last-child{border-bottom:none}
+.act-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px}
+.act-text{font-size:12px;color:var(--text2);font-family:var(--mono);line-height:1.5}
+.act-time{font-size:11px;color:var(--text3);font-family:var(--mono);flex-shrink:0;margin-left:auto;padding-left:10px}
+.tab{display:flex;flex-direction:column;flex:1;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══ SIDEBAR ══ -->
+<nav class="sb">
+  <div class="sb-logo">
+    <div class="sb-logo-mark">Lead<span>AI</span> Pro</div>
+    <div class="sb-logo-tag">Phase 1 · Real Data</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-item active" data-tab="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="sb-section">Leads</div>
+    <div class="sb-item" data-tab="generate">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Find Leads
+    </div>
+    <div class="sb-item" data-tab="pipeline">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12H3"/><path d="M6 15l-3-3 3-3"/><path d="M18 9l3 3-3 3"/></svg>
+      Pipeline
+      <span class="sb-badge" id="badge-pipe">0</span>
+    </div>
+    <div class="sb-section">Outreach</div>
+    <div class="sb-item" data-tab="compose">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Compose & Send
+    </div>
+    <div class="sb-item" data-tab="sent">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Sent Emails
+      <span class="sb-badge" id="badge-sent" style="background:rgba(0,208,132,.2);color:var(--success)">0</span>
+    </div>
+    <div class="sb-section">Settings</div>
+    <div class="sb-item" data-tab="setup">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      API Setup
+    </div>
+    <div class="sb-item" data-tab="profile">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      My Business
+    </div>
+  </div>
+  <div class="sb-foot">
+    <div class="sb-gmail">
+      <div class="pulse off" id="dot-gmail"></div>
+      <span id="lbl-gmail">Gmail not connected</span>
+    </div>
+    <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:4px">LeadAI Pro · Phase 1</div>
+  </div>
+</nav>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+<!-- DASHBOARD -->
+<div id="tab-dashboard" class="tab">
+  <div class="topbar">
+    <div><div class="tb-title">Dashboard</div><div class="tb-sub">Your lead generation command centre</div></div>
+    <div class="tb-right">
+      <span class="g-badge off" id="dash-gmail-badge">Gmail not set up</span>
+      <button class="btn btn-sm" onclick="go('generate')">Find Leads</button>
+    </div>
+  </div>
+  <div class="page">
+    <div class="stats">
+      <div class="stat"><div class="stat-label">Total Leads</div><div class="stat-val" id="s-total">0</div><div class="stat-sub" id="s-total-sub">None yet</div></div>
+      <div class="stat"><div class="stat-label">Hot Leads</div><div class="stat-val" style="color:var(--hot)" id="s-hot">0</div><div class="stat-sub">AI scored high intent</div></div>
+      <div class="stat"><div class="stat-label">Emails Sent</div><div class="stat-val" style="color:var(--success)" id="s-esent">0</div><div class="stat-sub" id="s-esent-sub">via Gmail</div></div>
+      <div class="stat"><div class="stat-label">Contacted</div><div class="stat-val" style="color:var(--accent2)" id="s-cont">0</div><div class="stat-sub">Leads reached out to</div></div>
+    </div>
+
+    <div class="st">Pipeline Snapshot</div>
+    <div class="pipe" id="dash-pipe">
+      <div class="pipe-col"><div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--text2)">New</span><span class="pipe-cnt" id="dp-new-c">0</span></div><div id="dp-new"><div class="pipe-empty">Find leads to start</div></div></div>
+      <div class="pipe-col"><div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--accent2)">Contacted</span><span class="pipe-cnt" id="dp-cont-c">0</span></div><div id="dp-cont"><div class="pipe-empty">None contacted yet</div></div></div>
+      <div class="pipe-col"><div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--accent3)">Replied</span><span class="pipe-cnt">0</span></div><div class="pipe-empty">Update manually</div></div>
+      <div class="pipe-col"><div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--success)">Converted</span><span class="pipe-cnt">0</span></div><div class="pipe-empty">Closed deals</div></div>
+    </div>
+
+    <div class="st" style="margin-top:22px">Recent Activity</div>
+    <div id="dash-activity"><div style="font-size:12px;font-family:var(--mono);color:var(--text3);padding:14px 0">No activity yet. Start by finding some leads.</div></div>
+  </div>
+</div>
+
+<!-- FIND LEADS -->
+<div id="tab-generate" class="tab" style="display:none">
+  <div class="topbar">
+    <div><div class="tb-title">Find Real Leads</div><div class="tb-sub">Powered by Google Places + Claude AI scoring</div></div>
+  </div>
+  <div class="page">
+    <div id="setup-warn" class="warn-box" style="margin-bottom:16px;display:none">
+      ⚠ Google Places API key not set. Go to <strong>API Setup</strong> to add your key first.
+    </div>
+    <div id="claude-warn" class="warn-box" style="margin-bottom:16px;display:none">
+      ⚠ Anthropic API key not set. AI scoring and email personalisation will be disabled. Set it in <strong>API Setup</strong>.
+    </div>
+
+    <div class="st">Search Parameters</div>
+    <div class="card">
+      <div class="grid3" style="margin-bottom:12px">
+        <div>
+          <label>Industry / Business Type</label>
+          <input id="g-type" type="text" placeholder="e.g. real estate agency, dental clinic, gym">
+        </div>
+        <div>
+          <label>City / Location</label>
+          <input id="g-city" type="text" placeholder="e.g. Johannesburg, Cape Town">
+        </div>
+        <div>
+          <label>Results to Fetch</label>
+          <select id="g-count">
+            <option value="10">10 companies</option>
+            <option value="20" selected>20 companies</option>
+            <option value="60">60 companies</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label>Your Offering (used for AI scoring relevance)</label>
+        <input id="g-offering" type="text" placeholder="e.g. social media marketing, bookkeeping software, web design">
+      </div>
+      <div class="flex aic gap8">
+        <button class="btn" id="find-btn" onclick="findLeads()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Find Leads
+        </button>
+        <button class="btn-ghost" onclick="clearAllLeads()">Clear All</button>
+        <button class="btn-ghost btn-sm" onclick="exportCSV()" id="export-btn" style="display:none">Export CSV</button>
+        <span id="find-status" style="font-size:12px;font-family:var(--mono);color:var(--text3);margin-left:4px"></span>
+      </div>
+    </div>
+
+    <div id="leads-wrap" style="display:none;margin-top:20px">
+      <div class="flex aic jcb" style="margin-bottom:10px">
+        <div class="st" style="margin:0">Found Leads <span id="leads-count-lbl" style="color:var(--accent2)"></span></div>
+        <div class="flex gap8">
+          <button class="btn-ghost btn-sm" onclick="scoreAllLeads()" id="score-all-btn">AI Score All</button>
+          <button class="btn btn-sm" onclick="go('compose')">Compose Emails →</button>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Category</th>
+              <th>Location</th>
+              <th>Rating</th>
+              <th>AI Score</th>
+              <th>Contact</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="leads-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PIPELINE -->
+<div id="tab-pipeline" class="tab" style="display:none">
+  <div class="topbar">
+    <div><div class="tb-title">Lead Pipeline</div><div class="tb-sub">Track every lead through your sales process</div></div>
+    <div class="tb-right"><button class="btn btn-sm" onclick="go('generate')">+ Find More</button></div>
+  </div>
+  <div class="page">
+    <div class="pipe">
+      <div class="pipe-col">
+        <div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--text2)">New</span><span class="pipe-cnt" id="pp-new-c">0</span></div>
+        <div id="pp-new"><div class="pipe-empty">No leads yet</div></div>
+      </div>
+      <div class="pipe-col">
+        <div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--accent2)">Contacted</span><span class="pipe-cnt" id="pp-cont-c">0</span></div>
+        <div id="pp-cont"><div class="pipe-empty">None contacted</div></div>
+      </div>
+      <div class="pipe-col">
+        <div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--accent3)">Replied</span><span class="pipe-cnt">0</span></div>
+        <div class="pipe-empty">Update manually</div>
+      </div>
+      <div class="pipe-col">
+        <div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--success)">Converted</span><span class="pipe-cnt">0</span></div>
+        <div class="pipe-empty">Closed deals</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPOSE -->
+<div id="tab-compose" class="tab" style="display:none">
+  <div class="topbar">
+    <div><div class="tb-title">Compose & Send</div><div class="tb-sub">AI-personalised outreach via Gmail</div></div>
+    <div class="tb-right"><span class="g-badge off" id="compose-gmail-badge">Gmail not set up</span></div>
+  </div>
+  <div class="page">
+    <div class="compose-grid">
+      <!-- LEFT -->
+      <div>
+        <div class="st">Select Lead</div>
+        <div class="card">
+          <div style="margin-bottom:10px">
+            <label>From your lead list</label>
+            <select id="lead-sel" onchange="pickLead()">
+              <option value="">— Select a lead —</option>
+            </select>
+          </div>
+          <div class="grid2" style="margin-bottom:10px">
+            <div>
+              <label>Contact Name</label>
+              <input id="c-name" type="text" placeholder="e.g. John Smith">
+            </div>
+            <div>
+              <label>Job Title</label>
+              <input id="c-title" type="text" placeholder="e.g. Owner">
+            </div>
+          </div>
+          <div style="margin-bottom:10px">
+            <label>Company</label>
+            <input id="c-company" type="text" placeholder="Company name">
+          </div>
+          <div>
+            <label>Company Website / Info</label>
+            <input id="c-website" type="text" placeholder="e.g. www.company.com">
+          </div>
+        </div>
+
+        <div class="st">Email Style</div>
+        <div class="card">
+          <div style="margin-bottom:10px">
+            <label>Tone</label>
+            <select id="e-tone">
+              <option value="professional">Professional & Direct</option>
+              <option value="friendly">Friendly & Conversational</option>
+              <option value="consultative">Consultative / Advisory</option>
+              <option value="urgent">Creating Urgency</option>
+            </select>
+          </div>
+          <div style="margin-bottom:12px">
+            <label>Template Type</label>
+            <select id="e-template">
+              <option value="intro">Cold Introduction</option>
+              <option value="value">Value Proposition</option>
+              <option value="problem">Problem → Solution</option>
+              <option value="followup">Follow-Up (2nd touch)</option>
+            </select>
+          </div>
+          <button class="btn" style="width:100%" id="ai-draft-btn" onclick="aiDraftEmail()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            AI Draft Email
+          </button>
+          <div id="draft-note" style="display:none" class="warn-box mt12">No Anthropic key — using smart template instead.</div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div>
+        <div class="st">Email Composer</div>
+        <div class="card">
+          <div class="email-hdr">
+            <span class="email-fld-lbl">TO:</span>
+            <input id="c-to" type="email" placeholder="recipient@company.com">
+          </div>
+          <div class="email-hdr">
+            <span class="email-fld-lbl">FROM:</span>
+            <input id="c-from" type="email" placeholder="Set in API Setup" readonly style="color:var(--text2)">
+          </div>
+          <div class="email-hdr" style="margin-bottom:12px">
+            <span class="email-fld-lbl">SUBJECT:</span>
+            <input id="c-subject" type="text" placeholder="Email subject line">
+          </div>
+          <hr>
+          <div id="c-body" class="email-body ph" contenteditable="true">AI Draft Email or select a template to generate your personalised outreach here.</div>
+          <hr>
+          <div class="flex gap8" style="flex-wrap:wrap">
+            <button class="btn-success" id="send-btn" onclick="sendEmail()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Send via Gmail
+            </button>
+            <button class="btn-ghost" onclick="copyEmail()">Copy</button>
+            <button class="btn-ghost" onclick="clearCompose()">Clear</button>
+          </div>
+          <div id="send-err" style="display:none;margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SENT -->
+<div id="tab-sent" class="tab" style="display:none">
+  <div class="topbar">
+    <div><div class="tb-title">Sent Emails</div><div class="tb-sub">All outreach sent via Gmail</div></div>
+    <div class="tb-right"><button class="btn-ghost btn-sm" onclick="clearSent()">Clear Log</button></div>
+  </div>
+  <div class="page">
+    <div id="sent-log"><div style="font-size:12px;font-family:var(--mono);color:var(--text3);text-align:center;padding:30px 0">No emails sent yet.</div></div>
+  </div>
+</div>
+
+<!-- API SETUP -->
+<div id="tab-setup" class="tab" style="display:none">
+  <div class="topbar">
+    <div><div class="tb-title">API Setup</div><div class="tb-sub">Connect your data sources</div></div>
+  </div>
+  <div class="page">
+
+    <!-- GOOGLE PLACES -->
+    <div class="st">Google Places API (Real Company Data)</div>
+    <div class="setup-step">
+      <div class="step-n">1</div>
+      <div><div class="step-t">Create a Google Cloud Project</div><div class="step-d">Go to <strong style="color:var(--accent2)">console.cloud.google.com</strong> → New Project. Name it anything (e.g. "LeadAI").</div></div>
+    </div>
+    <div class="setup-step">
+      <div class="step-n">2</div>
+      <div><div class="step-t">Enable Places API</div><div class="step-d">APIs & Services → Enable APIs → Search "Places API" → Enable it. Also enable "Maps JavaScript API".</div></div>
+    </div>
+    <div class="setup-step">
+      <div class="step-n">3</div>
+      <div><div class="step-t">Get API Key</div><div class="step-d">APIs & Services → Credentials → Create Credentials → API Key. Copy it and paste below. Google gives you $200 free credit/month — enough for thousands of searches.</div></div>
+    </div>
+    <div class="card mt8">
+      <div style="margin-bottom:12px">
+        <label>Google Places API Key</label>
+        <input id="gp-key" type="password" placeholder="AIzaSy...">
+      </div>
+      <div class="flex gap8">
+        <button class="btn" onclick="saveGPlaces()">Save Key</button>
+        <button class="btn-ghost" onclick="testGPlaces()">Test Connection</button>
+      </div>
+      <div id="gp-status" class="mt12" style="font-size:12px;font-family:var(--mono);color:var(--text3)"></div>
+    </div>
+
+    <!-- CLAUDE AI -->
+    <div class="st">Anthropic API (AI Scoring + Email Drafting)</div>
+    <div class="info-box" style="margin-bottom:14px">Claude AI analyses each lead and scores them hot/warm/cold based on your offering. It also writes personalised emails. Each client gets their own free API key from anthropic.com — sign up is free and includes $5 credit.</div>
+    <div class="setup-step">
+      <div class="step-n">1</div>
+      <div><div class="step-t">Get Your Anthropic API Key</div><div class="step-d">Go to <strong style="color:var(--accent2)">console.anthropic.com</strong> → Sign up free → API Keys → Create Key. $5 free credit on signup = hundreds of lead scores + email drafts.</div></div>
+    </div>
+    <div class="card mt8">
+      <div style="margin-bottom:12px">
+        <label>Anthropic API Key</label>
+        <input id="cl-key" type="password" placeholder="sk-ant-...">
+      </div>
+      <div class="flex gap8">
+        <button class="btn" onclick="saveClaudeKey()">Save Key</button>
+        <button class="btn-ghost" onclick="testClaude()">Test Connection</button>
+      </div>
+      <div id="cl-status" class="mt12" style="font-size:12px;font-family:var(--mono);color:var(--text3)"></div>
+    </div>
+
+    <!-- GMAIL -->
+    <div class="st">Gmail (Send Emails)</div>
+    <div class="setup-step">
+      <div class="step-n">1</div>
+      <div><div class="step-t">Enable Gmail App Password</div><div class="step-d">Go to your Google Account → Security → 2-Step Verification (enable if not on) → App Passwords → Generate password for "Mail". Copy the 16-character code.</div></div>
+    </div>
+    <div class="card mt8">
+      <div class="grid2" style="margin-bottom:12px">
+        <div>
+          <label>Your Gmail Address</label>
+          <input id="gm-email" type="email" placeholder="yourname@gmail.com">
+        </div>
+        <div>
+          <label>App Password</label>
+          <input id="gm-pass" type="password" placeholder="xxxx xxxx xxxx xxxx">
+        </div>
+      </div>
+      <div class="flex gap8">
+        <button class="btn" onclick="saveGmail()">Save Gmail</button>
+        <button class="btn-ghost" onclick="testGmailConn()">Test</button>
+        <button class="btn-danger" id="gm-disconnect" onclick="disconnectGmail()" style="display:none">Disconnect</button>
+      </div>
+      <div id="gm-status" class="mt12" style="font-size:12px;font-family:var(--mono);color:var(--text3)"></div>
+      <div class="info-box mt12">The app opens Gmail with your email pre-filled. You click Send — takes 2 seconds. For fully automated sending (zero clicks), a backend server is needed (Phase 2).</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div id="tab-profile" class="tab" style="display:none">
+  <div class="topbar">
+    <div><div class="tb-title">My Business</div><div class="tb-sub">Personalises all AI-generated emails</div></div>
+  </div>
+  <div class="page">
+    <div class="st">Business Details</div>
+    <div class="card">
+      <div class="grid2" style="margin-bottom:12px">
+        <div><label>Business Name</label><input id="p-biz" type="text" placeholder="e.g. Apex Digital Solutions"></div>
+        <div><label>Your Full Name</label><input id="p-name" type="text" placeholder="e.g. Thabo Sithole"></div>
+      </div>
+      <div style="margin-bottom:12px"><label>Your Role / Title</label><input id="p-role" type="text" placeholder="e.g. Founder, CEO"></div>
+      <div style="margin-bottom:12px"><label>Core Offering (what do you sell?)</label><textarea id="p-offering" rows="2" placeholder="We help businesses grow through AI-powered lead generation and automated outreach..."></textarea></div>
+      <div style="margin-bottom:12px"><label>Key Benefits / Results you deliver</label><textarea id="p-benefits" rows="3" placeholder="• Save 10+ hours/week on prospecting&#10;• Increase qualified leads by 3x&#10;• Automated personalised outreach at scale"></textarea></div>
+      <div class="grid2" style="margin-bottom:14px">
+        <div><label>Website</label><input id="p-web" type="text" placeholder="www.yourbusiness.com"></div>
+        <div><label>Phone</label><input id="p-phone" type="text" placeholder="+27 xx xxx xxxx"></div>
+      </div>
+      <button class="btn" onclick="saveProfile()">Save Profile</button>
+    </div>
+
+    <div class="st">Email Signature Preview</div>
+    <div class="card">
+      <div id="sig-preview" style="font-size:13px;line-height:1.9;font-family:var(--mono);color:var(--text2)">Fill in your profile to see your signature.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- LEAD DETAIL MODAL -->
+<div class="overlay" id="lead-modal" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-x" onclick="closeLeadModal()">✕</button>
+    <div class="modal-title" id="m-title">Company Name</div>
+    <div class="modal-sub" id="m-sub">Category · Location</div>
+    <div id="m-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════
+// STATE
+// ════════════════════════════════
+let leads = [];
+let sentEmails = [];
+let profile = {};
+let config = {};
+let activity = [];
+
+// ════════════════════════════════
+// INIT
+// ════════════════════════════════
+window.onload = () => {
+  load();
+  setupNav();
+  updateAllUI();
+};
+
+function load() {
+  try {
+    leads = JSON.parse(localStorage.getItem('lai_leads') || '[]');
+    sentEmails = JSON.parse(localStorage.getItem('lai_sent') || '[]');
+    profile = JSON.parse(localStorage.getItem('lai_profile') || '{}');
+    config = JSON.parse(localStorage.getItem('lai_config') || '{}');
+    activity = JSON.parse(localStorage.getItem('lai_activity') || '[]');
+
+    // Restore form values
+    const pFields = ['p-biz','p-name','p-role','p-offering','p-benefits','p-web','p-phone'];
+    pFields.forEach(f => { if (profile[f]) document.getElementById(f).value = profile[f]; });
+
+    if (config.gpKey) document.getElementById('gp-key').value = config.gpKey;
+    if (config.clKey) document.getElementById('cl-key').value = config.clKey;
+    if (config.gmEmail) { document.getElementById('gm-email').value = config.gmEmail; document.getElementById('gm-disconnect').style.display = 'inline-flex'; }
+    if (config.gmPass) document.getElementById('gm-pass').value = config.gmPass;
+  } catch(e) { console.warn('Load error', e); }
+}
+
+function persist() {
+  localStorage.setItem('lai_leads', JSON.stringify(leads));
+  localStorage.setItem('lai_sent', JSON.stringify(sentEmails));
+  localStorage.setItem('lai_profile', JSON.stringify(profile));
+  localStorage.setItem('lai_config', JSON.stringify(config));
+  localStorage.setItem('lai_activity', JSON.stringify(activity));
+}
+
+function updateAllUI() {
+  updateGmailUI();
+  updateStats();
+  renderDashPipe();
+  renderPipeline();
+  renderSentLog();
+  buildLeadSel();
+  updateSig();
+  checkSetupWarnings();
+}
+
+// ════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════
+function setupNav() {
+  document.querySelectorAll('.sb-item[data-tab]').forEach(el => {
+    el.addEventListener('click', () => go(el.dataset.tab));
+  });
+}
+
+function go(name) {
+  document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
+  document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + name).style.display = 'block';
+  const navEl = document.querySelector(`.sb-item[data-tab="${name}"]`);
+  if (navEl) navEl.classList.add('active');
+  if (name === 'pipeline') renderPipeline();
+  if (name === 'sent') renderSentLog();
+  if (name === 'compose') buildLeadSel();
+  if (name === 'dashboard') { updateStats(); renderDashPipe(); renderDashActivity(); }
+  if (name === 'generate') checkSetupWarnings();
+}
+
+function checkSetupWarnings() {
+  const gw = document.getElementById('setup-warn');
+  const cw = document.getElementById('claude-warn');
+  if (gw) gw.style.display = config.gpKey ? 'none' : 'block';
+  if (cw) cw.style.display = config.clKey ? 'none' : 'block';
+}
+
+// ════════════════════════════════
+// GOOGLE PLACES — REAL COMPANIES
+// ════════════════════════════════
+async function findLeads() {
+  const type = document.getElementById('g-type').value.trim();
+  const city = document.getElementById('g-city').value.trim();
+  const count = parseInt(document.getElementById('g-count').value);
+  const offering = document.getElementById('g-offering').value.trim();
+
+  if (!type) { toast('Enter a business type', 'err'); return; }
+  if (!city) { toast('Enter a city', 'err'); return; }
+  if (!config.gpKey) { toast('Add your Google Places API key first', 'err'); go('setup'); return; }
+
+  const btn = document.getElementById('find-btn');
+  const status = document.getElementById('find-status');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"><span></span><span></span><span></span></span> Searching...';
+  status.textContent = '';
+
+  try {
+    // Use Google Places Text Search
+    const query = encodeURIComponent(`${type} in ${city}`);
+    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&key=${config.gpKey}`;
+
+    // Note: Direct browser call to Places API requires enabling it without restriction
+    // or using a proxy. We use a CORS proxy approach or direct call.
+    const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+    const data = await response.json();
+
+    if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+      throw new Error(data.error_message || data.status || 'API error');
+    }
+
+    const places = (data.results || []).slice(0, count);
+
+    if (!places.length) {
+      status.textContent = 'No results found. Try a different search.';
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Find Leads';
+      return;
+    }
+
+    // Map to lead objects
+    const newLeads = places.map(p => ({
+      id: Date.now() + Math.random(),
+      name: p.name,
+      address: p.formatted_address || p.vicinity || city,
+      rating: p.rating || null,
+      totalRatings: p.user_ratings_total || 0,
+      types: (p.types || []).filter(t => !['establishment','point_of_interest'].includes(t)).slice(0,2),
+      placeId: p.place_id,
+      website: '',
+      phone: '',
+      contactName: '',
+      contactEmail: '',
+      aiScore: null,
+      aiReason: '',
+      offering,
+      status: 'new',
+      city,
+      type
+    }));
+
+    leads = [...leads, ...newLeads];
+    persist();
+
+    renderLeadsTable(newLeads);
+    document.getElementById('leads-wrap').style.display = 'block';
+    document.getElementById('leads-count-lbl').textContent = `(${newLeads.length} found)`;
+    document.getElementById('export-btn').style.display = 'inline-flex';
+    updateStats();
+    renderDashPipe();
+    buildLeadSel();
+    addActivity(`Found ${newLeads.length} real companies — "${type}" in ${city}`);
+    toast(`${newLeads.length} real companies found!`, 'ok');
+
+    // Auto-score if Claude key available
+    if (config.clKey && newLeads.length) {
+      setTimeout(() => scoreAllLeads(newLeads), 500);
+    }
+
+  } catch(err) {
+    console.error(err);
+    status.textContent = 'Error: ' + (err.message || 'Could not connect to Google Places');
+    toast('Search failed — check API key', 'err');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Find Leads';
+}
+
+function renderLeadsTable(leadsArr) {
+  const tbody = document.getElementById('leads-tbody');
+  tbody.innerHTML = '';
+  leadsArr.forEach(lead => {
+    const tr = document.createElement('tr');
+    tr.onclick = () => openLeadModal(lead);
+    const scoreHtml = lead.aiScore
+      ? `<span class="badge b-${lead.aiScore}">${scoreLabel(lead.aiScore)}</span>`
+      : `<span class="badge b-cold" style="opacity:.5">Pending</span>`;
+    const ratingHtml = lead.rating
+      ? `<span style="color:var(--warn);font-family:var(--mono);font-size:11px">★ ${lead.rating}</span>`
+      : `<span style="color:var(--text3);font-size:11px;font-family:var(--mono)">—</span>`;
+    const typeTxt = (lead.types || []).map(t => t.replace(/_/g,' ')).join(', ') || lead.type;
+    tr.innerHTML = `
+      <td class="td-name">${lead.name}</td>
+      <td class="td-mono">${typeTxt}</td>
+      <td class="td-mono">${lead.city}</td>
+      <td>${ratingHtml}</td>
+      <td id="score-${lead.id}">${scoreHtml}</td>
+      <td class="td-email">${lead.contactEmail || ""}</td>
+      <td class="td-right">
+        <button class="btn-ghost btn-sm" onclick="event.stopPropagation();prefillCompose('${lead.id}')">Email →</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ════════════════════════════════
+// AI LEAD SCORING (Claude)
+// ════════════════════════════════
+const scoreLabel = s => ({hot:'🔥 Hot',warm:'◈ Warm',cold:'· Cold'}[s] || s);
+const scoreBadge = s => ({hot:'b-hot',warm:'b-warm',cold:'b-cold'}[s] || 'b-cold');
+
+async function scoreAllLeads(leadsToScore) {
+  const arr = leadsToScore || leads.filter(l => !l.aiScore);
+  if (!arr.length) { toast('All leads already scored', 'info'); return; }
+  if (!config.clKey) { toast('Add Anthropic API key for AI scoring', 'err'); return; }
+
+  const btn = document.getElementById('score-all-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"><span></span><span></span><span></span></span> Scoring...';
+
+  const offering = document.getElementById('g-offering').value || profile['p-offering'] || 'business services';
+
+  // Score in batches of 5 to avoid rate limits
+  const batchSize = 5;
+  for (let i = 0; i < arr.length; i += batchSize) {
+    const batch = arr.slice(i, i + batchSize);
+    await scoreBatch(batch, offering);
+    if (i + batchSize < arr.length) await sleep(500);
+  }
+
+  persist();
+  updateStats();
+  addActivity(`AI scored ${arr.length} leads`);
+  toast(`${arr.length} leads scored by AI!`, 'ok');
+  btn.disabled = false;
+  btn.innerHTML = 'AI Score All';
+}
+
+async function scoreBatch(batch, offering) {
+  const prompt = `You are a B2B sales expert. Score these leads for an offering: "${offering}"
+
+For each company, rate them Hot/Warm/Cold based on:
+- How likely they need this offering
+- Business type relevance
+- Size indicators (rating count = activity level)
+
+Companies:
+${batch.map((l,i) => `${i+1}. ${l.name} | Type: ${(l.types||[l.type]).join(',')} | Rating: ${l.rating||'unknown'} (${l.totalRatings} reviews) | Location: ${l.city}`).join('\n')}
+
+Respond ONLY with valid JSON array (no markdown, no extra text):
+[{"index":1,"score":"hot","reason":"brief reason"},...]`;
+
+  try {
+    const res = await callClaude(prompt, 400);
+    const text = res.replace(/```json|```/g,'').trim();
+    const scores = JSON.parse(text);
+
+    scores.forEach(s => {
+      const lead = batch[s.index - 1];
+      if (!lead) return;
+      lead.aiScore = s.score;
+      lead.aiReason = s.reason;
+      // Update UI
+      const cell = document.getElementById(`score-${lead.id}`);
+      if (cell) {
+        cell.innerHTML = `<span class="badge ${scoreBadge(s.score)}">${scoreLabel(s.score)}</span>`;
+      }
+    });
+  } catch(e) {
+    console.warn('Score batch error', e);
+    // Fallback: assign warm to all
+    batch.forEach(l => { if (!l.aiScore) { l.aiScore = 'warm'; l.aiReason = 'Scored by template (AI unavailable)'; } });
+  }
+}
+
+async function callClaude(prompt, maxTokens = 800) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': config.clKey, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: maxTokens,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content[0].text;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ════════════════════════════════
+// EMAIL DRAFTING (Claude)
+// ════════════════════════════════
+async function aiDraftEmail() {
+  const name = document.getElementById('c-name').value;
+  const company = document.getElementById('c-company').value;
+  const title = document.getElementById('c-title').value;
+  const website = document.getElementById('c-website').value;
+  const tone = document.getElementById('e-tone').value;
+  const template = document.getElementById('e-template').value;
+  const bizName = profile['p-biz'] || '[Your Business]';
+  const yourName = profile['p-name'] || '[Your Name]';
+  const offering = profile['p-offering'] || document.getElementById('g-offering').value || 'our services';
+  const benefits = profile['p-benefits'] || '';
+  const role = profile['p-role'] || '';
+  const phone = profile['p-phone'] || '';
+  const web = profile['p-web'] || '';
+
+  const btn = document.getElementById('ai-draft-btn');
+  const bodyEl = document.getElementById('c-body');
+  const draftNote = document.getElementById('draft-note');
+
+  draftNote.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"><span></span><span></span><span></span></span> Drafting...';
+
+  if (!config.clKey) {
+    // Fallback template
+    draftNote.style.display = 'block';
+    applyFallbackTemplate(template, { name, company, title, bizName, yourName, offering, benefits, role, phone, web });
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg> AI Draft Email';
+    return;
+  }
+
+  const toneMap = {
+    professional: 'professional and direct',
+    friendly: 'friendly and conversational',
+    consultative: 'consultative and advisory',
+    urgent: 'creating gentle urgency'
+  };
+  const templateMap = {
+    intro: 'cold introduction email',
+    value: 'value proposition focused email',
+    problem: 'problem-solution email that identifies a likely pain point and offers a solution',
+    followup: 'warm follow-up second touch email'
+  };
+
+  const prompt = `Write a ${toneMap[tone]} B2B ${templateMap[template]}.
+
+Sender: ${yourName}${role ? ', ' + role : ''} at ${bizName}
+Offering: ${offering}
+${benefits ? 'Key benefits:\n' + benefits : ''}
+${web ? 'Website: ' + web : ''}
+${phone ? 'Phone: ' + phone : ''}
+
+Recipient: ${name || 'Business Owner'} ${title ? '(' + title + ')' : ''} at ${company || 'their company'}
+${website ? 'Their website: ' + website : ''}
+
+Requirements:
+- Subject line that gets opened (not spammy, no ALL CAPS)
+- 3-4 short paragraphs, conversational
+- Personalised to their business type
+- Clear single CTA (15-min call or quick reply)
+- Professional email signature
+
+Return EXACTLY in this format (nothing else):
+SUBJECT: [subject here]
+BODY:
+[email body here including signature]`;
+
+  try {
+    const text = await callClaude(prompt, 700);
+    const subjMatch = text.match(/SUBJECT:\s*(.+)/);
+    const bodyMatch = text.match(/BODY:\s*([\s\S]+)/);
+
+    const subj = subjMatch ? subjMatch[1].trim() : 'A quick introduction';
+    const body = bodyMatch ? bodyMatch[1].trim() : text;
+
+    document.getElementById('c-subject').value = subj;
+    bodyEl.textContent = body;
+    bodyEl.classList.remove('ph');
+    addActivity(`AI drafted email for ${company || 'lead'}`);
+    toast('Email drafted by AI!', 'ok');
+  } catch(e) {
+    console.error(e);
+    draftNote.style.display = 'block';
+    applyFallbackTemplate(template, { name, company, title, bizName, yourName, offering, benefits, role, phone, web });
+    toast('AI draft failed — used smart template', 'info');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg> AI Draft Email';
+}
+
+function applyFallbackTemplate(type, d) {
+  var fn = d.name ? d.name.split(' ')[0] : 'there';
+  var sig = '\n' + (d.yourName||'') + '\n' + (d.role ? d.role + '\n' : '') + (d.bizName||'') + (d.phone ? '\n' + d.phone : '') + (d.web ? '\n' + d.web : '');
+  var templates = {
+    intro: {
+      s: 'Quick intro — ' + (d.bizName||''),
+      b: 'Hi ' + fn + ',\n\nMy name is ' + (d.yourName||'') + (d.role ? ', ' + d.role : '') + ' at ' + (d.bizName||'') + '.\n\nI came across ' + (d.company||'your business') + ' and wanted to reach out personally — I believe we can add real value for you.\n\n' + (d.offering||'') + (d.benefits ? '\n\nWhat this typically means for clients:\n' + d.benefits : '') + '\n\nWould you be open to a quick 15-minute call this week to see if there is a fit?' + sig
+    },
+    value: {
+      s: 'How ' + (d.bizName||'') + ' helps businesses like yours',
+      b: 'Hi ' + fn + ',\n\nI will get straight to the point — ' + (d.bizName||'') + ' helps businesses like ' + (d.company||'yours') + ' ' + (d.offering||'grow faster with less effort') + '.' + (d.benefits ? '\n\nHere is what our clients typically experience:\n' + d.benefits : '') + '\n\nI would love to show you exactly how this would work for ' + (d.company||'your business') + ' — would a 15-minute call work for you?' + sig
+    },
+    problem: {
+      s: 'Are you still dealing with [this challenge]?',
+      b: 'Hi ' + fn + ',\n\nMost business owners I speak to in your industry are facing the same challenge: they want to grow but do not have the time or systems to do it consistently.\n\nThat is exactly what ' + (d.bizName||'') + ' solves. ' + (d.offering||'') + (d.benefits ? '\n' + d.benefits : '') + '\n\nI would love to show you how this works in practice. Would a quick call this week work for you?' + sig
+    },
+    followup: {
+      s: 'Following up — ' + (d.bizName||''),
+      b: 'Hi ' + fn + ',\n\nI reached out recently and wanted to follow up briefly in case my message got buried.\n\n' + (d.bizName||'') + ' helps businesses like ' + (d.company||'yours') + ' — ' + (d.offering||'and I think there is genuine value we can add') + '.\n\nIf timing was not right before, I completely understand. Just wanted to check in one more time.\n\nWould a 15-minute call work this week?' + sig
+    }
+  };
+  var t = templates[type] || templates.intro;
+  document.getElementById('c-subject').value = t.s;
+  var bodyEl = document.getElementById('c-body');
+  bodyEl.textContent = t.b;
+  bodyEl.classList.remove('ph');
+}
+
+// ════════════════════════════════
+// LEAD PICKER / COMPOSE
+// ════════════════════════════════
+function buildLeadSel() {
+  const sel = document.getElementById('lead-sel');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Select a lead —</option>';
+  leads.forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.id;
+    opt.textContent = `${l.name} · ${l.city}`;
+    sel.appendChild(opt);
+  });
+  if (cur) sel.value = cur;
+}
+
+function pickLead() {
+  const id = document.getElementById('lead-sel').value;
+  if (!id) return;
+  const lead = leads.find(l => l.id == id);
+  if (!lead) return;
+  document.getElementById('c-company').value = lead.name;
+  document.getElementById('c-website').value = lead.website || '';
+  if (lead.contactEmail) document.getElementById('c-to').value = lead.contactEmail;
+  if (lead.contactName) document.getElementById('c-name').value = lead.contactName;
+}
+
+function prefillCompose(id) {
+  go('compose');
+  setTimeout(() => {
+    document.getElementById('lead-sel').value = id;
+    pickLead();
+  }, 60);
+}
+
+function clearCompose() {
+  ['c-name','c-title','c-company','c-website','c-to','c-subject'].forEach(i => document.getElementById(i).value = '');
+  const b = document.getElementById('c-body');
+  b.textContent = 'AI Draft Email or select a template to generate your personalised outreach here.';
+  b.classList.add('ph');
+  document.getElementById('lead-sel').value = '';
+  document.getElementById('send-err').style.display = 'none';
+}
+
+function copyEmail() {
+  const subj = document.getElementById('c-subject').value;
+  const body = document.getElementById('c-body').textContent;
+  navigator.clipboard.writeText(`Subject: ${subj}\n\n${body}`).then(() => toast('Copied!', 'ok'));
+}
+
+// ════════════════════════════════
+// SEND EMAIL
+// ════════════════════════════════
+function sendEmail() {
+  const to = document.getElementById('c-to').value.trim();
+  const subject = document.getElementById('c-subject').value.trim();
+  const body = document.getElementById('c-body');
+  const bodyTxt = body.textContent.trim();
+  const errEl = document.getElementById('send-err');
+
+  errEl.style.display = 'none';
+
+  if (!to) { toast('Enter recipient email', 'err'); return; }
+  if (!subject) { toast('Enter a subject line', 'err'); return; }
+  if (!bodyTxt || body.classList.contains('ph')) { toast('Write your email first', 'err'); return; }
+
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"><span></span><span></span><span></span></span> Opening Gmail...';
+
+  setTimeout(() => {
+    // Open Gmail compose with pre-filled fields
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyTxt)}`;
+    window.open(gmailUrl, '_blank');
+
+    // Log it
+    sentEmails.unshift({ id: Date.now(), to, subject, body: bodyTxt, time: new Date().toLocaleString('en-ZA', { dateStyle:'short', timeStyle:'short' }) });
+
+    // Update lead status
+    const selId = document.getElementById('lead-sel').value;
+    if (selId) {
+      const lead = leads.find(l => l.id == selId);
+      if (lead) lead.status = 'contacted';
+    }
+
+    persist();
+    updateStats();
+    renderDashPipe();
+    renderPipeline();
+    renderSentLog();
+    addActivity(`Email sent to ${to} — "${subject}"`);
+    document.getElementById('badge-sent').textContent = sentEmails.length;
+    toast('Gmail opened with email ready!', 'ok');
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send via Gmail';
+  }, 400);
+}
+
+// ════════════════════════════════
+// STATS & PIPELINE
+// ════════════════════════════════
+function updateStats() {
+  const total = leads.length;
+  const hot = leads.filter(l => l.aiScore === 'hot').length;
+  const contacted = leads.filter(l => l.status === 'contacted').length;
+  const sent = sentEmails.length;
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-total-sub').textContent = total ? `${total} in pipeline` : 'None yet';
+  document.getElementById('s-hot').textContent = hot;
+  document.getElementById('s-esent').textContent = sent;
+  document.getElementById('s-cont').textContent = contacted;
+  document.getElementById('badge-pipe').textContent = total;
+  document.getElementById('badge-sent').textContent = sent;
+}
+
+function renderDashPipe() {
+  const newLeads = leads.filter(l => l.status === 'new').slice(0, 5);
+  const contLeads = leads.filter(l => l.status === 'contacted').slice(0, 5);
+  document.getElementById('dp-new-c').textContent = leads.filter(l => l.status === 'new').length;
+  document.getElementById('dp-cont-c').textContent = leads.filter(l => l.status === 'contacted').length;
+
+  const dpNew = document.getElementById('dp-new');
+  dpNew.innerHTML = newLeads.length ? newLeads.map(l => `
+    <div class="lc" onclick="prefillCompose('${l.id}')">
+      <div class="lc-name">${l.name}</div>
+      <div class="lc-co">${l.city}</div>
+      <div class="lc-foot">${l.aiScore ? `<span class="badge ${scoreBadge(l.aiScore)}">${scoreLabel(l.aiScore)}</span>` : ''}</div>
+    </div>`).join('') : '<div class="pipe-empty">Find leads to start</div>';
+
+  const dpCont = document.getElementById('dp-cont');
+  dpCont.innerHTML = contLeads.length ? contLeads.map(l => `
+    <div class="lc"><div class="lc-name">${l.name}</div><div class="lc-co">${l.city}</div><div class="lc-foot"><span class="badge b-contacted">Contacted</span></div></div>`).join('') : '<div class="pipe-empty">None yet</div>';
+}
+
+function renderPipeline() {
+  const newLeads = leads.filter(l => l.status === 'new');
+  const contLeads = leads.filter(l => l.status === 'contacted');
+  document.getElementById('pp-new-c').textContent = newLeads.length;
+  document.getElementById('pp-cont-c').textContent = contLeads.length;
+
+  const ppNew = document.getElementById('pp-new');
+  ppNew.innerHTML = newLeads.length ? newLeads.map(l => `
+    <div class="lc" onclick="prefillCompose('${l.id}')">
+      <div class="lc-name">${l.name}</div>
+      <div class="lc-co">${l.type} · ${l.city}</div>
+      ${l.contactEmail ? `<div class="lc-email">${l.contactEmail}</div>` : ''}
+      <div class="lc-foot">
+        ${l.aiScore ? `<span class="badge ${scoreBadge(l.aiScore)}">${scoreLabel(l.aiScore)}</span>` : ''}
+        <span class="badge b-new">${l.city}</span>
+      </div>
+    </div>`).join('') : '<div class="pipe-empty">No new leads</div>';
+
+  const ppCont = document.getElementById('pp-cont');
+  ppCont.innerHTML = contLeads.length ? contLeads.map(l => `
+    <div class="lc"><div class="lc-name">${l.name}</div><div class="lc-co">${l.city}</div><div class="lc-foot"><span class="badge b-contacted">Contacted</span></div></div>`).join('') : '<div class="pipe-empty">None contacted</div>';
+}
+
+function renderSentLog() {
+  const log = document.getElementById('sent-log');
+  if (!sentEmails.length) { log.innerHTML = '<div style="font-size:12px;font-family:var(--mono);color:var(--text3);text-align:center;padding:30px 0">No emails sent yet.</div>'; return; }
+  log.innerHTML = sentEmails.map(e => `
+    <div class="sent-row">
+      <div><div class="sent-to">${e.to}</div><div class="sent-meta">${e.time} · "${e.subject}"</div></div>
+      <span class="badge b-contacted">Sent</span>
+    </div>`).join('');
+}
+
+function clearSent() {
+  if (!confirm('Clear sent log?')) return;
+  sentEmails = [];
+  persist();
+  renderSentLog();
+  updateStats();
+  toast('Log cleared', 'info');
+}
+
+// ════════════════════════════════
+// ACTIVITY
+// ════════════════════════════════
+function addActivity(msg) {
+  activity.unshift({ msg, time: new Date().toLocaleTimeString('en-ZA', { hour:'2-digit', minute:'2-digit' }) });
+  if (activity.length > 20) activity.pop();
+  renderDashActivity();
+}
+
+function renderDashActivity() {
+  const el = document.getElementById('dash-activity');
+  if (!activity.length) { el.innerHTML = '<div style="font-size:12px;font-family:var(--mono);color:var(--text3);padding:14px 0">No activity yet.</div>'; return; }
+  el.innerHTML = activity.slice(0, 8).map(a => `
+    <div class="act-item">
+      <div class="act-dot"></div>
+      <div class="act-text">${a.msg}</div>
+      <div class="act-time">${a.time}</div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════
+// API CONFIG
+// ════════════════════════════════
+function saveGPlaces() {
+  const key = document.getElementById('gp-key').value.trim();
+  if (!key) { toast('Enter your Google Places key', 'err'); return; }
+  config.gpKey = key;
+  persist();
+  checkSetupWarnings();
+  toast('Google Places key saved!', 'ok');
+  document.getElementById('gp-status').textContent = '✓ Key saved. Ready to search.';
+}
+
+async function testGPlaces() {
+  const key = document.getElementById('gp-key').value.trim();
+  if (!key) { toast('Enter API key first', 'err'); return; }
+  document.getElementById('gp-status').textContent = 'Testing...';
+  try {
+    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=coffee+shop&key=${key}`;
+    const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+    const data = await res.json();
+    if (data.status === 'OK' || data.status === 'ZERO_RESULTS') {
+      document.getElementById('gp-status').textContent = '✓ Connected successfully!';
+      toast('Google Places connected!', 'ok');
+    } else {
+      document.getElementById('gp-status').textContent = '✗ Error: ' + (data.error_message || data.status);
+      toast('Connection failed', 'err');
+    }
+  } catch(e) {
+    document.getElementById('gp-status').textContent = '✗ Network error';
+    toast('Test failed', 'err');
+  }
+}
+
+function saveClaudeKey() {
+  const key = document.getElementById('cl-key').value.trim();
+  if (!key) { toast('Enter your Anthropic key', 'err'); return; }
+  config.clKey = key;
+  persist();
+  checkSetupWarnings();
+  toast('Anthropic key saved!', 'ok');
+  document.getElementById('cl-status').textContent = '✓ Key saved. AI scoring enabled.';
+}
+
+async function testClaude() {
+  const key = document.getElementById('cl-key').value.trim();
+  if (!key) { toast('Enter API key first', 'err'); return; }
+  document.getElementById('cl-status').textContent = 'Testing...';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'x-api-key':key, 'anthropic-version':'2023-06-01' },
+      body: JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:10, messages:[{role:'user',content:'Hi'}] })
+    });
+    const data = await res.json();
+    if (data.content) {
+      document.getElementById('cl-status').textContent = '✓ Claude AI connected!';
+      toast('Claude AI connected!', 'ok');
+    } else {
+      document.getElementById('cl-status').textContent = '✗ ' + (data.error?.message || 'Invalid key');
+      toast('Invalid API key', 'err');
+    }
+  } catch(e) {
+    document.getElementById('cl-status').textContent = '✗ Network error';
+    toast('Test failed', 'err');
+  }
+}
+
+function saveGmail() {
+  const email = document.getElementById('gm-email').value.trim();
+  if (!email) { toast('Enter Gmail address', 'err'); return; }
+  config.gmEmail = email;
+  config.gmPass = document.getElementById('gm-pass').value;
+  persist();
+  document.getElementById('c-from').value = email;
+  document.getElementById('gm-disconnect').style.display = 'inline-flex';
+  updateGmailUI();
+  toast('Gmail saved!', 'ok');
+  document.getElementById('gm-status').textContent = '✓ Gmail configured — emails will open in Gmail compose.';
+}
+
+function testGmailConn() {
+  if (!config.gmEmail) { toast('Save Gmail first', 'err'); return; }
+  toast(`Gmail: ${config.gmEmail} ✓`, 'ok');
+}
+
+function disconnectGmail() {
+  if (!confirm('Disconnect Gmail?')) return;
+  delete config.gmEmail; delete config.gmPass;
+  persist();
+  document.getElementById('gm-email').value = '';
+  document.getElementById('gm-pass').value = '';
+  document.getElementById('c-from').value = '';
+  document.getElementById('gm-disconnect').style.display = 'none';
+  updateGmailUI();
+  toast('Gmail disconnected', 'info');
+}
+
+function updateGmailUI() {
+  const on = !!config.gmEmail;
+  const dot = document.getElementById('dot-gmail');
+  const lbl = document.getElementById('lbl-gmail');
+  const dashBadge = document.getElementById('dash-gmail-badge');
+  const composeBadge = document.getElementById('compose-gmail-badge');
+  if (dot) { dot.className = on ? 'pulse' : 'pulse off'; }
+  if (lbl) lbl.textContent = on ? config.gmEmail : 'Gmail not connected';
+  const badgeClass = on ? 'g-badge on' : 'g-badge off';
+  const badgeText = on ? '● Gmail: ' + config.gmEmail : 'Gmail not set up';
+  if (dashBadge) { dashBadge.className = badgeClass; dashBadge.textContent = badgeText; }
+  if (composeBadge) { composeBadge.className = badgeClass; composeBadge.textContent = badgeText; }
+  if (on && document.getElementById('c-from')) document.getElementById('c-from').value = config.gmEmail;
+}
+
+// ════════════════════════════════
+// PROFILE
+// ════════════════════════════════
+function saveProfile() {
+  ['p-biz','p-name','p-role','p-offering','p-benefits','p-web','p-phone'].forEach(f => {
+    const el = document.getElementById(f);
+    if (el) profile[f] = el.value;
+  });
+  persist();
+  updateSig();
+  toast('Profile saved!', 'ok');
+}
+
+function updateSig() {
+  const el = document.getElementById('sig-preview');
+  if (!el) return;
+  const n = profile['p-name'] || '[Your Name]';
+  const r = profile['p-role'] || '';
+  const b = profile['p-biz'] || '[Your Business]';
+  const ph = profile['p-phone'] || '';
+  const w = profile['p-web'] || '';
+  el.innerHTML = `<strong style="color:var(--text);font-family:var(--font)">${n}</strong>${r ? '<br><span style="color:var(--text2)">' + r + '</span>' : ''}<br><span style="color:var(--accent2)">${b}</span>${ph ? '<br>' + ph : ''}${w ? '<br><span style="color:var(--accent3)">' + w + '</span>' : ''}`;
+}
+
+// ════════════════════════════════
+// MODAL
+// ════════════════════════════════
+function openLeadModal(lead) {
+  document.getElementById('m-title').textContent = lead.name;
+  document.getElementById('m-sub').textContent = `${(lead.types||[lead.type]).join(', ')} · ${lead.city}`;
+  document.getElementById('m-body').innerHTML = `
+    <div style="display:grid;gap:10px;font-size:13px">
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;font-size:12px">
+        <span style="color:var(--text3);font-family:var(--mono)">Address</span>
+        <span>${lead.address}</span>
+        <span style="color:var(--text3);font-family:var(--mono)">Rating</span>
+        <span>${lead.rating ? '★ ' + lead.rating + ' (' + lead.totalRatings + ' reviews)' : 'Not rated'}</span>
+        <span style="color:var(--text3);font-family:var(--mono)">AI Score</span>
+        <span>${lead.aiScore ? `<span class="badge ${scoreBadge(lead.aiScore)}">${scoreLabel(lead.aiScore)}</span>` : '<span class="badge b-cold" style="opacity:.5">Not scored</span>'}</span>
+        ${lead.aiReason ? `<span style="color:var(--text3);font-family:var(--mono)">AI Reason</span><span style="color:var(--text2);font-family:var(--mono);font-size:11px">${lead.aiReason}</span>` : ''}
+        <span style="color:var(--text3);font-family:var(--mono)">Status</span>
+        <span><span class="badge ${lead.status === 'contacted' ? 'b-contacted' : 'b-new'}">${lead.status}</span></span>
+      </div>
+      <hr>
+      <div>
+        <label>Contact Email (add manually for Phase 2)</label>
+        <div style="display:flex;gap:8px">
+          <input type="email" id="modal-email" value="${lead.contactEmail||''}" placeholder="contact@company.com" style="flex:1">
+          <button class="btn btn-sm" onclick="saveLeadEmail('${lead.id}')">Save</button>
+        </div>
+      </div>
+      <hr>
+      <button class="btn btn-sm" style="width:fit-content" onclick="closeLeadModal();prefillCompose('${lead.id}')">Compose Email →</button>
+    </div>`;
+  document.getElementById('lead-modal').classList.add('open');
+}
+
+function saveLeadEmail(id) {
+  const lead = leads.find(l => l.id == id);
+  if (!lead) return;
+  lead.contactEmail = document.getElementById('modal-email').value.trim();
+  persist();
+  buildLeadSel();
+  toast('Contact saved!', 'ok');
+}
+
+function closeLeadModal() { document.getElementById('lead-modal').classList.remove('open'); }
+function closeModal(e) { if (e.target.id === 'lead-modal') closeLeadModal(); }
+
+// ════════════════════════════════
+// EXPORT
+// ════════════════════════════════
+function clearAllLeads() {
+  if (!leads.length) return;
+  if (!confirm('Clear all leads?')) return;
+  leads = [];
+  persist();
+  document.getElementById('leads-wrap').style.display = 'none';
+  document.getElementById('leads-tbody').innerHTML = '';
+  updateStats();
+  renderDashPipe();
+  renderPipeline();
+  buildLeadSel();
+  toast('Leads cleared', 'info');
+}
+
+function exportCSV() {
+  if (!leads.length) { toast('No leads to export', 'err'); return; }
+  const hdr = 'Company,Category,City,Rating,Reviews,AI Score,AI Reason,Contact Email,Status\n';
+  const rows = leads.map(l =>
+    `"${l.name}","${(l.types||[l.type]).join(';')}","${l.city}","${l.rating||''}","${l.totalRatings||''}","${l.aiScore||''}","${(l.aiReason||'').replace(/"/g,"'")}","${l.contactEmail||''}","${l.status}"`
+  ).join('\n');
+  const blob = new Blob([hdr+rows], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'leadai-leads.csv';
+  a.click();
+  toast('CSV exported!', 'ok');
+}
+
+// ════════════════════════════════
+// TOAST
+// ════════════════════════════════
+let toastTimer;
+function toast(msg, type='ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = `toast ${type}`, 3200);
+}
+</script>
+</body>
+</html>

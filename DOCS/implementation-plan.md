@@ -1,6 +1,6 @@
 # LeadAI Pro — Angular Implementation Plan
 
-> **Stack:** Angular 21 · Supabase (Auth + PostgreSQL) · Spartan UI · Tailwind CSS 4.1
+> **Stack:** Angular 21 · Supabase (Auth + PostgreSQL) · Express API · tRPC · Drizzle ORM · Spartan UI · Tailwind CSS 4.1
 
 ---
 
@@ -21,15 +21,31 @@ The Angular rebuild replaces `localStorage` with Supabase (PostgreSQL + Auth), a
 ## 2. Tech Stack
 
 | Layer | Choice | Reason |
-|---|---|---|
+| --- | --- | --- |
 | Framework | Angular 21.2 | Already scaffolded; signals, standalone components, SSR |
 | UI Components | Spartan UI (`@spartan-ng/ui-*`) | Headless Angular components with Tailwind styling, shadcn-style API |
 | Styling | Tailwind CSS 4.1 | Already configured via PostCSS |
-| Auth + Database | Supabase | Email/password auth, PostgreSQL, RLS, JS client |
-| AI Scoring | Anthropic Claude API | User supplies own key; client-side calls |
-| Lead Discovery | Google Places Text Search | User supplies own key; client-side via CORS proxy |
-| Email | Gmail Compose URL | Opens pre-filled Gmail tab — no SMTP needed |
+| Auth | Supabase Auth | Email/password auth, session management, JWT issuance |
+| Database | Supabase PostgreSQL + Drizzle ORM | Drizzle for type-safe server-side queries; Supabase hosts PostgreSQL |
+| API Server | Express + tRPC | Dedicated Node API server; tRPC enforces shared types across frontend/backend |
+| AI Scoring | Anthropic Claude API | User supplies key (stored server-side); backend-only calls |
+| Lead Discovery | Google Places Text Search | User supplies key (stored server-side); backend proxy — no CORS proxy needed |
+| Email | Gmail Compose URL | Opens pre-filled Gmail tab — no SMTP needed; URL built client-side (no secrets) |
 | Testing | Vitest | Already configured |
+
+### Responsibility split
+
+| Operation | Where |
+| --- | --- |
+| Sign in / Sign up / Sign out | Angular → Supabase Auth (client-side, by design) |
+| JWT verification | Express middleware (every protected tRPC call) |
+| Google Places search | Angular → tRPC → Express → Google API |
+| Claude scoring / email draft | Angular → tRPC → Express → Anthropic API |
+| Leads CRUD | Angular → tRPC → Express → Drizzle → Supabase PG |
+| Sent emails / Activity / Profile | Angular → tRPC → Express → Drizzle → Supabase PG |
+| User config (API keys) | Write: Angular → tRPC → backend saves; Read: backend returns booleans only — keys never leave server |
+| Gmail compose tab | Angular (URL construction only; no secret involved) |
+| CSV export | Angular (client-side Blob; no secret involved) |
 
 ---
 
@@ -1001,8 +1017,10 @@ export const appConfig: ApplicationConfig = {
 
 ## 15. Implementation Phases
 
+### Phase 1 — Frontend (complete ✓)
+
 | Phase | Work |
-|---|---|
+| --- | --- |
 | 1 | Supabase project creation, run schema SQL, enable RLS |
 | 2 | `environment.ts` setup, Supabase client, `npm install @supabase/supabase-js` |
 | 3 | Spartan UI installation (all components listed in §3.2) |
@@ -1020,6 +1038,20 @@ export const appConfig: ApplicationConfig = {
 | 15 | My Business / Profile feature |
 | 16 | SSR audit — wrap all `window`/`document` calls in `isPlatformBrowser` |
 | 17 | `ng build` bundle size audit, fix any budget overruns |
+
+### Phase 2 — Backend API (see `DOCS/phase2-backend-api.md`)
+
+| Phase | Work |
+| --- | --- |
+| 18 | `api/` package scaffold — Express, tRPC v11, Drizzle, Zod, dotenv |
+| 19 | Drizzle schema + DB connection (Supabase PostgreSQL direct URL) |
+| 20 | tRPC init — context, `protectedProcedure`, root router |
+| 21 | Backend routers — places, ai, leads, config, activity, email, profile |
+| 22 | Express wiring — CORS, tRPC adapter at `/api/trpc`, health endpoint |
+| 23 | Angular dev proxy — `/api` → `localhost:3001` |
+| 24 | Angular tRPC client — shared `AppRouter` type, auth header interceptor |
+| 25 | Frontend service refactor — replace Supabase direct calls + HTTP calls with tRPC |
+| 26 | Integration test + build audit (`ng build` + `npm run build` in `api/`) |
 
 ---
 
