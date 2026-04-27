@@ -5,15 +5,16 @@
 Set up `drizzle-kit` so the database schema defined in `api/src/db/schema.ts` is managed as versioned SQL migration files. This replaces the manual "run SQL in Supabase editor" step from Phase 1 with a repeatable, code-reviewed workflow.
 
 Key constraints:
-- Supabase's PgBouncer pooler (port 6543) does **not** support DDL migrations — migrations must use the **direct connection** (port 5432).
-- A separate `DIRECT_URL` env var provides the direct connection; `DATABASE_URL` keeps the pooler URL for runtime queries.
+
+- Supabase's PgBouncer pooler (port 6543) does **not** support DDL migrations — use the session-mode pooler (port 5432) instead.
+- A separate `DIRECT_URL` env var provides the session-mode connection; `DATABASE_URL` keeps the transaction-mode pooler URL for runtime queries.
 - Migration files are committed to git; the schema is the source of truth.
 
 ---
 
 ## Architecture
 
-```
+```text
 api/
 ├── drizzle.config.ts          drizzle-kit config (points to DIRECT_URL)
 ├── drizzle/
@@ -25,7 +26,7 @@ api/
 
 ---
 
-## Phase 27 — Install drizzle-kit + direct connection env var
+## Phase 27 — Install drizzle-kit + session-mode env var
 
 ```bash
 cd api
@@ -33,15 +34,18 @@ npm install --save-dev drizzle-kit
 ```
 
 Add `DIRECT_URL` to `api/.env`:
-```
+
+```env
 DIRECT_URL=postgresql://postgres.[project-ref]:[password]@aws-0-eu-west-1.pooler.supabase.com:5432/postgres
 ```
 
-> The direct URL uses port **5432** (not 6543). Get it from:
-> Supabase → Settings → Database → Connection string → "URI" (not the pooler)
+> Uses Supabase's **session-mode pooler** (port 5432 on the pooler host, NOT the direct `db.*.supabase.co` host).
+> The true direct connection (`db.*.supabase.co:5432`) is blocked by most residential/corporate networks.
+> Session mode supports advisory locks and DDL — the same things drizzle-kit needs.
+> Transaction mode (port 6543) does NOT work for migrations.
 
-- [ ] `drizzle-kit` installed as dev dependency
-- [ ] `DIRECT_URL` added to `api/.env` (port 5432)
+- [x] `drizzle-kit` installed as dev dependency
+- [x] `DIRECT_URL` added to `api/.env` (session-mode pooler port 5432)
 
 ---
 
@@ -59,11 +63,12 @@ export default defineConfig({
   dialect: 'postgresql',
   dbCredentials: {
     url: process.env.DIRECT_URL!,
+    ssl: true,
   },
 });
 ```
 
-- [ ] `drizzle.config.ts` created
+- [x] `drizzle.config.ts` created
 
 ---
 
@@ -74,9 +79,9 @@ cd api
 npx drizzle-kit generate
 ```
 
-This reads `src/db/schema.ts` and writes `drizzle/0000_initial_schema.sql`.
+This reads `src/db/schema.ts` and writes `drizzle/0000_glamorous_barracuda.sql` (5 tables).
 
-- [ ] `drizzle/0000_initial_schema.sql` generated
+- [x] Initial migration SQL generated
 
 ---
 
@@ -98,23 +103,22 @@ Add to `api/package.json` scripts:
 - `db:studio` — open Drizzle Studio (browser DB explorer)
 - `db:push` — push schema directly to DB without migration files (dev only)
 
-- [ ] Migration scripts added to `package.json`
+- [x] Migration scripts added to `package.json`
 
 ---
 
-## Phase 31 — Apply initial migration
+## Phase 31 — Sync schema with Supabase
+
+Tables already existed from the Phase 1 manual SQL, so `db:push` was used to sync:
 
 ```bash
 cd api
-npm run db:migrate
+npm run db:push
 ```
 
-Verifies the migration applies cleanly. If the tables already exist in Supabase (created manually in Phase 1), the migration will fail with "already exists". Options:
-- Skip applying if Supabase already has the schema
-- Or mark migration as applied: `npx drizzle-kit migrate --skip-already-applied` (if supported)
-- Or use `db:push` for the first sync: `npm run db:push`
+Output: `[✓] Changes applied` — schema is in sync.
 
-- [ ] Migration applied (or schema verified in sync with Supabase)
+- [x] Schema verified in sync with Supabase via `db:push`
 
 ---
 
