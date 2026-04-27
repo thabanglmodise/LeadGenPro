@@ -1,0 +1,76 @@
+<div class="page">
+  <div class="page__header">
+    <h1 class="page__title">Pipeline</h1>
+    <p class="page__subtitle">Track your leads through the sales funnel</p>
+  </div>
+
+  <div class="kanban">
+    <div class="kanban__col">
+      <p class="kanban__col-title">New ({{ leadsService.newLeads().length }})</p>
+      @for (lead of leadsService.newLeads(); track lead.id) {
+        <div class="kanban__card">
+          <p class="kanban__card-name">{{ lead.name }}</p>
+          <p class="kanban__card-city">{{ lead.city }}</p>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px;">
+            <app-lead-score-badge [score]="lead.ai_score" />
+            <a [routerLink]="['/compose']" [queryParams]="{leadId: lead.id}"
+               style="font-size:11px; color:hsl(var(--accent)); text-decoration:none;">
+              Compose →
+            </a>
+          </div>
+        </div>
+      }
+      @if (leadsService.newLeads().length === 0) {
+        <p class="kanban__empty">No new leads</p>
+      }
+    </div>
+
+    <div class="kanban__col">
+      <p class="kanban__col-title">Contacted ({{ leadsService.contactedList().length }})</p>
+      @for (lead of leadsService.contactedList(); track lead.id) {
+        <div class="kanban__card">
+          <p class="kanban__card-name">{{ lead.name }}</p>
+          <p class="kanban__card-city">{{ lead.city }}</p>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px;">
+            <app-lead-score-badge [score]="lead.ai_score" />
+            <a [routerLink]="['/compose']" [queryParams]="{leadId: lead.id}"
+               style="font-size:11px; color:hsl(var(--accent)); text-decoration:none;">
+              Compose →
+            </a>
+          </div>
+        </div>
+      }
+      @if (leadsService.contactedList().length === 0) {
+        <p class="kanban__empty">No contacted leads</p>
+      }
+    </div>
+
+    <div class="kanban__col">
+      <p class="kanban__col-title">Replied ({{ leadsService.repliedList().length }})</p>
+      @for (lead of leadsService.repliedList(); track lead.id) {
+        <div class="kanban__card">
+          <p class="kanban__card-name">{{ lead.name }}</p>
+          <p class="kanban__card-city">{{ lead.city }}</p>
+          <app-lead-score-badge [score]="lead.ai_score" />
+        </div>
+      }
+      @if (leadsService.repliedList().length === 0) {
+        <p class="kanban__empty">None yet</p>
+      }
+    </div>
+
+    <div class="kanban__col">
+      <p class="kanban__col-title">Converted ({{ leadsService.convertedList().length }})</p>
+      @for (lead of leadsService.convertedList(); track lead.id) {
+        <div class="kanban__card">
+          <p class="kanban__card-name">{{ lead.name }}</p>
+          <p class="kanban__card-city">{{ lead.city }}</p>
+          <app-lead-score-badge [score]="lead.ai_score" />
+        </div>
+      }
+      @if (leadsService.convertedList().length === 0) {
+        <p class="kanban__empty">None yet</p>
+      }
+    </div>
+  </div>
+</div>

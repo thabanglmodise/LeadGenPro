@@ -1,0 +1,43 @@
+<div class="auth">
+  <div class="auth__card">
+    <h1 class="auth__title">⚡ LeadAI Pro</h1>
+    <p class="auth__subtitle">Sign in to your account</p>
+
+    @if (error()) {
+      <div class="auth__error">{{ error() }}</div>
+    }
+
+    <form class="auth__form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="auth__field">
+        <label class="auth__label" for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          class="auth__input"
+          formControlName="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+        />
+      </div>
+      <div class="auth__field">
+        <label class="auth__label" for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          class="auth__input"
+          formControlName="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+        />
+      </div>
+      <button type="submit" class="auth__btn" [disabled]="form.invalid || loading()">
+        {{ loading() ? 'Signing in…' : 'Sign in' }}
+      </button>
+    </form>
+
+    <div class="auth__links">
+      <a routerLink="/auth/signup">Create account</a>
+      <a routerLink="/auth/reset">Forgot password?</a>
+    </div>
+  </div>
+</div>

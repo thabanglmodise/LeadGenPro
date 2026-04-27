@@ -1,0 +1,71 @@
+<div class="page">
+  <div class="page__header">
+    <h1 class="page__title">API Setup</h1>
+    <p class="page__subtitle">Connect your API keys to enable lead discovery and AI features</p>
+  </div>
+
+  <form [formGroup]="form">
+    <!-- Google Places -->
+    <div class="section-card">
+      <p class="section-card__title">🔍 Google Places API</p>
+      <p class="section-card__subtitle">Required for finding local businesses</p>
+      <ol class="setup-steps">
+        <li class="setup-step">Go to <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a></li>
+        <li class="setup-step">Create or select a project → Enable the <strong>Places API</strong></li>
+        <li class="setup-step">Go to Credentials → Create API Key → paste below</li>
+      </ol>
+      <div style="display:flex; gap:10px; align-items:flex-end;">
+        <div class="field" style="flex:1;">
+          <label class="field__label">API Key</label>
+          <input type="password" class="field__input" formControlName="gp_key" placeholder="AIza…" />
+        </div>
+        <button type="button" class="btn btn--secondary" (click)="testGoogle()" [disabled]="testingGoogle()">
+          {{ testingGoogle() ? 'Testing…' : 'Test' }}
+        </button>
+      </div>
+      @if (googleStatus()) {
+        <p style="margin-top:8px; font-size:13px; color:hsl(var(--muted))">{{ googleStatus() }}</p>
+      }
+    </div>
+
+    <!-- Anthropic Claude -->
+    <div class="section-card">
+      <p class="section-card__title">✨ Anthropic Claude API</p>
+      <p class="section-card__subtitle">Required for AI lead scoring and email drafting</p>
+      <ol class="setup-steps">
+        <li class="setup-step">Go to <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></li>
+        <li class="setup-step">Go to API Keys → Create Key → paste below</li>
+      </ol>
+      <div style="display:flex; gap:10px; align-items:flex-end;">
+        <div class="field" style="flex:1;">
+          <label class="field__label">API Key</label>
+          <input type="password" class="field__input" formControlName="cl_key" placeholder="sk-ant-…" />
+        </div>
+        <button type="button" class="btn btn--secondary" (click)="testClaude()" [disabled]="testingClaude()">
+          {{ testingClaude() ? 'Testing…' : 'Test' }}
+        </button>
+      </div>
+      @if (claudeStatus()) {
+        <p style="margin-top:8px; font-size:13px; color:hsl(var(--muted))">{{ claudeStatus() }}</p>
+      }
+    </div>
+
+    <!-- Gmail -->
+    <div class="section-card">
+      <p class="section-card__title">📧 Gmail Address</p>
+      <p class="section-card__subtitle">Your Gmail address for the "Send via Gmail" feature</p>
+      <ol class="setup-steps">
+        <li class="setup-step">Enter the Gmail address you want emails sent from</li>
+        <li class="setup-step">The app opens Gmail Compose in a new tab — no SMTP or permissions needed</li>
+      </ol>
+      <div class="field" style="max-width:400px;">
+        <label class="field__label">Gmail Address</label>
+        <input type="email" class="field__input" formControlName="gm_email" placeholder="you@gmail.com" />
+      </div>
+    </div>
+
+    <button type="button" class="btn btn--primary" (click)="save()" [disabled]="saving()">
+      {{ saving() ? 'Saving…' : 'Save All Settings' }}
+    </button>
+  </form>
+</div>
