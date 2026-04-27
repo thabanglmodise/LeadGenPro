@@ -1,7 +1,7 @@
 import { PLATFORM_ID, Injectable, computed, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { SentEmail } from '../models/sent-email.model';
-import { supabase } from '../supabase.client';
+import { trpc } from '../trpc.client';
 
 @Injectable({ providedIn: 'root' })
 export class EmailService {
@@ -10,23 +10,15 @@ export class EmailService {
   readonly sent = this._sent.asReadonly();
   readonly sentCount = computed(() => this._sent().length);
 
-  async load(userId: string): Promise<void> {
-    const { data } = await supabase
-      .from('sent_emails')
-      .select('id, to_email, subject, sent_at')
-      .eq('user_id', userId)
-      .order('sent_at', { ascending: false });
-    this._sent.set((data as SentEmail[]) ?? []);
+  async load(): Promise<void> {
+    const data = await trpc.email.list.query();
+    this._sent.set(data as SentEmail[]);
   }
 
-  async logSent(to: string, subject: string, body: string, userId: string): Promise<void> {
-    const { data } = await supabase
-      .from('sent_emails')
-      .insert({ user_id: userId, to_email: to, subject, body })
-      .select('id, to_email, subject, sent_at')
-      .single();
-    if (data) {
-      this._sent.update(s => [data as SentEmail, ...s]);
+  async logSent(to: string, subject: string, body: string): Promise<void> {
+    const entry = await trpc.email.log.mutate({ to_email: to, subject, body });
+    if (entry) {
+      this._sent.update(s => [entry as SentEmail, ...s]);
     }
   }
 
@@ -39,7 +31,9 @@ export class EmailService {
   exportCSV(rows: Record<string, unknown>[], filename: string): void {
     if (!isPlatformBrowser(this.platformId)) return;
     const header = Object.keys(rows[0] ?? {}).join(',');
-    const body = rows.map(r => Object.values(r).map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+    const body = rows
+      .map(r => Object.values(r).map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','))
+      .join('\n');
     const blob = new Blob([`${header}\n${body}`], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -49,8 +43,8 @@ export class EmailService {
     URL.revokeObjectURL(url);
   }
 
-  async clearLog(userId: string): Promise<void> {
-    await supabase.from('sent_emails').delete().eq('user_id', userId);
+  async clearLog(): Promise<void> {
+    await trpc.email.clearLog.mutate();
     this._sent.set([]);
   }
 }

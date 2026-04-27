@@ -40,9 +40,8 @@ export class FindLeadsComponent implements OnInit {
 
   async ngOnInit() {
     await this.leadsService.loadLeads();
-    const userId = this.auth.user()?.id;
-    if (userId) {
-      await this.config.load(userId);
+    if (this.auth.user()?.id) {
+      await this.config.load();
     }
     this.displayedLeads.set(this.leadsService.leads());
   }
@@ -57,7 +56,7 @@ export class FindLeadsComponent implements OnInit {
     this.error.set('');
     const { businessType, city, offering } = this.form.value;
 
-    this.places.search(businessType!, city!, this.config.config()!.gp_key).subscribe({
+    this.places.search(businessType!, city!).subscribe({
       next: async (results) => {
         const newLeads = results.map(r => ({
           name: r.name,
@@ -102,7 +101,7 @@ export class FindLeadsComponent implements OnInit {
     }
     let done = 0;
     for (const batch of batches) {
-      this.claude.scoreBatch(batch, offering, this.config.config()!.cl_key).subscribe({
+      this.claude.scoreBatch(batch, offering).subscribe({
         next: async (scores) => {
           for (const s of scores) {
             await this.leadsService.updateLead(s.id, { ai_score: s.score, ai_reason: s.reason });

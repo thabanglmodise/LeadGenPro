@@ -17,17 +17,16 @@ export class DashboardComponent implements OnInit {
   protected readonly leadsService = inject(LeadsService);
   protected readonly emailService = inject(EmailService);
   protected readonly activityService = inject(ActivityService);
-  private readonly auth = inject(AuthService);
+  protected readonly auth = inject(AuthService);
 
   readonly recentActivity = this.activityService.activity;
 
   async ngOnInit() {
-    const userId = this.auth.user()?.id;
-    if (!userId) return;
+    if (!this.auth.user()?.id) return;
     await Promise.all([
       this.leadsService.loadLeads(),
-      this.emailService.load(userId),
-      this.activityService.load(userId),
+      this.emailService.load(),
+      this.activityService.load(),
     ]);
   }
 }

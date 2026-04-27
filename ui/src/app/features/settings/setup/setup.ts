@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
 import { ConfigService } from '../../../core/services/config.service';
+import { trpc } from '../../../core/trpc.client';
 
 @Component({
   selector: 'app-setup',
@@ -15,7 +15,6 @@ export class SetupComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   protected readonly config = inject(ConfigService);
-  private readonly http = inject(HttpClient);
 
   readonly form = this.fb.group({
     gp_key: [''],
@@ -30,56 +29,47 @@ export class SetupComponent implements OnInit {
   readonly claudeStatus = signal('');
 
   async ngOnInit() {
-    const userId = this.auth.user()?.id;
-    if (userId) {
-      await this.config.load(userId);
-      const cfg = this.config.config();
-      if (cfg) {
-        this.form.patchValue({ gp_key: cfg.gp_key, cl_key: cfg.cl_key, gm_email: cfg.gm_email });
-      }
-    }
+    if (!this.auth.user()?.id) return;
+    await this.config.load();
+    this.form.patchValue({ gm_email: this.config.gmEmail() });
   }
 
   async save() {
-    const userId = this.auth.user()?.id;
-    if (!userId) return;
+    if (!this.auth.user()?.id) return;
     this.saving.set(true);
+    const v = this.form.value;
     await this.config.save({
-      gp_key: this.form.value.gp_key ?? '',
-      cl_key: this.form.value.cl_key ?? '',
-      gm_email: this.form.value.gm_email ?? '',
-    }, userId);
+      ...(v.gp_key ? { gp_key: v.gp_key } : {}),
+      ...(v.cl_key ? { cl_key: v.cl_key } : {}),
+      ...(v.gm_email ? { gm_email: v.gm_email } : {}),
+    });
+    this.form.patchValue({ gp_key: '', cl_key: '' });
     this.saving.set(false);
   }
 
-  testGoogle() {
-    const key = this.form.value.gp_key;
-    if (!key) { this.googleStatus.set('❌ No key entered'); return; }
+  async testGoogle() {
     this.testingGoogle.set(true);
     this.googleStatus.set('');
-    const query = encodeURIComponent('coffee shop in New York');
-    const target = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&key=${key}`;
-    this.http.get<{ status: string }>(`https://corsproxy.io/?${encodeURIComponent(target)}`).subscribe({
-      next: (res) => {
-        this.googleStatus.set(res.status === 'OK' || res.status === 'ZERO_RESULTS' ? '✓ Connected' : `❌ ${res.status}`);
-        this.testingGoogle.set(false);
-      },
-      error: () => { this.googleStatus.set('❌ Request failed'); this.testingGoogle.set(false); },
-    });
+    try {
+      const result = await trpc.config.testGoogle.query();
+      this.googleStatus.set(result.ok ? '✓ Connected' : `❌ ${result.status}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Request failed';
+      this.googleStatus.set(`❌ ${msg}`);
+    }
+    this.testingGoogle.set(false);
   }
 
-  testClaude() {
-    const key = this.form.value.cl_key;
-    if (!key) { this.claudeStatus.set('❌ No key entered'); return; }
+  async testClaude() {
     this.testingClaude.set(true);
     this.claudeStatus.set('');
-    this.http.post<{ content: { text: string }[] }>(
-      'https://api.anthropic.com/v1/messages',
-      { model: 'claude-haiku-4-5-20251001', max_tokens: 10, messages: [{ role: 'user', content: 'Hi' }] },
-      { headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' } }
-    ).subscribe({
-      next: () => { this.claudeStatus.set('✓ Connected'); this.testingClaude.set(false); },
-      error: () => { this.claudeStatus.set('❌ Invalid key'); this.testingClaude.set(false); },
-    });
+    try {
+      const result = await trpc.config.testClaude.query();
+      this.claudeStatus.set(result.ok ? '✓ Connected' : '❌ Invalid key');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Request failed';
+      this.claudeStatus.set(`❌ ${msg}`);
+    }
+    this.testingClaude.set(false);
   }
 }

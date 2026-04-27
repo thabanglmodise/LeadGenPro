@@ -37,9 +37,8 @@ export class ProfileComponent implements OnInit {
   });
 
   async ngOnInit() {
-    const userId = this.auth.user()?.id;
-    if (!userId) return;
-    await this.profileService.load(userId);
+    if (!this.auth.user()?.id) return;
+    await this.profileService.load();
     const p = this.profileService.profile();
     if (p) {
       this.form.patchValue({
@@ -55,11 +54,10 @@ export class ProfileComponent implements OnInit {
   }
 
   async save() {
-    const userId = this.auth.user()?.id;
-    if (!userId) return;
+    if (!this.auth.user()?.id) return;
     this.saving.set(true);
     this.saved.set(false);
-    await this.profileService.save(this.form.value as any, userId);
+    await this.profileService.save(this.form.value as any);
     this.saving.set(false);
     this.saved.set(true);
   }

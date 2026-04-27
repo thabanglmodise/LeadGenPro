@@ -16,14 +16,12 @@ export class SentComponent implements OnInit {
   readonly confirming = signal(false);
 
   async ngOnInit() {
-    const userId = this.auth.user()?.id;
-    if (userId) await this.emailService.load(userId);
+    if (this.auth.user()?.id) await this.emailService.load();
   }
 
   async clearLog() {
-    const userId = this.auth.user()?.id;
-    if (!userId) return;
-    await this.emailService.clearLog(userId);
+    if (!this.auth.user()?.id) return;
+    await this.emailService.clearLog();
     this.confirming.set(false);
   }
 }

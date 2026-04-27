@@ -63,14 +63,13 @@ export class ComposeComponent implements OnInit {
   readonly templates = ['Cold Intro', 'Value Prop', 'Problem-Solution', 'Follow-Up'];
 
   async ngOnInit() {
-    const userId = this.auth.user()?.id;
-    if (!userId) return;
+    if (!this.auth.user()?.id) return;
     await Promise.all([
       this.leadsService.loadLeads(),
-      this.config.load(userId),
-      this.profile.load(userId),
+      this.config.load(),
+      this.profile.load(),
     ]);
-    this.form.patchValue({ from: this.config.config()?.gm_email ?? '' });
+    this.form.patchValue({ from: this.config.gmEmail() });
     const leadId = this.route.snapshot.queryParamMap.get('leadId');
     if (leadId) {
       this.form.patchValue({ leadId });
@@ -79,7 +78,7 @@ export class ComposeComponent implements OnInit {
   }
 
   onLeadSelect(id: string) {
-    const lead = this.leadsService.leads().find(l => l.id === id);
+    const lead = this.leadsService.leads().find((l: Lead) => l.id === id);
     if (!lead) return;
     this.form.patchValue({
       contactName: lead.contact_name,
@@ -95,7 +94,7 @@ export class ComposeComponent implements OnInit {
       return;
     }
     const leadId = this.form.value.leadId;
-    const lead = this.leadsService.leads().find(l => l.id === leadId);
+    const lead = this.leadsService.leads().find((l: Lead) => l.id === leadId);
     if (!lead) { this.applyFallback(); return; }
 
     this.drafting.set(true);
@@ -108,7 +107,7 @@ export class ComposeComponent implements OnInit {
       benefits: p?.benefits ?? '',
       tone: this.form.value.tone ?? 'Professional',
       template: this.form.value.template ?? 'Cold Intro',
-    }, this.config.config()!.cl_key).subscribe({
+    }).subscribe({
       next: (draft) => {
         this.form.patchValue({ subject: draft.subject, body: draft.body });
         this.drafting.set(false);
@@ -142,11 +141,10 @@ export class ComposeComponent implements OnInit {
     }
     this.sending.set(true);
     this.emailService.openGmailCompose(v.to!, v.subject!, v.body!);
-    const userId = this.auth.user()!.id;
-    await this.emailService.logSent(v.to!, v.subject!, v.body!, userId);
+    await this.emailService.logSent(v.to!, v.subject!, v.body!);
     if (v.leadId) {
       await this.leadsService.updateLead(v.leadId!, { status: 'contacted' });
-      await this.activityService.add(`Email sent to ${v.to} (${v.company})`, userId);
+      await this.activityService.add(`Email sent to ${v.to} (${v.company})`);
     }
     this.sent.set(true);
     this.sending.set(false);
