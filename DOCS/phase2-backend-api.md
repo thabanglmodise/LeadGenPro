@@ -100,7 +100,7 @@ SUPABASE_SERVICE_ROLE_KEY=[service-role-key]
 > `DATABASE_URL` is the direct PostgreSQL connection string from Supabase → Settings → Database → Connection string (not the JS client URL).
 > `SUPABASE_SERVICE_ROLE_KEY` is used only to verify JWTs via `supabaseAdmin.auth.getUser()`.
 
-- [ ] Scaffold complete
+- [x] Scaffold complete
 
 ---
 
@@ -184,8 +184,8 @@ export const db = drizzle(client, { schema });
 export type DB = typeof db;
 ```
 
-- [ ] Schema complete
-- [ ] DB connection complete
+- [x] Schema complete
+- [x] DB connection complete
 
 ---
 
@@ -256,9 +256,9 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
 });
 ```
 
-- [ ] tRPC init complete
-- [ ] Context complete
-- [ ] protectedProcedure complete
+- [x] tRPC init complete
+- [x] Context complete
+- [x] protectedProcedure complete
 
 ---
 
@@ -514,14 +514,14 @@ export const appRouter = router({
 export type AppRouter = typeof appRouter;
 ```
 
-- [ ] `places` router complete
-- [ ] `ai` router complete
-- [ ] `leads` router complete
-- [ ] `config` router complete
-- [ ] `activity` router complete
-- [ ] `email` router complete
-- [ ] `profile` router complete
-- [ ] Root router + `AppRouter` type export complete
+- [x] `places` router complete
+- [x] `ai` router complete
+- [x] `leads` router complete
+- [x] `config` router complete
+- [x] `activity` router complete
+- [x] `email` router complete
+- [x] `profile` router complete
+- [x] Root router + `AppRouter` type export complete
 
 ---
 
@@ -553,10 +553,10 @@ const port = process.env.PORT ?? 3001;
 app.listen(port, () => console.log(`API server listening on http://localhost:${port}`));
 ```
 
-- [ ] Express app wired
-- [ ] CORS configured for Angular dev + SSR ports
-- [ ] `/api/trpc` handler mounted
-- [ ] `/api/health` endpoint added
+- [x] Express app wired
+- [x] CORS configured for Angular dev + SSR ports
+- [x] `/api/trpc` handler mounted
+- [x] `/api/health` endpoint added
 
 ---
 
@@ -582,8 +582,8 @@ Update `leadGenPro/angular.json` → `projects.leadGenPro.architect.serve.option
 }
 ```
 
-- [ ] `proxy.conf.json` created
-- [ ] `angular.json` updated with `proxyConfig`
+- [x] `proxy.conf.json` created
+- [x] `angular.json` updated with `proxyConfig`
 
 ---
 
@@ -612,7 +612,7 @@ export const trpc = createTRPCClient<AppRouter>({
 
 > The `import type { AppRouter }` is a type-only import — it is erased at build time and adds zero runtime bytes to the Angular bundle. TypeScript resolves it at compile time from the sibling `api/` package.
 
-- [ ] tRPC client created with auth header interceptor
+- [x] tRPC client created with auth header interceptor
 
 ---
 
@@ -655,14 +655,14 @@ async loadLeads(): Promise<void> {
 - `HttpClient` usage in `places.service.ts` and `claude.service.ts` (replaced by tRPC)
 - `apiKey` parameters from `PlacesService.search()` and `ClaudeService.scoreBatch()` / `draftEmail()` signatures
 
-- [ ] `leads.service.ts` refactored
-- [ ] `config.service.ts` refactored (boolean flags only)
-- [ ] `activity.service.ts` refactored
-- [ ] `email.service.ts` refactored (DB calls only; Gmail/CSV helpers unchanged)
-- [ ] `profile.service.ts` refactored
-- [ ] `places.service.ts` refactored (tRPC, no CORS proxy)
-- [ ] `claude.service.ts` refactored (tRPC, no API key param)
-- [ ] API key params removed from `find-leads.ts` component calls
+- [x] `leads.service.ts` refactored
+- [x] `config.service.ts` refactored (boolean flags only)
+- [x] `activity.service.ts` refactored
+- [x] `email.service.ts` refactored (DB calls only; Gmail/CSV helpers unchanged)
+- [x] `profile.service.ts` refactored
+- [x] `places.service.ts` refactored (tRPC, no CORS proxy)
+- [x] `claude.service.ts` refactored (tRPC, no API key param)
+- [x] API key params removed from `find-leads.ts` component calls
 
 ---
 
@@ -682,14 +682,14 @@ cd leadGenPro && ng build
 
 ### Checklist
 
-- [ ] `GET /api/health` returns `{ ok: true }`
-- [ ] Unauthenticated tRPC call returns `UNAUTHORIZED`
-- [ ] Login flow works (Supabase Auth, client-side unchanged)
-- [ ] Dashboard loads leads, sent emails, activity via tRPC
-- [ ] Find Leads search calls `trpc.places.search` — no CORS proxy in network tab
-- [ ] AI scoring calls `trpc.ai.score` — no Anthropic URL in browser network tab
-- [ ] API key fields in Settings save via tRPC; retrieving settings shows boolean badges only
-- [ ] Test Connection buttons hit backend, return real status
-- [ ] Gmail compose opens pre-filled tab
-- [ ] `ng build` passes under 600kB warning budget
-- [ ] `npm run build` in `api/` compiles without TypeScript errors
+- [x] `GET /api/health` returns `{ ok: true }`
+- [x] Unauthenticated tRPC call returns `UNAUTHORIZED`
+- [x] Login flow works (Supabase Auth, client-side unchanged)
+- [x] Dashboard loads leads, sent emails, activity via tRPC
+- [x] Find Leads search calls `trpc.places.search` — no CORS proxy in network tab
+- [x] AI scoring calls `trpc.ai.score` — no Anthropic URL in browser network tab
+- [x] API key fields in Settings save via tRPC; retrieving settings shows boolean badges only
+- [x] Test Connection buttons hit backend, return real status
+- [x] Gmail compose opens pre-filled tab
+- [x] `ng build` passes under 600kB warning budget
+- [x] `npm run build` in `api/` compiles without TypeScript errors
