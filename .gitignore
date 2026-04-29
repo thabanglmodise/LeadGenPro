@@ -1,3 +1,5 @@
+ui/src/environments/*
+
 CLAUDE.md
 api/.env
 ui/src/environments/environment.prod.ts

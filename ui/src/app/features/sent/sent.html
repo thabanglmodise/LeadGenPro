@@ -1,0 +1,48 @@
+<div class="page">
+  <div class="page__header" style="display:flex; align-items:center; justify-content:space-between;">
+    <div>
+      <h1 class="page__title">Sent Emails</h1>
+      <p class="page__subtitle">History of emails opened via Gmail compose</p>
+    </div>
+    @if (emailService.sentCount() > 0) {
+      <div>
+        @if (!confirming()) {
+          <button class="btn btn--danger" (click)="confirming.set(true)">Clear Log</button>
+        } @else {
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span style="font-size:13px; color:hsl(var(--muted))">Are you sure?</span>
+            <button class="btn btn--danger btn--sm" (click)="clearLog()">Yes, clear</button>
+            <button class="btn btn--secondary btn--sm" (click)="confirming.set(false)">Cancel</button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  @if (emailService.sent().length > 0) {
+    <div class="section-card" style="padding:0; overflow:hidden;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>TO</th>
+            <th>Subject</th>
+            <th>Sent</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (email of emailService.sent(); track email.id) {
+            <tr>
+              <td>{{ email.to_email }}</td>
+              <td>{{ email.subject }}</td>
+              <td>{{ email.sent_at | date:'medium' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div style="text-align:center; padding:60px; color:hsl(var(--muted)); font-size:14px;">
+      No sent emails yet. Use Compose & Send to reach out to leads.
+    </div>
+  }
+</div>

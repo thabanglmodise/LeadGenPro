@@ -1,0 +1,152 @@
+import {
+  ChangeDetectionStrategy, Component, OnInit, inject, signal
+} from '@angular/core';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Lead } from '../../core/models/lead.model';
+import { ActivityService } from '../../core/services/activity.service';
+import { AuthService } from '../../core/services/auth.service';
+import { ClaudeService } from '../../core/services/claude.service';
+import { ConfigService } from '../../core/services/config.service';
+import { EmailService } from '../../core/services/email.service';
+import { LeadsService } from '../../core/services/leads.service';
+import { ProfileService } from '../../core/services/profile.service';
+
+const FALLBACK_SUBJECT = 'Quick introduction from {senderName}';
+const FALLBACK_BODY = `Hi {contactName},
+
+I wanted to reach out about {company}. We offer {offering} that could help your business.
+
+Would you be open to a quick call?
+
+Best,
+{senderName}`;
+
+@Component({
+  selector: 'app-compose',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ReactiveFormsModule],
+  templateUrl: './compose.html',
+})
+export class ComposeComponent implements OnInit {
+  private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  protected readonly leadsService = inject(LeadsService);
+  protected readonly config = inject(ConfigService);
+  private readonly profile = inject(ProfileService);
+  private readonly claude = inject(ClaudeService);
+  private readonly emailService = inject(EmailService);
+  private readonly activityService = inject(ActivityService);
+  private readonly auth = inject(AuthService);
+
+  readonly form = this.fb.group({
+    leadId: [''],
+    contactName: [''],
+    jobTitle: [''],
+    company: [''],
+    website: [''],
+    tone: ['Professional'],
+    template: ['Cold Intro'],
+    to: [''],
+    from: [''],
+    subject: [''],
+    body: [''],
+  });
+
+  readonly drafting = signal(false);
+  readonly sending = signal(false);
+  readonly error = signal('');
+  readonly sent = signal(false);
+
+  readonly tones = ['Professional', 'Friendly', 'Consultative', 'Urgent'];
+  readonly templates = ['Cold Intro', 'Value Prop', 'Problem-Solution', 'Follow-Up'];
+
+  async ngOnInit() {
+    if (!this.auth.user()?.id) return;
+    await Promise.all([
+      this.leadsService.loadLeads(),
+      this.config.load(),
+      this.profile.load(),
+    ]);
+    this.form.patchValue({ from: this.config.gmEmail() });
+    const leadId = this.route.snapshot.queryParamMap.get('leadId');
+    if (leadId) {
+      this.form.patchValue({ leadId });
+      this.onLeadSelect(leadId);
+    }
+  }
+
+  onLeadSelect(id: string) {
+    const lead = this.leadsService.leads().find((l: Lead) => l.id === id);
+    if (!lead) return;
+    this.form.patchValue({
+      contactName: lead.contact_name,
+      company: lead.name,
+      website: lead.website,
+      to: lead.contact_email,
+    });
+  }
+
+  async draftEmail() {
+    if (!this.config.hasClaudeKey()) {
+      this.applyFallback();
+      return;
+    }
+    const leadId = this.form.value.leadId;
+    const lead = this.leadsService.leads().find((l: Lead) => l.id === leadId);
+    if (!lead) { this.applyFallback(); return; }
+
+    this.drafting.set(true);
+    const p = this.profile.profile();
+    this.claude.draftEmail({
+      lead,
+      senderName: p?.full_name ?? '',
+      senderRole: p?.role ?? '',
+      offering: p?.offering ?? '',
+      benefits: p?.benefits ?? '',
+      tone: this.form.value.tone ?? 'Professional',
+      template: this.form.value.template ?? 'Cold Intro',
+    }).subscribe({
+      next: (draft) => {
+        this.form.patchValue({ subject: draft.subject, body: draft.body });
+        this.drafting.set(false);
+      },
+      error: (err: Error) => {
+        this.error.set(err.message);
+        this.applyFallback();
+        this.drafting.set(false);
+      },
+    });
+  }
+
+  private applyFallback() {
+    const v = this.form.value;
+    const p = this.profile.profile();
+    this.form.patchValue({
+      subject: FALLBACK_SUBJECT.replace('{senderName}', p?.full_name ?? 'us'),
+      body: FALLBACK_BODY
+        .replace('{contactName}', v.contactName || 'there')
+        .replace('{company}', v.company || 'your company')
+        .replace('{offering}', p?.offering || 'our services')
+        .replace('{senderName}', p?.full_name || 'the team'),
+    });
+  }
+
+  async sendEmail() {
+    const v = this.form.value;
+    if (!v.to || !v.subject || !v.body) {
+      this.error.set('TO, SUBJECT, and body are required.');
+      return;
+    }
+    this.sending.set(true);
+    this.emailService.openGmailCompose(v.to!, v.subject!, v.body!);
+    await this.emailService.logSent(v.to!, v.subject!, v.body!);
+    if (v.leadId) {
+      await this.leadsService.updateLead(v.leadId!, { status: 'contacted' });
+      await this.activityService.add(`Email sent to ${v.to} (${v.company})`);
+    }
+    this.sent.set(true);
+    this.sending.set(false);
+  }
+}

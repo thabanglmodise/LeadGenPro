@@ -1,0 +1,100 @@
+<div class="page">
+  <div class="page__header">
+    <h1 class="page__title">Dashboard</h1>
+    <p class="page__subtitle">Your lead generation overview</p>
+  </div>
+
+  <!-- Stats grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <p class="stat-card__label">Total Leads</p>
+      <p class="stat-card__value">{{ leadsService.totalLeads() }}</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-card__label">Hot Leads</p>
+      <p class="stat-card__value stat-card__value--hot">{{ leadsService.hotLeads() }}</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-card__label">Emails Sent</p>
+      <p class="stat-card__value stat-card__value--accent">{{ emailService.sentCount() }}</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-card__label">Contacted</p>
+      <p class="stat-card__value stat-card__value--success">{{ leadsService.contactedLeads() }}</p>
+    </div>
+  </div>
+
+  <!-- Pipeline snapshot -->
+  <div class="section-card">
+    <p class="section-card__title">Pipeline Snapshot</p>
+    <div class="kanban">
+      <div class="kanban__col">
+        <p class="kanban__col-title">New ({{ leadsService.newLeads().length }})</p>
+        @for (lead of leadsService.newLeads().slice(0, 5); track lead.id) {
+          <div class="kanban__card">
+            <p class="kanban__card-name">{{ lead.name }}</p>
+            <p class="kanban__card-city">{{ lead.city }}</p>
+            <app-lead-score-badge [score]="lead.ai_score" />
+          </div>
+        }
+        @if (leadsService.newLeads().length === 0) {
+          <p class="kanban__empty">No leads yet</p>
+        }
+      </div>
+      <div class="kanban__col">
+        <p class="kanban__col-title">Contacted ({{ leadsService.contactedList().length }})</p>
+        @for (lead of leadsService.contactedList().slice(0, 5); track lead.id) {
+          <div class="kanban__card">
+            <p class="kanban__card-name">{{ lead.name }}</p>
+            <p class="kanban__card-city">{{ lead.city }}</p>
+            <app-lead-score-badge [score]="lead.ai_score" />
+          </div>
+        }
+        @if (leadsService.contactedList().length === 0) {
+          <p class="kanban__empty">None yet</p>
+        }
+      </div>
+      <div class="kanban__col">
+        <p class="kanban__col-title">Replied ({{ leadsService.repliedList().length }})</p>
+        @for (lead of leadsService.repliedList().slice(0, 5); track lead.id) {
+          <div class="kanban__card">
+            <p class="kanban__card-name">{{ lead.name }}</p>
+            <p class="kanban__card-city">{{ lead.city }}</p>
+          </div>
+        }
+        @if (leadsService.repliedList().length === 0) {
+          <p class="kanban__empty">None yet</p>
+        }
+      </div>
+      <div class="kanban__col">
+        <p class="kanban__col-title">Converted ({{ leadsService.convertedList().length }})</p>
+        @for (lead of leadsService.convertedList().slice(0, 5); track lead.id) {
+          <div class="kanban__card">
+            <p class="kanban__card-name">{{ lead.name }}</p>
+            <p class="kanban__card-city">{{ lead.city }}</p>
+          </div>
+        }
+        @if (leadsService.convertedList().length === 0) {
+          <p class="kanban__empty">None yet</p>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent activity -->
+  <div class="section-card">
+    <p class="section-card__title">Recent Activity</p>
+    @if (recentActivity().length > 0) {
+      <ul class="activity-list">
+        @for (entry of recentActivity().slice(0, 8); track entry.id) {
+          <li class="activity-item">
+            <span>{{ entry.message }}</span>
+            <span class="activity-item__time">{{ entry.created_at | date:'short' }}</span>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p style="font-size:13px; color:hsl(var(--muted))">No activity yet. Start by finding leads!</p>
+    }
+  </div>
+</div>

@@ -1,0 +1,109 @@
+<div class="page">
+  <div class="page__header">
+    <h1 class="page__title">Compose & Send</h1>
+    <p class="page__subtitle">Draft and send personalised cold outreach</p>
+  </div>
+
+  @if (error()) {
+    <div class="warning-banner" style="margin-bottom:16px;">❌ {{ error() }}</div>
+  }
+
+  @if (sent()) {
+    <div class="warning-banner" style="background:hsl(var(--success)/0.1);border-color:hsl(var(--success)/0.3);color:hsl(var(--success)); margin-bottom:16px;">
+      ✓ Gmail compose opened and email logged!
+    </div>
+  }
+
+  <form [formGroup]="form">
+    <div class="compose">
+      <!-- Left panel -->
+      <div class="compose__panel">
+        <p style="font-size:14px; font-weight:600; color:hsl(var(--foreground)); margin:0;">Lead Details</p>
+
+        <div class="field">
+          <label class="field__label">Select Lead</label>
+          <select class="field__select" formControlName="leadId" (change)="onLeadSelect(form.value.leadId || '')">
+            <option value="">— choose a lead —</option>
+            @for (lead of leadsService.leads(); track lead.id) {
+              <option [value]="lead.id">{{ lead.name }} · {{ lead.city }}</option>
+            }
+          </select>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="field">
+            <label class="field__label">Contact Name</label>
+            <input type="text" class="field__input" formControlName="contactName" />
+          </div>
+          <div class="field">
+            <label class="field__label">Job Title</label>
+            <input type="text" class="field__input" formControlName="jobTitle" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field__label">Company</label>
+          <input type="text" class="field__input" formControlName="company" />
+        </div>
+
+        <div class="field">
+          <label class="field__label">Website</label>
+          <input type="text" class="field__input" formControlName="website" />
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="field">
+            <label class="field__label">Tone</label>
+            <select class="field__select" formControlName="tone">
+              @for (tone of tones; track tone) {
+                <option [value]="tone">{{ tone }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label">Template</label>
+            <select class="field__select" formControlName="template">
+              @for (tmpl of templates; track tmpl) {
+                <option [value]="tmpl">{{ tmpl }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn--primary" (click)="draftEmail()" [disabled]="drafting()">
+          {{ drafting() ? '✨ Drafting…' : '✨ AI Draft Email' }}
+        </button>
+      </div>
+
+      <!-- Right panel -->
+      <div class="compose__panel">
+        <p style="font-size:14px; font-weight:600; color:hsl(var(--foreground)); margin:0;">Email</p>
+
+        <div class="field">
+          <label class="field__label">TO</label>
+          <input type="email" class="field__input" formControlName="to" placeholder="recipient@example.com" />
+        </div>
+
+        <div class="field">
+          <label class="field__label">FROM</label>
+          <input type="text" class="field__input" formControlName="from" [readonly]="true"
+                 style="opacity:0.6;" />
+        </div>
+
+        <div class="field">
+          <label class="field__label">SUBJECT</label>
+          <input type="text" class="field__input" formControlName="subject" />
+        </div>
+
+        <div class="field" style="flex:1;">
+          <label class="field__label">Body</label>
+          <textarea class="field__textarea" formControlName="body" style="min-height:200px;"></textarea>
+        </div>
+
+        <button type="button" class="btn btn--primary" (click)="sendEmail()" [disabled]="sending()">
+          {{ sending() ? 'Opening…' : '📤 Send via Gmail' }}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

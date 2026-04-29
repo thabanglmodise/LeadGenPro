@@ -1,0 +1,54 @@
+<aside class="sidebar">
+  <div class="sidebar__brand">
+    <span class="sidebar__logo">⚡</span>
+    <span class="sidebar__title">LeadAI Pro</span>
+  </div>
+
+  <nav class="sidebar__nav">
+    <a routerLink="/dashboard" routerLinkActive="sidebar__link--active" class="sidebar__link">
+      <span class="sidebar__link-icon">📊</span>
+      <span>Dashboard</span>
+    </a>
+    <a routerLink="/leads/find" routerLinkActive="sidebar__link--active" class="sidebar__link">
+      <span class="sidebar__link-icon">🔍</span>
+      <span>Find Leads</span>
+    </a>
+    <a routerLink="/pipeline" routerLinkActive="sidebar__link--active" class="sidebar__link">
+      <span class="sidebar__link-icon">📋</span>
+      <span>Pipeline</span>
+      @if (totalLeads() > 0) {
+        <span class="sidebar__badge">{{ totalLeads() }}</span>
+      }
+    </a>
+    <a routerLink="/compose" routerLinkActive="sidebar__link--active" class="sidebar__link">
+      <span class="sidebar__link-icon">✉️</span>
+      <span>Compose & Send</span>
+    </a>
+    <a routerLink="/sent" routerLinkActive="sidebar__link--active" class="sidebar__link">
+      <span class="sidebar__link-icon">📤</span>
+      <span>Sent Emails</span>
+      @if (sentCount() > 0) {
+        <span class="sidebar__badge">{{ sentCount() }}</span>
+      }
+    </a>
+
+    <div class="sidebar__divider"></div>
+
+    <a routerLink="/settings/setup" routerLinkActive="sidebar__link--active" class="sidebar__link">
+      <span class="sidebar__link-icon">🔑</span>
+      <span>API Setup</span>
+      @if (!gmailConnected()) {
+        <span class="sidebar__badge sidebar__badge--warn">!</span>
+      }
+    </a>
+    <a routerLink="/settings/profile" routerLinkActive="sidebar__link--active" class="sidebar__link">
+      <span class="sidebar__link-icon">🏢</span>
+      <span>My Business</span>
+    </a>
+  </nav>
+
+  <div class="sidebar__footer">
+    <span class="sidebar__user">{{ auth.user()?.email }}</span>
+    <button class="sidebar__signout" (click)="signOut()">Sign out</button>
+  </div>
+</aside>

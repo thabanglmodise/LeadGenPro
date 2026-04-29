@@ -1,0 +1,29 @@
+<div class="auth">
+  <div class="auth__card">
+    <h1 class="auth__title">⚡ LeadAI Pro</h1>
+    <p class="auth__subtitle">Reset your password</p>
+
+    @if (success()) {
+      <div class="auth__success">Password reset email sent. Check your inbox.</div>
+      <div class="auth__links" style="margin-top:16px">
+        <a routerLink="/auth/login">← Back to sign in</a>
+      </div>
+    } @else {
+      @if (error()) {
+        <div class="auth__error">{{ error() }}</div>
+      }
+      <form class="auth__form" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="auth__field">
+          <label class="auth__label" for="email">Email</label>
+          <input id="email" type="email" class="auth__input" formControlName="email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+        <button type="submit" class="auth__btn" [disabled]="form.invalid || loading()">
+          {{ loading() ? 'Sending…' : 'Send reset email' }}
+        </button>
+      </form>
+      <div class="auth__links">
+        <a routerLink="/auth/login">← Back to sign in</a>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,121 @@
+<div class="page">
+  <div class="page__header">
+    <h1 class="page__title">Find Leads</h1>
+    <p class="page__subtitle">Discover local businesses via Google Places</p>
+  </div>
+
+  @if (!config.hasGoogleKey()) {
+    <div class="warning-banner">
+      ⚠️ No Google Places API key. <a routerLink="/settings/setup">Add it in API Setup →</a>
+    </div>
+  }
+  @if (!config.hasClaudeKey()) {
+    <div class="warning-banner">
+      ⚠️ No Claude API key — AI scoring disabled. <a routerLink="/settings/setup">Add it in API Setup →</a>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="warning-banner">❌ {{ error() }}</div>
+  }
+
+  <!-- Search form -->
+  <div class="section-card">
+    <form [formGroup]="form" (ngSubmit)="onSearch()" style="display:grid; grid-template-columns:1fr 1fr 140px 1fr auto; gap:12px; align-items:end;">
+      <div class="field">
+        <label class="field__label">Business Type</label>
+        <input type="text" class="field__input" formControlName="businessType" placeholder="e.g. restaurant" />
+      </div>
+      <div class="field">
+        <label class="field__label">City</label>
+        <input type="text" class="field__input" formControlName="city" placeholder="e.g. Austin, TX" />
+      </div>
+      <div class="field">
+        <label class="field__label">Count</label>
+        <select class="field__select" formControlName="count">
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="60">60</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field__label">Your Offering</label>
+        <input type="text" class="field__input" formControlName="offering" placeholder="e.g. web design" />
+      </div>
+      <button type="submit" class="btn btn--primary" [disabled]="form.invalid || searching()">
+        {{ searching() ? 'Searching…' : 'Search' }}
+      </button>
+    </form>
+  </div>
+
+  <!-- Actions -->
+  <div style="display:flex; gap:10px; margin-bottom:16px; align-items:center;">
+    <button class="btn btn--secondary btn--sm" (click)="autoScore()" [disabled]="scoring() || !config.hasClaudeKey()">
+      {{ scoring() ? 'Scoring…' : '✨ AI Score All' }}
+    </button>
+    <button class="btn btn--secondary btn--sm" (click)="exportCSV()" [disabled]="leadsService.totalLeads() === 0">
+      ⬇ Export CSV
+    </button>
+    <span style="font-size:13px; color:hsl(var(--muted)); margin-left:auto;">
+      {{ leadsService.totalLeads() }} leads total
+    </span>
+  </div>
+
+  <!-- Results table -->
+  @if (leadsService.leads().length > 0) {
+    <div class="section-card" style="padding:0; overflow:hidden;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Category</th>
+            <th>Location</th>
+            <th>Rating</th>
+            <th>AI Score</th>
+            <th>Contact</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (lead of leadsService.leads(); track lead.id) {
+            <tr>
+              <td>
+                <div style="font-weight:600;">{{ lead.name }}</div>
+                @if (lead.website) {
+                  <a [href]="lead.website" target="_blank" style="font-size:11px; color:hsl(var(--accent));">{{ lead.website }}</a>
+                }
+              </td>
+              <td>{{ lead.type }}</td>
+              <td>{{ lead.city }}</td>
+              <td>
+                @if (lead.rating) {
+                  <span>⭐ {{ lead.rating }}</span>
+                } @else {
+                  <span style="color:hsl(var(--muted))">—</span>
+                }
+              </td>
+              <td><app-lead-score-badge [score]="lead.ai_score" /></td>
+              <td>
+                @if (lead.contact_email) {
+                  <span>{{ lead.contact_email }}</span>
+                } @else {
+                  <span style="color:hsl(var(--muted))">—</span>
+                }
+              </td>
+              <td>
+                <div style="display:flex; gap:6px;">
+                  <a [routerLink]="['/compose']" [queryParams]="{leadId: lead.id}" class="btn btn--secondary btn--sm">✉</a>
+                  <button class="btn btn--danger btn--sm" (click)="deleteLead(lead.id)">✕</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div style="text-align:center; padding:40px; color:hsl(var(--muted)); font-size:14px;">
+      No leads yet. Search above to find businesses.
+    </div>
+  }
+</div>
