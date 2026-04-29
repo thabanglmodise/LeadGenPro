@@ -1,7 +1,7 @@
 <aside class="sidebar">
   <div class="sidebar__brand">
-    <span class="sidebar__logo">⚡</span>
-    <span class="sidebar__title">LeadAI Pro</span>
+    <div class="sidebar__logo">P</div>
+    <span class="sidebar__title">Prospekt</span>
   </div>
 
   <nav class="sidebar__nav">
@@ -49,6 +49,15 @@
 
   <div class="sidebar__footer">
     <span class="sidebar__user">{{ auth.user()?.email }}</span>
-    <button class="sidebar__signout" (click)="signOut()">Sign out</button>
+    <div class="sidebar__actions">
+      <button class="sidebar__signout" (click)="signOut()">Sign out</button>
+      <button
+        class="sidebar__theme-toggle"
+        (click)="toggleTheme()"
+        [title]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+      >
+        {{ isDark() ? '☀️' : '🌙' }}
+      </button>
+    </div>
   </div>
 </aside>

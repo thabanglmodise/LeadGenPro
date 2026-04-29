@@ -4,6 +4,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ConfigService } from '../../../core/services/config.service';
 import { EmailService } from '../../../core/services/email.service';
 import { LeadsService } from '../../../core/services/leads.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -17,12 +18,18 @@ export class SidebarComponent {
   protected readonly config = inject(ConfigService);
   protected readonly leads = inject(LeadsService);
   protected readonly email = inject(EmailService);
+  protected readonly themeService = inject(ThemeService);
 
   readonly gmailConnected = computed(() => this.config.hasGmail());
   readonly totalLeads = computed(() => this.leads.totalLeads());
   readonly sentCount = computed(() => this.email.sentCount());
+  readonly isDark = computed(() => this.themeService.theme() === 'dark');
 
   async signOut() {
     await this.auth.signOut();
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggle();
   }
 }

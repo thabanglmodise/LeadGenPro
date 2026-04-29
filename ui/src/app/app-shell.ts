@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { computed } from '@angular/core';
 import { SidebarComponent } from './shared/components/sidebar/sidebar';
+import { ThemeService } from './core/services/theme.service';
 
 @Component({
   selector: 'app-shell',
@@ -21,5 +22,8 @@ import { SidebarComponent } from './shared/components/sidebar/sidebar';
 })
 export class AppShellComponent {
   private readonly router = inject(Router);
+  /* inject to trigger init — ThemeService applies the stored theme in its constructor */
+  private readonly _theme = inject(ThemeService);
+
   readonly isAuthRoute = computed(() => this.router.url.startsWith('/auth'));
 }
