@@ -126,25 +126,25 @@ Add an `/admin` route group guarded by `adminGuard` with its own shell layout (a
 
 ### Acceptance criteria
 
-- [ ] `/admin` route renders an admin-accented layout; redirects non-admins to `/dashboard`
-- [ ] Admin sidebar section appears in the main sidebar only when `role === 'admin'`
-- [ ] Users table lists all profiles with status and tier badges
-- [ ] Approve action sets `profiles.status = 'active'` and `app_metadata.role = 'user'`; user can then sign in
-- [ ] Suspend action sets `profiles.status = 'suspended'`; suspended users are blocked by `authGuard`
-- [ ] Invite modal sends a Supabase invite email; invited user appears in users table as `pending_verification`
-- [ ] Auto-approve toggle reads and writes `platform_settings.auto_approve` via tRPC
-- [ ] All admin tRPC procedures are protected by role check in the tRPC context middleware
+- [x] `/admin` route renders an admin-accented layout; redirects non-admins to `/dashboard`
+- [x] Admin sidebar section appears in the main sidebar only when `role === 'admin'`
+- [x] Users table lists all profiles with status and tier badges
+- [x] Approve action sets `profiles.status = 'active'` and `app_metadata.role = 'user'`; user can then sign in
+- [x] Suspend action sets `profiles.status = 'suspended'`; suspended users are blocked by `authGuard`
+- [x] Invite modal sends a Supabase invite email; invited user appears in users table as `pending_verification`
+- [x] Auto-approve toggle reads and writes `platform_settings.auto_approve` via tRPC
+- [x] All admin tRPC procedures are protected by role check in the tRPC context middleware
 
 ### Unit tests — Phase 3
 
-- [ ] `admin.approveUser` procedure: sets `profiles.status = 'active'` and calls Supabase admin API to set `app_metadata.role = 'user'`
-- [ ] `admin.suspendUser` procedure: sets `profiles.status = 'suspended'`
-- [ ] `admin.inviteUser` procedure: calls `supabase.auth.admin.inviteUserByEmail` with the provided email
-- [ ] All three admin procedures: throw `UNAUTHORIZED` when caller does not have `role = 'admin'` in JWT
-- [ ] `admin.listUsers` procedure: returns all profiles; throws `UNAUTHORIZED` for non-admins
-- [ ] `admin.setAutoApprove` procedure: writes the boolean to `platform_settings.auto_approve`
-- [ ] `AdminUsersComponent`: renders approve and suspend buttons only for non-admin profiles
-- [ ] `ApprovalQueueComponent`: renders empty state when no `pending_approval` users exist
+- [x] `admin.approveUser` procedure: sets `profiles.status = 'active'` and calls Supabase admin API to set `app_metadata.role = 'user'`
+- [x] `admin.suspendUser` procedure: sets `profiles.status = 'suspended'`
+- [x] `admin.inviteUser` procedure: calls `supabase.auth.admin.inviteUserByEmail` with the provided email
+- [x] All three admin procedures: throw `UNAUTHORIZED` when caller does not have `role = 'admin'` in JWT
+- [x] `admin.listUsers` procedure: returns all profiles; throws `UNAUTHORIZED` for non-admins
+- [x] `admin.setAutoApprove` procedure: writes the boolean to `platform_settings.auto_approve`
+- [x] `AdminUsersComponent`: renders approve and suspend buttons only for non-admin profiles
+- [x] `ApprovalQueueComponent`: renders empty state when no `pending_approval` users exist
 
 ---
 

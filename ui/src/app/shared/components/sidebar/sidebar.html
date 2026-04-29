@@ -32,6 +32,14 @@
       }
     </a>
 
+    @if (auth.role() === 'admin') {
+      <div class="sidebar__divider"></div>
+      <a routerLink="/admin" routerLinkActive="sidebar__link--active" class="sidebar__link sidebar__link--admin">
+        <span class="sidebar__link-icon">🛡️</span>
+        <span>Admin Panel</span>
+      </a>
+    }
+
     <div class="sidebar__divider"></div>
 
     <a routerLink="/settings/setup" routerLinkActive="sidebar__link--active" class="sidebar__link">

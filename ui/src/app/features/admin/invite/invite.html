@@ -1,0 +1,39 @@
+<div class="page">
+  <div class="page__header">
+    <h1 class="page__title">Invite User</h1>
+    <p class="page__subtitle">Send a Supabase invite email to a new client</p>
+  </div>
+
+  <div class="admin-form-card">
+    @if (success()) {
+      <div class="admin-form-card__success">
+        Invite sent! The user will receive an email to set up their account.
+      </div>
+    }
+
+    @if (error()) {
+      <p class="admin-page__error">{{ error() }}</p>
+    }
+
+    <div class="form-group">
+      <label class="form-label" for="invite-email">Email address</label>
+      <input
+        id="invite-email"
+        class="form-input"
+        type="email"
+        placeholder="client@example.com"
+        [ngModel]="email()"
+        (ngModelChange)="email.set($event)"
+        [disabled]="sending()"
+      />
+    </div>
+
+    <button
+      class="admin-btn admin-btn--primary"
+      (click)="send()"
+      [disabled]="sending() || !email().trim()"
+    >
+      {{ sending() ? 'Sending…' : 'Send Invite' }}
+    </button>
+  </div>
+</div>
