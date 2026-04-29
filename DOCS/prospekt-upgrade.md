@@ -84,30 +84,30 @@ Add `status`, `tier`, `key_list`, and `onboarding` columns to the `profiles` tab
 
 ### Acceptance criteria
 
-- [ ] `profiles` table has `status`, `tier` (default `basic`), `key_list` (default `default`), `onboarding` columns via migration
-- [ ] `platform_settings` table exists with `auto_approve` (default `true`) and `global_key_mode` (default `disabled`)
-- [ ] New sign-up sets `status = pending_verification`; email confirmation advances to `active` (auto-approve ON) or `pending_approval` (auto-approve OFF)
-- [ ] `AuthService.role` signal reads `app_metadata.role` from JWT
-- [ ] `adminGuard` blocks non-admin users from `/admin/**` and redirects to `/dashboard`
-- [ ] `authGuard` redirects `pending_verification` → `/auth/verify-prompt`, `pending_approval` → `/auth/pending`
-- [ ] `/auth/verify-prompt` page explains email confirmation step
-- [ ] `/auth/pending` page explains awaiting admin approval
-- [ ] First admin can be provisioned by manually setting `app_metadata: { role: 'admin' }` in Supabase dashboard
+- [x] `profiles` table has `status`, `tier` (default `basic`), `key_list` (default `default`), `onboarding` columns via migration
+- [x] `platform_settings` table exists with `auto_approve` (default `true`) and `global_key_mode` (default `disabled`)
+- [x] New sign-up sets `status = pending_verification`; email confirmation advances to `active` (auto-approve ON) or `pending_approval` (auto-approve OFF)
+- [x] `AuthService.role` signal reads `app_metadata.role` from JWT
+- [x] `adminGuard` blocks non-admin users from `/admin/**` and redirects to `/dashboard`
+- [x] `authGuard` redirects `pending_verification` → `/auth/verify-prompt`, `pending_approval` → `/auth/pending`
+- [x] `/auth/verify-prompt` page explains email confirmation step
+- [x] `/auth/pending` page explains awaiting admin approval
+- [x] First admin can be provisioned by manually setting `app_metadata: { role: 'admin' }` in Supabase dashboard
 
 ### Unit tests — Phase 2
 
-- [ ] `AuthService`: `role` signal returns `'admin'` when `app_metadata.role` is `'admin'`
-- [ ] `AuthService`: `role` signal returns `null` when `app_metadata` is absent
-- [ ] `AuthService`: `profileStatus` signal reflects the value from the session's profile
-- [ ] `authGuard`: returns `true` for an `active` user
-- [ ] `authGuard`: redirects to `/auth/verify-prompt` for `pending_verification`
-- [ ] `authGuard`: redirects to `/auth/pending` for `pending_approval`
-- [ ] `authGuard`: redirects to `/auth/login` for unauthenticated user
-- [ ] `adminGuard`: returns `true` for a user with `role === 'admin'`
-- [ ] `adminGuard`: redirects to `/dashboard` for a user with any other role
-- [ ] `auth.signup` tRPC procedure: creates profile with `status = 'pending_verification'`
-- [ ] status-advancement logic: sets `active` when `auto_approve` is `true`
-- [ ] status-advancement logic: sets `pending_approval` when `auto_approve` is `false`
+- [x] `AuthService`: `role` signal returns `'admin'` when `app_metadata.role` is `'admin'`
+- [x] `AuthService`: `role` signal returns `null` when `app_metadata` is absent
+- [x] `AuthService`: `profileStatus` signal reflects the value from the session's profile
+- [x] `authGuard`: returns `true` for an `active` user
+- [x] `authGuard`: redirects to `/auth/verify-prompt` for `pending_verification`
+- [x] `authGuard`: redirects to `/auth/pending` for `pending_approval`
+- [x] `authGuard`: redirects to `/auth/login` for unauthenticated user
+- [x] `adminGuard`: returns `true` for a user with `role === 'admin'`
+- [x] `adminGuard`: redirects to `/dashboard` for a user with any other role
+- [x] `auth.initProfile` tRPC procedure: creates profile with `status = 'pending_verification'`
+- [x] status-advancement logic: sets `active` when `auto_approve` is `true`
+- [x] status-advancement logic: sets `pending_approval` when `auto_approve` is `false`
 
 ---
 

@@ -5,6 +5,7 @@ import {
   doublePrecision,
   integer,
   jsonb,
+  boolean,
   timestamp,
 } from 'drizzle-orm/pg-core';
 
@@ -17,6 +18,20 @@ export const profiles = pgTable('profiles', {
   benefits: text('benefits'),
   website: text('website'),
   phone: text('phone'),
+  // auth & subscription
+  status: text('status').notNull().default('pending_verification'),
+  tier: text('tier').notNull().default('basic'),
+  key_list: text('key_list').notNull().default('default'),
+  onboarding: jsonb('onboarding').$type<Record<string, boolean>>(),
+  updated_at: timestamp('updated_at').defaultNow(),
+});
+
+export const platform_settings = pgTable('platform_settings', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  auto_approve: boolean('auto_approve').notNull().default(true),
+  global_key_mode: text('global_key_mode').notNull().default('disabled'),
+  global_gp_key: text('global_gp_key'),
+  global_cl_key: text('global_cl_key'),
   updated_at: timestamp('updated_at').defaultNow(),
 });
 

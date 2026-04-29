@@ -6,6 +6,7 @@ import { configRouter } from './routers/config.js';
 import { activityRouter } from './routers/activity.js';
 import { emailRouter } from './routers/email.js';
 import { profileRouter } from './routers/profile.js';
+import { authRouter } from './routers/auth.js';
 
 export const appRouter = router({
   places: placesRouter,
@@ -15,6 +16,7 @@ export const appRouter = router({
   activity: activityRouter,
   email: emailRouter,
   profile: profileRouter,
+  auth: authRouter,
 });
 
 export type AppRouter = typeof appRouter;
