@@ -1,0 +1,32 @@
+<!-- profile menu link always present -->
+<div class="onboarding-widget__checklist-link">
+  <button class="btn btn--ghost onboarding-widget__open-btn" (click)="openWizard()">
+    📋 Setup checklist
+  </button>
+</div>
+
+@if (showWidget()) {
+  <div class="onboarding-widget">
+    <div class="onboarding-widget__header">
+      <h3 class="onboarding-widget__title">Getting started</h3>
+      <span class="onboarding-widget__percent">{{ progress() }}%</span>
+    </div>
+
+    <div class="onboarding-widget__bar">
+      <div class="onboarding-widget__bar-fill" [style.width.%]="progress()"></div>
+    </div>
+
+    <ul class="onboarding-widget__steps">
+      @for (step of steps(); track step.key) {
+        <li class="onboarding-widget__step" [class.onboarding-widget__step--done]="stepDone(step.key)">
+          <span class="onboarding-widget__check">{{ stepDone(step.key) ? '✓' : '○' }}</span>
+          <span class="onboarding-widget__step-label">{{ step.label }}</span>
+        </li>
+      }
+    </ul>
+
+    <button class="btn btn--primary onboarding-widget__cta" (click)="openWizard()">
+      Continue setup →
+    </button>
+  </div>
+}

@@ -9,6 +9,7 @@ import { profileRouter } from './routers/profile.js';
 import { authRouter } from './routers/auth.js';
 import { adminRouter } from './routers/admin.js';
 import { userApiKeysRouter } from './routers/user-api-keys.js';
+import { onboardingRouter } from './routers/onboarding.js';
 
 export const appRouter = router({
   places: placesRouter,
@@ -21,6 +22,7 @@ export const appRouter = router({
   auth: authRouter,
   admin: adminRouter,
   userApiKeys: userApiKeysRouter,
+  onboarding: onboardingRouter,
 });
 
 export type AppRouter = typeof appRouter;

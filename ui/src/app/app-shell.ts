@@ -1,14 +1,16 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { computed } from '@angular/core';
 import { SidebarComponent } from './shared/components/sidebar/sidebar';
+import { OnboardingWizardComponent } from './shared/components/onboarding-wizard/onboarding-wizard';
 import { ThemeService } from './core/services/theme.service';
+import { OnboardingService } from './core/services/onboarding.service';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, SidebarComponent],
+  imports: [RouterOutlet, SidebarComponent, OnboardingWizardComponent],
   template: `
     <div class="flex min-h-screen" style="background: hsl(var(--bg))">
       @if (!isAuthRoute()) {
@@ -18,12 +20,26 @@ import { ThemeService } from './core/services/theme.service';
         <router-outlet />
       </main>
     </div>
+    @if (!isAuthRoute() && onboarding.showWizard()) {
+      <app-onboarding-wizard />
+    }
   `,
 })
 export class AppShellComponent {
   private readonly router = inject(Router);
-  /* inject to trigger init — ThemeService applies the stored theme in its constructor */
+  private readonly auth = inject(AuthService);
   private readonly _theme = inject(ThemeService);
+  protected readonly onboarding = inject(OnboardingService);
 
   readonly isAuthRoute = computed(() => this.router.url.startsWith('/auth'));
+
+  constructor() {
+    effect(() => {
+      const _user = this.auth.user();
+      const _onAuth = this.isAuthRoute();
+      if (_user && !_onAuth) {
+        this.onboarding.load();
+      }
+    });
+  }
 }

@@ -30,6 +30,10 @@ export const ADMIN_ROUTES: Routes = [
         path: 'api-keys',
         loadComponent: () => import('./api-keys/api-keys').then(m => m.AdminApiKeysComponent),
       },
+      {
+        path: 'platform-setup',
+        loadComponent: () => import('./platform-setup/platform-setup').then(m => m.PlatformSetupComponent),
+      },
     ],
   },
 ];

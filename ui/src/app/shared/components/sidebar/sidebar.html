@@ -62,6 +62,7 @@
   </nav>
 
   <div class="sidebar__footer">
+    <button class="sidebar__checklist-btn" (click)="openChecklist()">📋 Setup checklist</button>
     <span class="sidebar__user">{{ auth.user()?.email }}</span>
     <div class="sidebar__actions">
       <button class="sidebar__signout" (click)="signOut()">Sign out</button>

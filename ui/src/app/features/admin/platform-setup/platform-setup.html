@@ -1,0 +1,63 @@
+<div class="page">
+  <div class="page__header">
+    <h1 class="page__title">Platform Setup</h1>
+    <p class="page__subtitle">System health and configuration status</p>
+  </div>
+
+  <!-- Database health -->
+  <section class="platform-setup__section">
+    <h2 class="platform-setup__section-title">Database Connection</h2>
+    <div class="platform-setup__health-row">
+      @switch (healthStatus()) {
+        @case ('checking') {
+          <span class="platform-setup__status platform-setup__status--checking">⏳ Checking…</span>
+        }
+        @case ('ok') {
+          <span class="platform-setup__status platform-setup__status--ok">✓ Connected</span>
+          <span class="platform-setup__status-detail">Last checked {{ healthTimestamp() }}</span>
+        }
+        @case ('error') {
+          <span class="platform-setup__status platform-setup__status--error">✗ {{ healthError() }}</span>
+        }
+      }
+      <button class="admin-btn" (click)="checkHealth()" [disabled]="healthStatus() === 'checking'">
+        Re-check
+      </button>
+    </div>
+  </section>
+
+  <!-- API Keys status -->
+  @if (!loading()) {
+    <section class="platform-setup__section">
+      <h2 class="platform-setup__section-title">API Keys</h2>
+      <div class="platform-setup__status-list">
+        <div class="platform-setup__status-item">
+          <span class="platform-setup__status-item-label">Google Places key</span>
+          @if (hasGpKey()) {
+            <span class="platform-setup__status platform-setup__status--ok">✓ Configured</span>
+          } @else {
+            <span class="platform-setup__status platform-setup__status--warn">⚠ Not set</span>
+          }
+        </div>
+        <div class="platform-setup__status-item">
+          <span class="platform-setup__status-item-label">Anthropic (Claude) key</span>
+          @if (hasClKey()) {
+            <span class="platform-setup__status platform-setup__status--ok">✓ Configured</span>
+          } @else {
+            <span class="platform-setup__status platform-setup__status--warn">⚠ Not set</span>
+          }
+        </div>
+        <div class="platform-setup__status-item">
+          <span class="platform-setup__status-item-label">Key policy</span>
+          <span class="platform-setup__status platform-setup__status--{{ keyMode() === 'disabled' ? 'warn' : 'ok' }}">
+            {{ keyMode() }}
+          </span>
+        </div>
+      </div>
+      <a routerLink="/admin/api-keys" class="admin-btn admin-btn--primary" style="display:inline-block; margin-top:12px;">
+        Manage API Keys →
+      </a>
+    </section>
+  }
+
+</div>

@@ -5,6 +5,7 @@ import { ConfigService } from '../../../core/services/config.service';
 import { EmailService } from '../../../core/services/email.service';
 import { LeadsService } from '../../../core/services/leads.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { OnboardingService } from '../../../core/services/onboarding.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -19,6 +20,7 @@ export class SidebarComponent {
   protected readonly leads = inject(LeadsService);
   protected readonly email = inject(EmailService);
   protected readonly themeService = inject(ThemeService);
+  private readonly onboarding = inject(OnboardingService);
 
   readonly gmailConnected = computed(() => this.config.hasGmail());
   readonly totalLeads = computed(() => this.leads.totalLeads());
@@ -35,5 +37,9 @@ export class SidebarComponent {
 
   toggleTheme(): void {
     this.themeService.toggle();
+  }
+
+  openChecklist(): void {
+    this.onboarding.openWizard();
   }
 }

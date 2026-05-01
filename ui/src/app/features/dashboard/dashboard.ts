@@ -3,6 +3,7 @@ import { ActivityService } from '../../core/services/activity.service';
 import { EmailService } from '../../core/services/email.service';
 import { LeadsService } from '../../core/services/leads.service';
 import { AuthService } from '../../core/services/auth.service';
+import { OnboardingWidgetComponent } from '../../shared/components/onboarding-widget/onboarding-widget';
 import { LeadScoreBadgeComponent } from '../../shared/components/lead-score-badge/lead-score-badge';
 import { DatePipe } from '@angular/common';
 
@@ -10,7 +11,7 @@ import { DatePipe } from '@angular/common';
   selector: 'app-dashboard',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [LeadScoreBadgeComponent, DatePipe],
+  imports: [LeadScoreBadgeComponent, DatePipe, OnboardingWidgetComponent],
   templateUrl: './dashboard.html',
 })
 export class DashboardComponent implements OnInit {
