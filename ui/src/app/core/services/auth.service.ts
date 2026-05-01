@@ -1,6 +1,7 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../supabase.client';
+import { ThemeService } from './theme.service';
 
 type ProfileStatus =
   | 'pending_verification'
@@ -11,6 +12,7 @@ type ProfileStatus =
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly themeService = inject(ThemeService);
   private readonly _user = signal<User | null>(null);
   private readonly _profileStatus = signal<ProfileStatus>(null);
   private readonly _profileLoaded = signal(false);
@@ -46,12 +48,15 @@ export class AuthService {
 
     const { data } = await supabase
       .from('profiles')
-      .select('status, tier')
+      .select('status, tier, theme')
       .eq('id', userId)
       .single();
 
     this._profileStatus.set((data?.status as ProfileStatus) ?? null);
     this._tier.set((data?.tier as string) ?? 'basic');
+    if (data?.theme === 'dark' || data?.theme === 'light') {
+      this.themeService.syncFromDb(data.theme);
+    }
     this._profileLoaded.set(true);
   }
 

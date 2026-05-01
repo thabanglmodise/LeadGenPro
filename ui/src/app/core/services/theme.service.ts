@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import { trpc } from '../trpc.client';
 
 type Theme = 'dark' | 'light';
 
@@ -22,13 +23,18 @@ export class ThemeService {
   toggle(): void {
     const _next: Theme = this.theme() === 'dark' ? 'light' : 'dark';
     this.apply(_next);
+    trpc.profile.setTheme.mutate({ theme: _next }).catch(() => {});
   }
 
-  private apply(_theme: Theme): void {
+  syncFromDb(theme: Theme): void {
+    this.apply(theme);
+  }
+
+  private apply(theme: Theme): void {
     const _html = document.documentElement;
     _html.classList.remove('dark', 'light');
-    _html.classList.add(_theme);
-    localStorage.setItem(STORAGE_KEY, _theme);
-    this.theme.set(_theme);
+    _html.classList.add(theme);
+    localStorage.setItem(STORAGE_KEY, theme);
+    this.theme.set(theme);
   }
 }

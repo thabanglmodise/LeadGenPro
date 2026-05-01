@@ -91,4 +91,4 @@ AuthService (updated)
 - [x] **Stage 5** — `PipelineCardComponent` (shared) + pipeline page wiring + Jasmine spec
 - [x] **Stage 6** — `/settings/smtp` UI page + route + sidebar link
 - [x] **Stage 7** — Compose dual-mode send UI + `compose.spec.ts`
-- [ ] **Stage 8** — Theme persistence (`profiles.theme` column, auth service read/write, `profile.setTheme` tRPC)
+- [x] **Stage 8** — Theme persistence (`profiles.theme` column, auth service read/write, `profile.setTheme` tRPC)

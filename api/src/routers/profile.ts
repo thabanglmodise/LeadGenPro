@@ -35,4 +35,17 @@ export const profileRouter = router({
         .returning();
       return updated;
     }),
+
+  setTheme: protectedProcedure
+    .input(z.object({ theme: z.enum(['dark', 'light']) }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .insert(profiles)
+        .values({ id: ctx.user.id, theme: input.theme, updated_at: new Date() })
+        .onConflictDoUpdate({
+          target: profiles.id,
+          set: { theme: input.theme, updated_at: new Date() },
+        });
+      return { ok: true };
+    }),
 });
