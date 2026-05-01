@@ -14,6 +14,7 @@ export class AuthService {
   private readonly _user = signal<User | null>(null);
   private readonly _profileStatus = signal<ProfileStatus>(null);
   private readonly _profileLoaded = signal(false);
+  private readonly _tier = signal<string>('basic');
 
   readonly user = this._user.asReadonly();
   readonly isLoggedIn = computed(() => !!this._user());
@@ -21,6 +22,7 @@ export class AuthService {
     () => (this._user()?.app_metadata?.['role'] as string) ?? null,
   );
   readonly profileStatus = this._profileStatus.asReadonly();
+  readonly tier = this._tier.asReadonly();
 
   constructor() {
     supabase.auth.getSession().then(({ data }) => {
@@ -44,11 +46,12 @@ export class AuthService {
 
     const { data } = await supabase
       .from('profiles')
-      .select('status')
+      .select('status, tier')
       .eq('id', userId)
       .single();
 
     this._profileStatus.set((data?.status as ProfileStatus) ?? null);
+    this._tier.set((data?.tier as string) ?? 'basic');
     this._profileLoaded.set(true);
   }
 

@@ -24,6 +24,10 @@ export class SidebarComponent {
   readonly totalLeads = computed(() => this.leads.totalLeads());
   readonly sentCount = computed(() => this.email.sentCount());
   readonly isDark = computed(() => this.themeService.theme() === 'dark');
+  readonly showByok = computed(() => {
+    const _t = this.auth.tier();
+    return _t === 'plus' || _t === 'pro';
+  });
 
   async signOut() {
     await this.auth.signOut();

@@ -53,6 +53,12 @@
       <span class="sidebar__link-icon">🏢</span>
       <span>My Business</span>
     </a>
+    @if (showByok()) {
+      <a routerLink="/settings/api-keys" routerLinkActive="sidebar__link--active" class="sidebar__link">
+        <span class="sidebar__link-icon">🗝️</span>
+        <span>My API Keys</span>
+      </a>
+    }
   </nav>
 
   <div class="sidebar__footer">

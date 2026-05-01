@@ -1,8 +1,7 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { eq } from 'drizzle-orm';
 import { router, protectedProcedure } from '../trpc.js';
-import { user_config } from '../db/schema.js';
+import { resolveKey } from '../lib/resolve-key.js';
 
 export interface PlaceResult {
   place_id: string;
@@ -26,20 +25,10 @@ export const placesRouter = router({
   search: protectedProcedure
     .input(z.object({ type: z.string().min(1), city: z.string().min(1) }))
     .query(async ({ ctx, input }) => {
-      const [config] = await ctx.db
-        .select({ gp_key: user_config.gp_key })
-        .from(user_config)
-        .where(eq(user_config.id, ctx.user.id));
-
-      if (!config?.gp_key) {
-        throw new TRPCError({
-          code: 'PRECONDITION_FAILED',
-          message: 'Google Places API key not configured. Add it in Settings → API Setup.',
-        });
-      }
+      const _gpKey = await resolveKey(ctx.db, ctx.user.id, 'gp');
 
       const query = encodeURIComponent(`${input.type} in ${input.city}`);
-      const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&key=${config.gp_key}`;
+      const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&key=${_gpKey}`;
 
       const res = await fetch(url);
       if (!res.ok) {

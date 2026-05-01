@@ -1,0 +1,136 @@
+<div class="page">
+  <div class="page__header">
+    <h1 class="page__title">API Keys</h1>
+    <p class="page__subtitle">Manage global API keys and user access policy</p>
+  </div>
+
+  @if (error()) {
+    <p class="admin-page__error">{{ error() }}</p>
+  }
+  @if (saved()) {
+    <p class="admin-page__saved">{{ saved() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="admin-page__loading">Loading…</p>
+  } @else {
+
+    <!-- Key Policy -->
+    <section class="api-keys__section">
+      <h2 class="api-keys__section-title">Key Policy</h2>
+      <p class="api-keys__section-desc">Controls which users can access shared global API keys.</p>
+      <div class="api-keys__policy-row">
+        <span class="api-keys__policy-label">{{ currentModeLabel() }}</span>
+        <button class="admin-btn" (click)="cycleMode()" [disabled]="saving()">
+          Cycle policy →
+        </button>
+      </div>
+    </section>
+
+    <!-- Global Keys -->
+    <section class="api-keys__section">
+      <h2 class="api-keys__section-title">Global Google Places Key</h2>
+      @if (hasGpKey()) {
+        <p class="api-keys__stored">A key is currently stored. Enter a new value to replace it.</p>
+      }
+      <div class="api-keys__input-row">
+        <input
+          class="api-keys__input"
+          type="password"
+          placeholder="AIza…"
+          [ngModel]="gpKey()"
+          (ngModelChange)="gpKey.set($event)"
+          autocomplete="off"
+        />
+        <button class="admin-btn" (click)="testKey('gp')" [disabled]="!gpKey() || testing() !== null">
+          {{ testing() === 'gp' ? 'Testing…' : 'Test' }}
+        </button>
+        <button class="admin-btn admin-btn--approve" (click)="saveGpKey()" [disabled]="!gpKey() || saving()">
+          Save
+        </button>
+      </div>
+      @if (testResult() && testing() === null) {
+        <p class="api-keys__test-result">{{ testResult() }}</p>
+      }
+    </section>
+
+    <section class="api-keys__section">
+      <h2 class="api-keys__section-title">Global Anthropic (Claude) Key</h2>
+      @if (hasClKey()) {
+        <p class="api-keys__stored">A key is currently stored. Enter a new value to replace it.</p>
+      }
+      <div class="api-keys__input-row">
+        <input
+          class="api-keys__input"
+          type="password"
+          placeholder="sk-ant-…"
+          [ngModel]="clKey()"
+          (ngModelChange)="clKey.set($event)"
+          autocomplete="off"
+        />
+        <button class="admin-btn" (click)="testKey('cl')" [disabled]="!clKey() || testing() !== null">
+          {{ testing() === 'cl' ? 'Testing…' : 'Test' }}
+        </button>
+        <button class="admin-btn admin-btn--approve" (click)="saveClKey()" [disabled]="!clKey() || saving()">
+          Save
+        </button>
+      </div>
+    </section>
+
+    <!-- User Access Table -->
+    <section class="api-keys__section">
+      <h2 class="api-keys__section-title">User Access</h2>
+      <p class="api-keys__section-desc">Assign tiers and whitelist/blacklist membership per user.</p>
+
+      @if (userActionError()) {
+        <p class="admin-page__error">{{ userActionError() }}</p>
+      }
+
+      @if (loadingUsers()) {
+        <p class="admin-page__loading">Loading users…</p>
+      } @else {
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th class="admin-table__th">User</th>
+                <th class="admin-table__th">Tier</th>
+                <th class="admin-table__th">Key List</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of users(); track user.id) {
+                <tr class="admin-table__row">
+                  <td class="admin-table__td">{{ displayName(user) }}</td>
+                  <td class="admin-table__td">
+                    <select
+                      class="api-keys__select"
+                      [ngModel]="user.tier"
+                      (ngModelChange)="setUserTier(user.id, $event)"
+                    >
+                      <option value="basic">basic</option>
+                      <option value="plus">plus</option>
+                      <option value="pro">pro</option>
+                    </select>
+                  </td>
+                  <td class="admin-table__td">
+                    <select
+                      class="api-keys__select"
+                      [ngModel]="user.key_list"
+                      (ngModelChange)="setKeyList(user.id, $event)"
+                    >
+                      <option value="default">default</option>
+                      <option value="whitelisted">whitelisted</option>
+                      <option value="blacklisted">blacklisted</option>
+                    </select>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+  }
+</div>

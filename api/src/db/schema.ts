@@ -80,3 +80,11 @@ export const activity_log = pgTable('activity_log', {
   message: text('message').notNull(),
   created_at: timestamp('created_at').defaultNow(),
 });
+
+export const user_api_keys = pgTable('user_api_keys', {
+  user_id: uuid('user_id').primaryKey(),
+  gp_key: text('gp_key'),
+  cl_key: text('cl_key'),
+  prefer_global: boolean('prefer_global').notNull().default(false),
+  updated_at: timestamp('updated_at').defaultNow(),
+});

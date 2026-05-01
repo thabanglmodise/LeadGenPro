@@ -1,0 +1,76 @@
+<div class="page">
+  <div class="page__header">
+    <h1 class="page__title">Personal API Keys</h1>
+    <p class="page__subtitle">Your own Google Places and Anthropic keys — stored encrypted, never exposed in responses</p>
+  </div>
+
+  @if (loading()) {
+    <p class="setup-status">Loading…</p>
+  } @else {
+
+    @if (error()) {
+      <p class="setup-status setup-status--error">{{ error() }}</p>
+    }
+    @if (saved()) {
+      <p class="setup-status setup-status--success">Keys saved.</p>
+    }
+
+    <div class="section-card">
+      <p class="section-card__title">🔍 Google Places API Key</p>
+      @if (hasGpKey()) {
+        <p class="section-card__subtitle">A key is stored. Enter a new value to replace it.</p>
+      } @else {
+        <p class="section-card__subtitle">No key stored yet.</p>
+      }
+      <input
+        class="field__input"
+        type="password"
+        placeholder="AIza…"
+        [ngModel]="gpKey()"
+        (ngModelChange)="gpKey.set($event)"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="section-card">
+      <p class="section-card__title">🤖 Anthropic (Claude) API Key</p>
+      @if (hasClKey()) {
+        <p class="section-card__subtitle">A key is stored. Enter a new value to replace it.</p>
+      } @else {
+        <p class="section-card__subtitle">No key stored yet.</p>
+      }
+      <input
+        class="field__input"
+        type="password"
+        placeholder="sk-ant-…"
+        [ngModel]="clKey()"
+        (ngModelChange)="clKey.set($event)"
+        autocomplete="off"
+      />
+    </div>
+
+    @if (isPro()) {
+      <div class="section-card">
+        <p class="section-card__title">⚙️ Key Preference (Pro)</p>
+        <p class="section-card__subtitle">When enabled, the platform's global key is used instead of your own when the admin policy allows.</p>
+        <label class="setup-toggle-label">
+          <input
+            type="checkbox"
+            [ngModel]="preferGlobal()"
+            (ngModelChange)="preferGlobal.set($event)"
+          />
+          Prefer global key
+        </label>
+      </div>
+    }
+
+    <button
+      class="btn btn--primary"
+      (click)="save()"
+      [disabled]="saving()"
+    >
+      {{ saving() ? 'Saving…' : 'Save keys' }}
+    </button>
+
+  }
+</div>

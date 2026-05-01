@@ -15,6 +15,13 @@
       "when": 1777477757629,
       "tag": "0001_faithful_clint_barton",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777635921682,
+      "tag": "0002_illegal_shinko_yamashiro",
+      "breakpoints": true
     }
   ]
 }

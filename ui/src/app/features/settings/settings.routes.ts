@@ -7,8 +7,11 @@ export const SETTINGS_ROUTES: Routes = [
   },
   {
     path: 'profile',
-    loadComponent: () =>
-      import('./profile/profile').then(m => m.ProfileComponent),
+    loadComponent: () => import('./profile/profile').then(m => m.ProfileComponent),
+  },
+  {
+    path: 'api-keys',
+    loadComponent: () => import('./api-keys/api-keys').then(m => m.SettingsApiKeysComponent),
   },
   { path: '', redirectTo: 'setup', pathMatch: 'full' },
 ];
