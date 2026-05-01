@@ -86,7 +86,7 @@ AuthService (updated)
 - [ ] Create DOCS/phase6-client-upgrades.md (this file)
 - [x] **Stage 1** — DB schema additions + Drizzle migration (`api/src/db/schema.ts` + `api/drizzle/0003_*.sql`)
 - [x] **Stage 2** — `leads.updateStatus` tRPC procedure + `api/src/routers/leads.spec.ts`
-- [ ] **Stage 3** — `email.sendSmtp` + `email.testSmtp` tRPC procedures + `api/src/routers/email.spec.ts`; install nodemailer; extend `user-api-keys.ts` with `saveSmtp`
+- [x] **Stage 3** — `email.sendSmtp` + `email.testSmtp` tRPC procedures + `api/src/routers/email.spec.ts`; install nodemailer; extend `user-api-keys.ts` with `saveSmtp`
 - [ ] **Stage 4** — `exportToCsv` pure util + spec; CSV export button on find-leads page
 - [ ] **Stage 5** — `PipelineCardComponent` (shared) + pipeline page wiring + Jasmine spec
 - [ ] **Stage 6** — `/settings/smtp` UI page + route + sidebar link
