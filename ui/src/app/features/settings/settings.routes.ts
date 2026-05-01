@@ -13,5 +13,9 @@ export const SETTINGS_ROUTES: Routes = [
     path: 'api-keys',
     loadComponent: () => import('./api-keys/api-keys').then(m => m.SettingsApiKeysComponent),
   },
+  {
+    path: 'smtp',
+    loadComponent: () => import('./smtp/smtp').then(m => m.SmtpSettingsComponent),
+  },
   { path: '', redirectTo: 'setup', pathMatch: 'full' },
 ];

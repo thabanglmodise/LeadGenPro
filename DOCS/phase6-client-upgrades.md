@@ -89,6 +89,6 @@ AuthService (updated)
 - [x] **Stage 3** — `email.sendSmtp` + `email.testSmtp` tRPC procedures + `api/src/routers/email.spec.ts`; install nodemailer; extend `user-api-keys.ts` with `saveSmtp`
 - [x] **Stage 4** — `exportToCsv` pure util + spec; CSV export button on find-leads page
 - [x] **Stage 5** — `PipelineCardComponent` (shared) + pipeline page wiring + Jasmine spec
-- [ ] **Stage 6** — `/settings/smtp` UI page + route + sidebar link
+- [x] **Stage 6** — `/settings/smtp` UI page + route + sidebar link
 - [ ] **Stage 7** — Compose dual-mode send UI + `compose.spec.ts`
 - [ ] **Stage 8** — Theme persistence (`profiles.theme` column, auth service read/write, `profile.setTheme` tRPC)

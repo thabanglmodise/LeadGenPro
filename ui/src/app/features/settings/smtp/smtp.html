@@ -1,0 +1,75 @@
+<div class="page">
+  <div class="page__header">
+    <h1 class="page__title">SMTP Settings</h1>
+    <p class="page__subtitle">Configure server-side email sending</p>
+  </div>
+
+  @if (hasSavedCreds()) {
+    <div class="smtp-settings__status smtp-settings__status--saved">
+      ✓ SMTP credentials are saved. Enter new values below to update.
+    </div>
+  }
+
+  @if (saveSuccess()) {
+    <div class="smtp-settings__status smtp-settings__status--ok">✓ Credentials saved.</div>
+  }
+
+  @if (testResult() === 'ok') {
+    <div class="smtp-settings__status smtp-settings__status--ok">✓ SMTP connection verified.</div>
+  }
+
+  @if (error()) {
+    <div class="smtp-settings__status smtp-settings__status--error">❌ {{ error() }}</div>
+  }
+
+  <div class="section-card">
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <div style="display:grid; grid-template-columns:1fr 120px; gap:12px;">
+        <div class="field">
+          <label class="field__label">SMTP Host</label>
+          <input type="text" class="field__input" formControlName="smtp_host" placeholder="smtp.example.com" />
+        </div>
+        <div class="field">
+          <label class="field__label">Port</label>
+          <input type="number" class="field__input" formControlName="smtp_port" />
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="field">
+          <label class="field__label">Username</label>
+          <input type="text" class="field__input" formControlName="smtp_user" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label class="field__label">Password</label>
+          <input type="password" class="field__input" formControlName="smtp_pass" autocomplete="current-password" placeholder="{{ hasSavedCreds() ? '(unchanged)' : '' }}" />
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="field">
+          <label class="field__label">From Name</label>
+          <input type="text" class="field__input" formControlName="smtp_from_name" placeholder="Jane Doe" />
+        </div>
+        <div class="field">
+          <label class="field__label">From Email</label>
+          <input type="email" class="field__input" formControlName="smtp_from_email" placeholder="jane@example.com" />
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:8px;">
+        <button type="submit" class="btn btn--primary" [disabled]="form.invalid || saving()">
+          {{ saving() ? 'Saving…' : 'Save Credentials' }}
+        </button>
+        <button
+          type="button"
+          class="btn btn--secondary"
+          (click)="testConnection()"
+          [disabled]="!hasSavedCreds() || testing()"
+        >
+          {{ testing() ? 'Testing…' : 'Test Connection' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
