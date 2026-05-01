@@ -4,6 +4,7 @@ import {
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Lead } from '../../../core/models/lead.model';
+import { exportToCsv } from '../../../core/utils/export-csv';
 import { AuthService } from '../../../core/services/auth.service';
 import { ClaudeService } from '../../../core/services/claude.service';
 import { ConfigService } from '../../../core/services/config.service';
@@ -115,17 +116,16 @@ export class FindLeadsComponent implements OnInit {
   }
 
   exportCSV() {
-    const rows = this.leadsService.leads() as unknown as Record<string, unknown>[];
-    if (rows.length === 0) return;
-    const header = Object.keys(rows[0]).join(',');
-    const body = rows.map(r => Object.values(r).map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob([`${header}\n${body}`], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'leads.csv';
-    a.click();
-    URL.revokeObjectURL(url);
+    const _leads = this.leadsService.leads();
+    if (_leads.length === 0) return;
+    const _csv = exportToCsv(_leads);
+    const _blob = new Blob([_csv], { type: 'text/csv' });
+    const _url = URL.createObjectURL(_blob);
+    const _a = document.createElement('a');
+    _a.href = _url;
+    _a.download = 'leads.csv';
+    _a.click();
+    URL.revokeObjectURL(_url);
   }
 
   async deleteLead(id: string) {

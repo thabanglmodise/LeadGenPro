@@ -11,16 +11,15 @@ function makeAuthService(overrides: {
   return {
     isLoggedIn: signal(overrides.isLoggedIn ?? false),
     profileStatus: signal(overrides.profileStatus ?? null),
-    ensureProfileLoaded: jasmine.createSpy('ensureProfileLoaded').and.returnValue(Promise.resolve()),
+    ensureProfileLoaded: vi.fn().mockResolvedValue(undefined),
   };
 }
 
 describe('authGuard', () => {
-  let mockRouter: jasmine.SpyObj<Router>;
+  let mockRouter: { parseUrl: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
-    mockRouter = jasmine.createSpyObj('Router', ['parseUrl']);
-    mockRouter.parseUrl.and.callFake((url: string) => url as unknown as ReturnType<Router['parseUrl']>);
+    mockRouter = { parseUrl: vi.fn().mockImplementation((url: string) => url) };
   });
 
   async function runGuard(authOverrides: { isLoggedIn?: boolean; profileStatus?: string | null }) {
@@ -37,13 +36,13 @@ describe('authGuard', () => {
   }
 
   it('redirects to /auth/login when not logged in', async () => {
-    const _result = await runGuard({ isLoggedIn: false });
+    await runGuard({ isLoggedIn: false });
     expect(mockRouter.parseUrl).toHaveBeenCalledWith('/auth/login');
   });
 
   it('returns true for active user', async () => {
     const _result = await runGuard({ isLoggedIn: true, profileStatus: 'active' });
-    expect(_result).toBeTrue();
+    expect(_result).toBeTruthy();
   });
 
   it('redirects to /auth/verify-prompt for pending_verification', async () => {

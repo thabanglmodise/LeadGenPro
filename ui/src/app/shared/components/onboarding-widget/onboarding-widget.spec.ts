@@ -11,7 +11,7 @@ function makeOnboardingService(progressValue: number) {
       { key: 'step_b', label: 'Step B', description: '', routerLink: '/' },
     ]),
     steps: signal<Record<string, boolean>>({}),
-    openWizard: jasmine.createSpy('openWizard'),
+    openWizard: vi.fn(),
   } as unknown as OnboardingService;
 }
 
@@ -22,7 +22,7 @@ describe('OnboardingWidgetComponent', () => {
         providers: [{ provide: OnboardingService, useValue: makeOnboardingService(50) }],
       });
       const _fixture = TestBed.createComponent(OnboardingWidgetComponent);
-      expect(_fixture.componentInstance.showWidget()).toBeTrue();
+      expect(_fixture.componentInstance.showWidget()).toBeTruthy();
     });
 
     it('is false when progress === 80', () => {
@@ -30,7 +30,7 @@ describe('OnboardingWidgetComponent', () => {
         providers: [{ provide: OnboardingService, useValue: makeOnboardingService(80) }],
       });
       const _fixture = TestBed.createComponent(OnboardingWidgetComponent);
-      expect(_fixture.componentInstance.showWidget()).toBeFalse();
+      expect(_fixture.componentInstance.showWidget()).toBeFalsy();
     });
 
     it('is false when progress > 80', () => {
@@ -38,7 +38,7 @@ describe('OnboardingWidgetComponent', () => {
         providers: [{ provide: OnboardingService, useValue: makeOnboardingService(100) }],
       });
       const _fixture = TestBed.createComponent(OnboardingWidgetComponent);
-      expect(_fixture.componentInstance.showWidget()).toBeFalse();
+      expect(_fixture.componentInstance.showWidget()).toBeFalsy();
     });
   });
 

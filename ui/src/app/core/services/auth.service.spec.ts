@@ -1,21 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { AuthService } from './auth.service';
 
-/* Supabase client is a module-level singleton — we mock it globally */
-const mockGetSession = jasmine.createSpy('getSession').and.returnValue(
-  Promise.resolve({ data: { session: null } }),
-);
-const mockOnAuthStateChange = jasmine.createSpy('onAuthStateChange').and.returnValue({
-  data: { subscription: { unsubscribe: () => {} } },
-});
-const mockFrom = jasmine.createSpy('from');
-
-jasmine.getEnv().beforeEach(() => {
-  mockGetSession.calls.reset();
-  mockOnAuthStateChange.calls.reset();
-  mockFrom.calls.reset();
-});
-
 describe('AuthService', () => {
   let service: AuthService;
 
@@ -35,13 +20,11 @@ describe('AuthService', () => {
   describe('role signal', () => {
     it('returns null when app_metadata is absent', () => {
       service = TestBed.inject(AuthService);
-      /* no user set — role defaults to null */
       expect(service.role()).toBeNull();
     });
 
     it('returns "admin" when app_metadata.role is "admin"', () => {
       service = TestBed.inject(AuthService);
-      /* directly patch the internal signal via the user reference */
       const _user = buildUser({ app_metadata: { role: 'admin' } });
       (service as unknown as { _user: { set: (v: unknown) => void } })._user.set(_user);
       expect(service.role()).toBe('admin');
@@ -84,13 +67,13 @@ describe('AuthService', () => {
   describe('isLoggedIn', () => {
     it('is false when no user', () => {
       service = TestBed.inject(AuthService);
-      expect(service.isLoggedIn()).toBeFalse();
+      expect(service.isLoggedIn()).toBeFalsy();
     });
 
     it('is true when user is set', () => {
       service = TestBed.inject(AuthService);
       (service as unknown as { _user: { set: (v: unknown) => void } })._user.set(buildUser());
-      expect(service.isLoggedIn()).toBeTrue();
+      expect(service.isLoggedIn()).toBeTruthy();
     });
   });
 });

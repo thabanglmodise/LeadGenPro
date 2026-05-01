@@ -12,11 +12,10 @@ function makeAuthService(overrides: { isLoggedIn?: boolean; role?: string | null
 }
 
 describe('adminGuard', () => {
-  let mockRouter: jasmine.SpyObj<Router>;
+  let mockRouter: { parseUrl: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
-    mockRouter = jasmine.createSpyObj('Router', ['parseUrl']);
-    mockRouter.parseUrl.and.callFake((url: string) => url as unknown as ReturnType<Router['parseUrl']>);
+    mockRouter = { parseUrl: vi.fn().mockImplementation((url: string) => url) };
   });
 
   function runGuard(authOverrides: { isLoggedIn?: boolean; role?: string | null }) {
@@ -39,7 +38,7 @@ describe('adminGuard', () => {
 
   it('returns true for admin user', () => {
     const _result = runGuard({ isLoggedIn: true, role: 'admin' });
-    expect(_result).toBeTrue();
+    expect(_result).toBeTruthy();
   });
 
   it('redirects to /dashboard for a user with role "user"', () => {

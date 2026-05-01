@@ -10,7 +10,7 @@ describe('ApprovalQueueComponent', () => {
   it('renders with empty pending list by default', () => {
     const _fixture = TestBed.createComponent(ApprovalQueueComponent);
     const _comp = _fixture.componentInstance;
-    expect(_comp.pending()).toHaveSize(0);
+    expect(_comp.pending()).toHaveLength(0);
   });
 
   it('pending computed filters to only pending_approval status', () => {
@@ -25,7 +25,7 @@ describe('ApprovalQueueComponent', () => {
       { id: 'u3', full_name: 'Carol', biz_name: null, status: 'pending_approval', tier: 'plus' },
     ]);
 
-    expect(_comp.pending()).toHaveSize(2);
+    expect(_comp.pending()).toHaveLength(2);
     expect(_comp.pending().map(u => u.id)).toEqual(['u2', 'u3']);
   });
 
@@ -38,6 +38,6 @@ describe('ApprovalQueueComponent', () => {
       { id: 'u1', full_name: 'Alice', biz_name: null, status: 'active', tier: 'basic' },
     ]);
 
-    expect(_comp.pending()).toHaveSize(0);
+    expect(_comp.pending()).toHaveLength(0);
   });
 });

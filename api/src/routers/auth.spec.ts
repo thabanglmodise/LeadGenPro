@@ -97,7 +97,7 @@ describe('authRouter.advanceStatus', () => {
 describe('adminProcedure authorization', () => {
   it('throws UNAUTHORIZED when role is not admin', () => {
     expect(() => {
-      if ('user' !== 'admin') throw new TRPCError({ code: 'UNAUTHORIZED' });
+      if (('user' as string) !== 'admin') throw new TRPCError({ code: 'UNAUTHORIZED' });
     }).toThrow(TRPCError);
   });
 
