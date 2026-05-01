@@ -10,7 +10,7 @@
 
   @if (sent()) {
     <div class="warning-banner" style="background:hsl(var(--success)/0.1);border-color:hsl(var(--success)/0.3);color:hsl(var(--success)); margin-bottom:16px;">
-      ✓ Gmail compose opened and email logged!
+      ✓ Email sent!
     </div>
   }
 
@@ -100,9 +100,20 @@
           <textarea class="field__textarea" formControlName="body" style="min-height:200px;"></textarea>
         </div>
 
-        <button type="button" class="btn btn--primary" (click)="sendEmail()" [disabled]="sending()">
-          {{ sending() ? 'Opening…' : '📤 Send via Gmail' }}
-        </button>
+        <!-- Send actions -->
+        <div class="compose__send-group">
+          @if (smtpConfigured()) {
+            <button type="button" class="btn btn--primary compose__send-btn--smtp" (click)="sendViaSMTP()" [disabled]="sending()">
+              {{ sending() ? 'Sending…' : '📤 Send via SMTP' }}
+            </button>
+          }
+          <button type="button" class="btn btn--secondary" (click)="copyToClipboard()">
+            📋 Copy to clipboard
+          </button>
+          <button type="button" class="btn btn--secondary" (click)="openMailto()">
+            📧 Open in mail app
+          </button>
+        </div>
       </div>
     </div>
   </form>

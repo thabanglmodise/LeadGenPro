@@ -15,8 +15,8 @@ export class EmailService {
     this._sent.set(data as SentEmail[]);
   }
 
-  async logSent(to: string, subject: string, body: string): Promise<void> {
-    const entry = await trpc.email.log.mutate({ to_email: to, subject, body });
+  async logSent(to: string, subject: string, body: string, send_method?: 'smtp' | 'mailto' | 'clipboard'): Promise<void> {
+    const entry = await trpc.email.log.mutate({ to_email: to, subject, body, send_method });
     if (entry) {
       this._sent.update(s => [entry as SentEmail, ...s]);
     }

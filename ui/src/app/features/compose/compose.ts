@@ -11,6 +11,7 @@ import { ConfigService } from '../../core/services/config.service';
 import { EmailService } from '../../core/services/email.service';
 import { LeadsService } from '../../core/services/leads.service';
 import { ProfileService } from '../../core/services/profile.service';
+import { trpc } from '../../core/trpc.client';
 
 const FALLBACK_SUBJECT = 'Quick introduction from {senderName}';
 const FALLBACK_BODY = `Hi {contactName},
@@ -58,6 +59,7 @@ export class ComposeComponent implements OnInit {
   readonly sending = signal(false);
   readonly error = signal('');
   readonly sent = signal(false);
+  readonly smtpConfigured = signal(false);
 
   readonly tones = ['Professional', 'Friendly', 'Consultative', 'Urgent'];
   readonly templates = ['Cold Intro', 'Value Prop', 'Problem-Solution', 'Follow-Up'];
@@ -70,21 +72,23 @@ export class ComposeComponent implements OnInit {
       this.profile.load(),
     ]);
     this.form.patchValue({ from: this.config.gmEmail() });
-    const leadId = this.route.snapshot.queryParamMap.get('leadId');
-    if (leadId) {
-      this.form.patchValue({ leadId });
-      this.onLeadSelect(leadId);
+    const _status = await trpc.userApiKeys.load.query();
+    this.smtpConfigured.set(_status.has_smtp);
+    const _leadId = this.route.snapshot.queryParamMap.get('leadId');
+    if (_leadId) {
+      this.form.patchValue({ leadId: _leadId });
+      this.onLeadSelect(_leadId);
     }
   }
 
   onLeadSelect(id: string) {
-    const lead = this.leadsService.leads().find((l: Lead) => l.id === id);
-    if (!lead) return;
+    const _lead = this.leadsService.leads().find((l: Lead) => l.id === id);
+    if (!_lead) return;
     this.form.patchValue({
-      contactName: lead.contact_name,
-      company: lead.name,
-      website: lead.website,
-      to: lead.contact_email,
+      contactName: _lead.contact_name,
+      company: _lead.name,
+      website: _lead.website,
+      to: _lead.contact_email,
     });
   }
 
@@ -93,18 +97,18 @@ export class ComposeComponent implements OnInit {
       this.applyFallback();
       return;
     }
-    const leadId = this.form.value.leadId;
-    const lead = this.leadsService.leads().find((l: Lead) => l.id === leadId);
-    if (!lead) { this.applyFallback(); return; }
+    const _leadId = this.form.value.leadId;
+    const _lead = this.leadsService.leads().find((l: Lead) => l.id === _leadId);
+    if (!_lead) { this.applyFallback(); return; }
 
     this.drafting.set(true);
-    const p = this.profile.profile();
+    const _p = this.profile.profile();
     this.claude.draftEmail({
-      lead,
-      senderName: p?.full_name ?? '',
-      senderRole: p?.role ?? '',
-      offering: p?.offering ?? '',
-      benefits: p?.benefits ?? '',
+      lead: _lead,
+      senderName: _p?.full_name ?? '',
+      senderRole: _p?.role ?? '',
+      offering: _p?.offering ?? '',
+      benefits: _p?.benefits ?? '',
       tone: this.form.value.tone ?? 'Professional',
       template: this.form.value.template ?? 'Cold Intro',
     }).subscribe({
@@ -121,32 +125,63 @@ export class ComposeComponent implements OnInit {
   }
 
   private applyFallback() {
-    const v = this.form.value;
-    const p = this.profile.profile();
+    const _v = this.form.value;
+    const _p = this.profile.profile();
     this.form.patchValue({
-      subject: FALLBACK_SUBJECT.replace('{senderName}', p?.full_name ?? 'us'),
+      subject: FALLBACK_SUBJECT.replace('{senderName}', _p?.full_name ?? 'us'),
       body: FALLBACK_BODY
-        .replace('{contactName}', v.contactName || 'there')
-        .replace('{company}', v.company || 'your company')
-        .replace('{offering}', p?.offering || 'our services')
-        .replace('{senderName}', p?.full_name || 'the team'),
+        .replace('{contactName}', _v.contactName || 'there')
+        .replace('{company}', _v.company || 'your company')
+        .replace('{offering}', _p?.offering || 'our services')
+        .replace('{senderName}', _p?.full_name || 'the team'),
     });
   }
 
-  async sendEmail() {
-    const v = this.form.value;
-    if (!v.to || !v.subject || !v.body) {
+  async sendViaSMTP() {
+    const _v = this.form.value;
+    if (!_v.to || !_v.subject || !_v.body) {
       this.error.set('TO, SUBJECT, and body are required.');
       return;
     }
     this.sending.set(true);
-    this.emailService.openGmailCompose(v.to!, v.subject!, v.body!);
-    await this.emailService.logSent(v.to!, v.subject!, v.body!);
-    if (v.leadId) {
-      await this.leadsService.updateLead(v.leadId!, { status: 'contacted' });
-      await this.activityService.add(`Email sent to ${v.to} (${v.company})`);
+    this.error.set('');
+    try {
+      await trpc.email.sendSmtp.mutate({
+        to_email: _v.to!,
+        subject: _v.subject!,
+        body: _v.body!,
+      });
+      if (_v.leadId) {
+        await this.leadsService.updateLead(_v.leadId!, { status: 'contacted' });
+        await this.activityService.add(`Email sent (SMTP) to ${_v.to} (${_v.company})`);
+      }
+      this.sent.set(true);
+    } catch (err) {
+      this.error.set(err instanceof Error ? err.message : 'Send failed');
+    } finally {
+      this.sending.set(false);
+    }
+  }
+
+  async copyToClipboard() {
+    const _v = this.form.value;
+    const _text = `Subject: ${_v.subject ?? ''}\n\n${_v.body ?? ''}`;
+    await navigator.clipboard.writeText(_text);
+    await this.emailService.logSent(_v.to ?? '', _v.subject ?? '', _v.body ?? '', 'clipboard');
+    if (_v.leadId) {
+      await this.leadsService.updateLead(_v.leadId!, { status: 'contacted' });
     }
     this.sent.set(true);
-    this.sending.set(false);
+  }
+
+  openMailto() {
+    const _v = this.form.value;
+    const _url = `mailto:${encodeURIComponent(_v.to ?? '')}?subject=${encodeURIComponent(_v.subject ?? '')}&body=${encodeURIComponent(_v.body ?? '')}`;
+    window.open(_url, '_blank');
+    this.emailService.logSent(_v.to ?? '', _v.subject ?? '', _v.body ?? '', 'mailto');
+    if (_v.leadId) {
+      this.leadsService.updateLead(_v.leadId!, { status: 'contacted' });
+    }
+    this.sent.set(true);
   }
 }
