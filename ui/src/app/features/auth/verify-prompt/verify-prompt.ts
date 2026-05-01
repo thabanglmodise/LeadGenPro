@@ -11,7 +11,7 @@ import { trpc } from '../../../core/trpc.client';
   templateUrl: './verify-prompt.html',
 })
 export class VerifyPromptComponent implements OnInit {
-  private readonly auth = inject(AuthService);
+  protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
   readonly advancing = signal(false);
