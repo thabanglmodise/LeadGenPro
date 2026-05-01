@@ -1,0 +1,19 @@
+<div class="pipeline-card">
+  <p class="pipeline-card__name">{{ lead.name }}</p>
+  <p class="pipeline-card__city">{{ lead.city }}</p>
+  <div class="pipeline-card__footer">
+    <app-lead-score-badge [score]="lead.ai_score" />
+    <select
+      class="pipeline-card__status-select"
+      [value]="displayStatus()"
+      (change)="onStageChange($any($event.target).value)"
+    >
+      @for (stage of stages; track stage) {
+        <option [value]="stage">{{ stage }}</option>
+      }
+    </select>
+  </div>
+  <a [routerLink]="['/compose']" [queryParams]="{leadId: lead.id}" class="pipeline-card__compose-link">
+    Compose →
+  </a>
+</div>

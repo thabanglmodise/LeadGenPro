@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { Lead } from '../models/lead.model';
+import { Lead, LeadStatus } from '../models/lead.model';
 import { trpc } from '../trpc.client';
 
 @Injectable({ providedIn: 'root' })
@@ -28,6 +28,19 @@ export class LeadsService {
   async updateLead(id: string, patch: Partial<Lead>): Promise<void> {
     await trpc.leads.update.mutate({ id, patch });
     this._leads.update(list => list.map(l => (l.id === id ? { ...l, ...patch } : l)));
+  }
+
+  async updateStatus(id: string, status: LeadStatus): Promise<void> {
+    const _prev = this._leads().find(l => l.id === id)?.status;
+    this._leads.update(list => list.map(l => (l.id === id ? { ...l, status } : l)));
+    try {
+      await trpc.leads.updateStatus.mutate({ id, status });
+    } catch (err) {
+      if (_prev) {
+        this._leads.update(list => list.map(l => (l.id === id ? { ...l, status: _prev } : l)));
+      }
+      throw err;
+    }
   }
 
   async deleteLead(id: string): Promise<void> {
