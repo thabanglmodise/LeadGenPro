@@ -23,6 +23,7 @@ export const profiles = pgTable('profiles', {
   tier: text('tier').notNull().default('basic'),
   key_list: text('key_list').notNull().default('default'),
   onboarding: jsonb('onboarding').$type<Record<string, boolean>>(),
+  theme: text('theme'),
   updated_at: timestamp('updated_at').defaultNow(),
 });
 
@@ -63,6 +64,7 @@ export const sent_emails = pgTable('sent_emails', {
   to_email: text('to_email').notNull(),
   subject: text('subject'),
   body: text('body'),
+  send_method: text('send_method'),
   sent_at: timestamp('sent_at').defaultNow(),
 });
 
@@ -86,5 +88,11 @@ export const user_api_keys = pgTable('user_api_keys', {
   gp_key: text('gp_key'),
   cl_key: text('cl_key'),
   prefer_global: boolean('prefer_global').notNull().default(false),
+  smtp_host: text('smtp_host'),
+  smtp_port: integer('smtp_port'),
+  smtp_user: text('smtp_user'),
+  smtp_pass: text('smtp_pass'),
+  smtp_from_name: text('smtp_from_name'),
+  smtp_from_email: text('smtp_from_email'),
   updated_at: timestamp('updated_at').defaultNow(),
 });
