@@ -24,7 +24,7 @@ export class DashboardComponent implements OnInit {
 
   async ngOnInit() {
     if (!this.auth.user()?.id) return;
-    await Promise.all([
+    await Promise.allSettled([
       this.leadsService.loadLeads(),
       this.emailService.load(),
       this.activityService.load(),

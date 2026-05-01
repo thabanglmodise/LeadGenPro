@@ -11,8 +11,12 @@ export class EmailService {
   readonly sentCount = computed(() => this._sent().length);
 
   async load(): Promise<void> {
-    const data = await trpc.email.list.query();
-    this._sent.set(data as SentEmail[]);
+    try {
+      const data = await trpc.email.list.query();
+      this._sent.set(data as SentEmail[]);
+    } catch {
+      /* non-fatal — dashboard degrades gracefully if query fails */
+    }
   }
 
   async logSent(to: string, subject: string, body: string, send_method?: 'smtp' | 'mailto' | 'clipboard'): Promise<void> {
