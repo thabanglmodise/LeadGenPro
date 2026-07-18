@@ -16,37 +16,37 @@ describe('AdminUsersComponent', () => {
     const _fixture = TestBed.createComponent(AdminUsersComponent);
     const _comp = _fixture.componentInstance;
     const _adminUser = MOCK_USERS[2];
-    expect(_comp.isActionable(_adminUser)).toBeFalse();
+    expect(_comp.isActionable(_adminUser)).toBeFalsy();
   });
 
   it('isActionable returns true for non-admin users', () => {
     const _fixture = TestBed.createComponent(AdminUsersComponent);
     const _comp = _fixture.componentInstance;
     const _user = MOCK_USERS[0];
-    expect(_comp.isActionable(_user)).toBeTrue();
+    expect(_comp.isActionable(_user)).toBeTruthy();
   });
 
   it('canApprove returns true for pending_approval status', () => {
     const _fixture = TestBed.createComponent(AdminUsersComponent);
     const _comp = _fixture.componentInstance;
-    expect(_comp.canApprove(MOCK_USERS[1])).toBeTrue();
+    expect(_comp.canApprove(MOCK_USERS[1])).toBeTruthy();
   });
 
   it('canApprove returns false for active status', () => {
     const _fixture = TestBed.createComponent(AdminUsersComponent);
     const _comp = _fixture.componentInstance;
-    expect(_comp.canApprove(MOCK_USERS[0])).toBeFalse();
+    expect(_comp.canApprove(MOCK_USERS[0])).toBeFalsy();
   });
 
   it('canSuspend returns true for active non-admin users', () => {
     const _fixture = TestBed.createComponent(AdminUsersComponent);
     const _comp = _fixture.componentInstance;
-    expect(_comp.canSuspend(MOCK_USERS[0])).toBeTrue();
+    expect(_comp.canSuspend(MOCK_USERS[0])).toBeTruthy();
   });
 
   it('canSuspend returns false for pending_approval users', () => {
     const _fixture = TestBed.createComponent(AdminUsersComponent);
     const _comp = _fixture.componentInstance;
-    expect(_comp.canSuspend(MOCK_USERS[1])).toBeFalse();
+    expect(_comp.canSuspend(MOCK_USERS[1])).toBeFalsy();
   });
 });

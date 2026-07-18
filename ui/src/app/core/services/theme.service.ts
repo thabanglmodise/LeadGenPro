@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { trpc } from '../trpc.client';
 
 type Theme = 'dark' | 'light';
@@ -8,10 +9,13 @@ const DEFAULT_THEME: Theme = 'dark';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
+  private readonly platformId = inject(PLATFORM_ID);
   readonly theme = signal<Theme>(DEFAULT_THEME);
 
   constructor() {
-    this.init();
+    if (isPlatformBrowser(this.platformId)) {
+      this.init();
+    }
   }
 
   private init(): void {
@@ -23,7 +27,9 @@ export class ThemeService {
   toggle(): void {
     const _next: Theme = this.theme() === 'dark' ? 'light' : 'dark';
     this.apply(_next);
-    trpc.profile.setTheme.mutate({ theme: _next }).catch(() => {});
+    if (isPlatformBrowser(this.platformId)) {
+      trpc.profile.setTheme.mutate({ theme: _next }).catch(() => {});
+    }
   }
 
   syncFromDb(theme: Theme): void {
@@ -31,6 +37,10 @@ export class ThemeService {
   }
 
   private apply(theme: Theme): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      this.theme.set(theme);
+      return;
+    }
     const _html = document.documentElement;
     _html.classList.remove('dark', 'light');
     _html.classList.add(theme);

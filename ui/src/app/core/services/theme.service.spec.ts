@@ -21,8 +21,8 @@ describe('ThemeService', () => {
 
   it('defaults to dark mode when localStorage has no entry', () => {
     expect(service.theme()).toBe('dark');
-    expect(html.classList.contains('dark')).toBeTrue();
-    expect(html.classList.contains('light')).toBeFalse();
+    expect(html.classList.contains('dark')).toBeTruthy();
+    expect(html.classList.contains('light')).toBeFalsy();
   });
 
   it('restores dark theme from localStorage on init', () => {
@@ -31,7 +31,7 @@ describe('ThemeService', () => {
     TestBed.configureTestingModule({});
     const _restored = TestBed.inject(ThemeService);
     expect(_restored.theme()).toBe('dark');
-    expect(html.classList.contains('dark')).toBeTrue();
+    expect(html.classList.contains('dark')).toBeTruthy();
   });
 
   it('restores light theme from localStorage on init', () => {
@@ -40,16 +40,16 @@ describe('ThemeService', () => {
     TestBed.configureTestingModule({});
     const _restored = TestBed.inject(ThemeService);
     expect(_restored.theme()).toBe('light');
-    expect(html.classList.contains('light')).toBeTrue();
-    expect(html.classList.contains('dark')).toBeFalse();
+    expect(html.classList.contains('light')).toBeTruthy();
+    expect(html.classList.contains('dark')).toBeFalsy();
   });
 
   it('toggles from dark to light and updates class + localStorage', () => {
     expect(service.theme()).toBe('dark');
     service.toggle();
     expect(service.theme()).toBe('light');
-    expect(html.classList.contains('light')).toBeTrue();
-    expect(html.classList.contains('dark')).toBeFalse();
+    expect(html.classList.contains('light')).toBeTruthy();
+    expect(html.classList.contains('dark')).toBeFalsy();
     expect(localStorage.getItem('prospekt-theme')).toBe('light');
   });
 
@@ -57,8 +57,8 @@ describe('ThemeService', () => {
     service.toggle(); // dark → light
     service.toggle(); // light → dark
     expect(service.theme()).toBe('dark');
-    expect(html.classList.contains('dark')).toBeTrue();
-    expect(html.classList.contains('light')).toBeFalse();
+    expect(html.classList.contains('dark')).toBeTruthy();
+    expect(html.classList.contains('light')).toBeFalsy();
     expect(localStorage.getItem('prospekt-theme')).toBe('dark');
   });
 

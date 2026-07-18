@@ -1,0 +1,4 @@
+[build]
+  base = "ui"
+  command = "node scripts/write-env.js && npm run build -- --output-mode=static"
+  publish = "dist/leadGenPro/browser"
