@@ -1,9 +1,7 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { eq } from 'drizzle-orm';
 import { router, protectedProcedure } from '../trpc.js';
-import { user_config } from '../db/schema.js';
-import type { DB } from '../db/index.js';
+import { resolveKey } from '../lib/resolve-key.js';
 
 const LeadInputSchema = z.object({
   id: z.string(),
@@ -29,7 +27,7 @@ export const aiRouter = router({
   score: protectedProcedure
     .input(z.object({ leads: z.array(LeadInputSchema), offering: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const clKey = await getClaudeKey(ctx.db, ctx.user.id);
+      const clKey = await resolveKey(ctx.db, ctx.user.id, 'cl');
       const prompt = buildScoringPrompt(input.leads, input.offering);
       const text = await callClaude(prompt, 400, clKey);
       try {
@@ -46,7 +44,7 @@ export const aiRouter = router({
   draft: protectedProcedure
     .input(EmailDraftSchema)
     .mutation(async ({ ctx, input }) => {
-      const clKey = await getClaudeKey(ctx.db, ctx.user.id);
+      const clKey = await resolveKey(ctx.db, ctx.user.id, 'cl');
       const prompt = buildEmailPrompt(input);
       const text = await callClaude(prompt, 700, clKey);
       const subjMatch = text.match(/SUBJECT:\s*(.+)/);
@@ -57,20 +55,6 @@ export const aiRouter = router({
       };
     }),
 });
-
-async function getClaudeKey(db: DB, userId: string): Promise<string> {
-  const [config] = await db
-    .select({ cl_key: user_config.cl_key })
-    .from(user_config)
-    .where(eq(user_config.id, userId));
-  if (!config?.cl_key) {
-    throw new TRPCError({
-      code: 'PRECONDITION_FAILED',
-      message: 'Claude API key not configured. Add it in Settings → API Setup.',
-    });
-  }
-  return config.cl_key;
-}
 
 async function callClaude(prompt: string, maxTokens: number, apiKey: string): Promise<string> {
   const res = await fetch('https://api.anthropic.com/v1/messages', {

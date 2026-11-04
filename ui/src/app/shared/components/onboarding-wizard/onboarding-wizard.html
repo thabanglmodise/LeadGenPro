@@ -1,0 +1,83 @@
+<div class="wizard-backdrop" (click)="close()">
+  <div class="wizard" (click)="$event.stopPropagation()">
+
+    <button class="wizard__close" (click)="close()" aria-label="Close wizard">✕</button>
+
+    <div class="wizard__header">
+      <h1 class="wizard__title">
+        {{ onboarding.isAdmin() ? 'Platform Setup' : 'Getting Started' }}
+      </h1>
+      <p class="wizard__subtitle">
+        Complete these steps to get the most out of Prospekt.
+      </p>
+      <div class="wizard__progress-bar">
+        <div class="wizard__progress-fill" [style.width.%]="progress()"></div>
+      </div>
+      <p class="wizard__progress-label">{{ progress() }}% complete</p>
+    </div>
+
+    <!-- Step nav pills -->
+    <div class="wizard__step-nav">
+      @for (step of steps(); track step.key; let i = $index) {
+        <button
+          class="wizard__step-pill"
+          [class.wizard__step-pill--active]="i === currentIndex()"
+          [class.wizard__step-pill--done]="stepDone(step.key)"
+          (click)="goTo(i)"
+        >
+          @if (stepDone(step.key)) { ✓ } @else { {{ i + 1 }} }
+        </button>
+      }
+    </div>
+
+    <!-- Current step -->
+    @if (currentStep(); as step) {
+      <div class="wizard__step">
+        <div class="wizard__step-status">
+          @if (isCurrentDone()) {
+            <span class="wizard__step-done-badge">✓ Done</span>
+          } @else {
+            <span class="wizard__step-pending-badge">Pending</span>
+          }
+        </div>
+        <h2 class="wizard__step-title">{{ step.label }}</h2>
+        <p class="wizard__step-desc">{{ step.description }}</p>
+
+        <div class="wizard__step-actions">
+          <a
+            class="btn btn--primary"
+            [routerLink]="step.routerLink"
+            (click)="close()"
+          >
+            Go to page →
+          </a>
+
+          @if (!isCurrentDone()) {
+            <button class="btn btn--ghost" (click)="markDone()">
+              Mark as done
+            </button>
+          }
+
+          @if (step.skippable && !isCurrentDone()) {
+            <button class="btn btn--ghost" (click)="skip()">Skip</button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Navigation -->
+    <div class="wizard__footer">
+      <button
+        class="btn btn--ghost"
+        (click)="goTo(currentIndex() - 1)"
+        [disabled]="currentIndex() === 0"
+      >
+        ← Back
+      </button>
+      <button class="btn btn--ghost" (click)="advance()">
+        {{ currentIndex() === steps().length - 1 ? 'Finish' : 'Next →' }}
+      </button>
+    </div>
+
+  </div>
+</div>

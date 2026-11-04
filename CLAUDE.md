@@ -41,3 +41,4 @@
 - You are only to make commits to the `more-cowbell` branch.
 - You are permitted to pull from the master branch and merge that into the `more-cowbell` branch.
 - For all commits create a summary to-do list in markdown format defining what has been done and what still needs to be done. This list should be informed by the feature documentation used to create that feature located in `./DOCS`
+- Do not include claude or anthropic in commits. No Authors are to be specified in commit messages

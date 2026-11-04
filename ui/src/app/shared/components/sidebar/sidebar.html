@@ -1,7 +1,7 @@
 <aside class="sidebar">
   <div class="sidebar__brand">
-    <span class="sidebar__logo">⚡</span>
-    <span class="sidebar__title">LeadAI Pro</span>
+    <div class="sidebar__logo">P</div>
+    <span class="sidebar__title">Prospekt</span>
   </div>
 
   <nav class="sidebar__nav">
@@ -32,6 +32,14 @@
       }
     </a>
 
+    @if (auth.role() === 'admin') {
+      <div class="sidebar__divider"></div>
+      <a routerLink="/admin" routerLinkActive="sidebar__link--active" class="sidebar__link sidebar__link--admin">
+        <span class="sidebar__link-icon">🛡️</span>
+        <span>Admin Panel</span>
+      </a>
+    }
+
     <div class="sidebar__divider"></div>
 
     <a routerLink="/settings/setup" routerLinkActive="sidebar__link--active" class="sidebar__link">
@@ -45,10 +53,30 @@
       <span class="sidebar__link-icon">🏢</span>
       <span>My Business</span>
     </a>
+    @if (showByok()) {
+      <a routerLink="/settings/api-keys" routerLinkActive="sidebar__link--active" class="sidebar__link">
+        <span class="sidebar__link-icon">🗝️</span>
+        <span>My API Keys</span>
+      </a>
+    }
+    <a routerLink="/settings/smtp" routerLinkActive="sidebar__link--active" class="sidebar__link">
+      <span class="sidebar__link-icon">📨</span>
+      <span>SMTP Settings</span>
+    </a>
   </nav>
 
   <div class="sidebar__footer">
+    <button class="sidebar__checklist-btn" (click)="openChecklist()">📋 Setup checklist</button>
     <span class="sidebar__user">{{ auth.user()?.email }}</span>
-    <button class="sidebar__signout" (click)="signOut()">Sign out</button>
+    <div class="sidebar__actions">
+      <button class="sidebar__signout" (click)="signOut()">Sign out</button>
+      <button
+        class="sidebar__theme-toggle"
+        (click)="toggleTheme()"
+        [title]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+      >
+        {{ isDark() ? '☀️' : '🌙' }}
+      </button>
+    </div>
   </div>
 </aside>

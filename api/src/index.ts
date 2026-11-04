@@ -4,6 +4,7 @@ import cors from 'cors';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './router.js';
 import { createContext } from './context.js';
+import { serveUi } from './lib/serve-ui.js';
 
 const app = express();
 
@@ -28,6 +29,8 @@ app.use(
     createContext,
   }),
 );
+
+serveUi(app);
 
 const port = Number(process.env.PORT ?? 3001);
 app.listen(port, () => {

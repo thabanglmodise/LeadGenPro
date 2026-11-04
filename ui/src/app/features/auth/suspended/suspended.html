@@ -1,0 +1,21 @@
+<div class="auth">
+  <div class="auth__card">
+    <div class="auth__logo">
+      <div class="auth__logo-mark">P</div>
+    </div>
+    <h1 class="auth__title">Account suspended</h1>
+    <p class="auth__subtitle">
+      Your account has been suspended. Please contact support if you believe this is a mistake.
+    </p>
+
+    <div style="margin-top: 24px;">
+      <button class="auth__btn" style="background: hsl(var(--danger) / 0.15); color: hsl(var(--danger));" (click)="signOut()">
+        Sign out
+      </button>
+    </div>
+
+    <div style="margin-top: 16px; text-align: center; font-size: 13px; color: hsl(var(--muted));">
+      Signed in as {{ auth.user()?.email }}
+    </div>
+  </div>
+</div>

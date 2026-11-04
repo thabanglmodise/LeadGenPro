@@ -1,0 +1,19 @@
+<div class="auth">
+  <div class="auth__card">
+    <div class="auth__logo">
+      <div class="auth__logo-mark">P</div>
+    </div>
+    <h1 class="auth__title">Pending approval</h1>
+    <p class="auth__subtitle">
+      Your account is awaiting admin approval. You'll receive an email once your account is activated.
+    </p>
+
+    <div style="margin-top: 24px;">
+      <button class="auth__btn" (click)="signOut()">Sign out</button>
+    </div>
+
+    <div style="margin-top: 16px; text-align: center; font-size: 13px; color: hsl(var(--muted));">
+      Signed in as {{ auth.user()?.email }}
+    </div>
+  </div>
+</div>

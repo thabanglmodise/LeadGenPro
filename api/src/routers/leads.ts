@@ -1,7 +1,10 @@
 import { z } from 'zod';
 import { eq, and, desc } from 'drizzle-orm';
+import { TRPCError } from '@trpc/server';
 import { router, protectedProcedure } from '../trpc.js';
 import { leads } from '../db/schema.js';
+
+const LEAD_STATUSES = ['new', 'contacted', 'replied', 'converted'] as const;
 
 const LeadInsertSchema = z.object({
   name: z.string(),
@@ -60,4 +63,25 @@ export const leadsRouter = router({
   clearAll: protectedProcedure.mutation(async ({ ctx }) => {
     await ctx.db.delete(leads).where(eq(leads.user_id, ctx.user.id));
   }),
+
+  updateStatus: protectedProcedure
+    .input(z.object({ id: z.string().uuid(), status: z.enum(LEAD_STATUSES) }))
+    .mutation(async ({ ctx, input }) => {
+      const [existing] = await ctx.db
+        .select({ user_id: leads.user_id })
+        .from(leads)
+        .where(eq(leads.id, input.id));
+      if (!existing) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Lead not found' });
+      }
+      if (existing.user_id !== ctx.user.id) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not your lead' });
+      }
+      const [updated] = await ctx.db
+        .update(leads)
+        .set({ status: input.status })
+        .where(eq(leads.id, input.id))
+        .returning();
+      return updated;
+    }),
 });

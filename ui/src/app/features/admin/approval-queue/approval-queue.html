@@ -1,0 +1,47 @@
+<div class="page">
+  <div class="page__header">
+    <h1 class="page__title">Approval Queue</h1>
+    <p class="page__subtitle">Users awaiting manual approval</p>
+  </div>
+
+  @if (actionError()) {
+    <p class="admin-page__error">{{ actionError() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="admin-page__loading">Loading…</p>
+  } @else if (pending().length === 0) {
+    <div class="admin-empty-state">
+      <p class="admin-empty-state__message">No users pending approval.</p>
+      <p class="admin-empty-state__hint">New registrations will appear here when auto-approve is off.</p>
+    </div>
+  } @else {
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th class="admin-table__th">Name / Business</th>
+            <th class="admin-table__th">Tier</th>
+            <th class="admin-table__th">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of pending(); track user.id) {
+            <tr class="admin-table__row">
+              <td class="admin-table__td">
+                <span class="admin-table__name">{{ user.full_name || user.biz_name || '—' }}</span>
+              </td>
+              <td class="admin-table__td">
+                <span class="admin-badge admin-badge--tier">{{ user.tier }}</span>
+              </td>
+              <td class="admin-table__td admin-table__td--actions">
+                <button class="admin-btn admin-btn--approve" (click)="approve(user.id)">Approve</button>
+                <button class="admin-btn admin-btn--reject" (click)="reject(user.id)">Reject</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

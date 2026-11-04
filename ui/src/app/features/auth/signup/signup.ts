@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { trpc } from '../../../core/trpc.client';
 
 function confirmPasswordValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.parent?.get('password')?.value;
@@ -38,8 +39,16 @@ export class SignupComponent {
     if (error) {
       this.error.set(error.message);
       this.loading.set(false);
-    } else {
-      this.success.set(true);
+      return;
     }
+
+    /* Create the profile row with pending_verification status */
+    try {
+      await trpc.auth.initProfile.mutate();
+    } catch {
+      /* Non-fatal — profile may already exist or be created by a trigger */
+    }
+
+    this.success.set(true);
   }
 }

@@ -1,0 +1,36 @@
+<div class="page">
+  <div class="page__header">
+    <h1 class="page__title">Overview</h1>
+    <p class="page__subtitle">Platform health at a glance</p>
+  </div>
+
+  @if (loading()) {
+    <p class="admin-page__loading">Loading…</p>
+  } @else {
+    <div class="admin-stats">
+      <div class="admin-stat-card">
+        <span class="admin-stat-card__label">Total Users</span>
+        <span class="admin-stat-card__value">{{ stats().total }}</span>
+      </div>
+      <div class="admin-stat-card admin-stat-card--success">
+        <span class="admin-stat-card__label">Active</span>
+        <span class="admin-stat-card__value">{{ stats().active }}</span>
+      </div>
+      <div class="admin-stat-card admin-stat-card--warn">
+        <span class="admin-stat-card__label">Pending Approval</span>
+        <span class="admin-stat-card__value">{{ stats().pendingApproval }}</span>
+      </div>
+      <div class="admin-stat-card admin-stat-card--danger">
+        <span class="admin-stat-card__label">Suspended</span>
+        <span class="admin-stat-card__value">{{ stats().suspended }}</span>
+      </div>
+    </div>
+
+    <div class="admin-info-row">
+      <span class="admin-info-row__label">Auto-approve new registrations</span>
+      <span class="admin-info-row__value" [class.admin-info-row__value--on]="autoApprove()">
+        {{ autoApprove() ? 'ON' : 'OFF' }}
+      </span>
+    </div>
+  }
+</div>

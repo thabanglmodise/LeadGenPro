@@ -8,6 +8,27 @@
       "when": 1777293063917,
       "tag": "0000_glamorous_barracuda",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777477757629,
+      "tag": "0001_faithful_clint_barton",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777635921682,
+      "tag": "0002_illegal_shinko_yamashiro",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1777672496229,
+      "tag": "0003_past_exiles",
+      "breakpoints": true
     }
   ]
 }

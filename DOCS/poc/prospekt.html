@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prospekt — AI Lead Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080B12;--bg2:#0D1120;--bg3:#111828;--bg4:#141D2E;--bg5:#1C2540;
+  --border:#1C2540;--border2:#253060;--border3:#2e3a6e;
+  --accent:#00E5B0;--accent2:#00B589;--accent3:#00E5B0;--accentg:#7B61FF;
+  --text:#E8EDF8;--text2:#7A8BAA;--text3:#4F5F80;
+  --hot:#F59E0B;--warm:#7B61FF;--cold:#00E5B0;
+  --success:#22C55E;--danger:#F04444;--warn:#F59E0B;
+  --admin:#7B61FF;--admin2:#9d87ff;
+  --font:'DM Sans',system-ui,sans-serif;--mono:'DM Sans',monospace;
+  --r:10px;--rl:14px;--rxl:20px;
+}
+html{scroll-behavior:smooth;height:100%;overflow:auto;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.5;overflow:auto;width:100%;min-height:100vh;}
+
+/* ══ SCREENS ══ */
+.screen{display:none;}
+.screen.active{display:block;}
+#screen-login.active{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;}
+
+/* ══ SCROLLBAR ══ */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:6px}
+::-webkit-scrollbar-thumb:hover{background:var(--text2)}
+::-webkit-scrollbar-corner{background:var(--bg2)}
+*{scrollbar-width:thin;scrollbar-color:var(--border2) var(--bg2);}
+
+/* ══════════════════════════════
+   LOGIN SCREEN
+══════════════════════════════ */
+#screen-login{
+  background:radial-gradient(ellipse 80% 60% at 50% 0%, #0D1F3A 0%, var(--bg) 70%);
+  padding:24px;
+}
+.login-wrap{width:100%;max-width:440px;}
+.login-logo{text-align:center;margin-bottom:40px}
+.login-logo-mark{font-size:32px;font-weight:800;letter-spacing:-1px;font-family:'Syne',sans-serif;}
+.login-logo-mark span{color:var(--accent2)}
+.login-logo-tag{font-size:11px;font-family:var(--mono);color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-top:6px}
+.login-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rxl);padding:32px;margin-bottom:16px;width:100%}
+.login-title{font-size:18px;font-weight:700;margin-bottom:6px;letter-spacing:-0.3px}
+.login-sub{font-size:12px;color:var(--text2);font-family:var(--mono);margin-bottom:24px}
+.login-field{margin-bottom:16px}
+.login-field label{display:block;font-size:10px;font-family:var(--mono);letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:6px}
+.login-field input{
+  background:var(--bg3);border:1px solid var(--border2);color:var(--text);
+  border-radius:var(--r);padding:11px 14px;font-size:14px;font-family:var(--font);
+  width:100%;outline:none;transition:border-color .15s;
+}
+.login-field input:focus{border-color:var(--accent);background:var(--bg4)}
+.login-btn{
+  width:100%;padding:12px;border:none;border-radius:var(--r);
+  font-size:14px;font-weight:700;font-family:var(--font);
+  cursor:pointer;transition:all .15s;margin-top:4px;
+}
+.login-btn.admin{background:linear-gradient(135deg,var(--admin),#e55a2b);color:#fff}
+.login-btn.admin:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(255,107,53,0.35)}
+.login-btn.user{background:linear-gradient(135deg,var(--accent),#3a56d4);color:#fff}
+.login-btn.user:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(79,110,247,0.35)}
+.login-btn:active{transform:translateY(0)}
+.login-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.login-divider{display:flex;align-items:center;gap:12px;margin:16px 0}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.login-divider span{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.login-error{background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);border-radius:var(--r);padding:10px 14px;font-size:12px;font-family:var(--mono);color:var(--danger);margin-top:12px;display:none}
+.login-footer{text-align:center;font-size:11px;font-family:var(--mono);color:var(--text3);margin-top:20px}
+
+/* ══════════════════════════════
+   SHARED APP LAYOUT
+══════════════════════════════ */
+.app-layout{display:flex;min-height:100vh;min-width:960px;}
+.sidebar{
+  width:240px;flex-shrink:0;background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.sb-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border)}
+.sb-logo-mark{font-size:19px;font-weight:800;letter-spacing:-0.5px}
+.sb-logo-mark span{color:var(--accent2)}
+.sb-logo-mark.admin-logo span{color:var(--admin2)}
+.sb-logo-tag{font-size:10px;font-family:var(--mono);color:var(--text3);margin-top:3px;letter-spacing:1.5px;text-transform:uppercase}
+.sb-nav{flex:1;padding:10px 0}
+.sb-section{font-size:9px;font-family:var(--mono);letter-spacing:2px;color:var(--text3);padding:14px 18px 5px;text-transform:uppercase}
+.sb-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 18px;font-size:13px;font-weight:500;
+  cursor:pointer;color:var(--text2);
+  transition:all .15s;border-left:2px solid transparent;user-select:none;
+}
+.sb-item:hover{color:var(--text);background:rgba(79,110,247,.06)}
+.sb-item.active{color:var(--accent2);border-left-color:var(--accent);background:rgba(79,110,247,.1)}
+.sb-item.admin-item:hover{background:rgba(255,107,53,.06)}
+.sb-item.admin-item.active{color:var(--admin2);border-left-color:var(--admin);background:rgba(255,107,53,.1)}
+.sb-item svg{width:15px;height:15px;flex-shrink:0;opacity:.7}
+.sb-item.active svg{opacity:1}
+.sb-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:700;font-family:var(--mono);padding:1px 7px;border-radius:20px}
+.sb-badge.orange{background:var(--admin)}
+.sb-foot{padding:14px 18px;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.sb-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accentg));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.sb-avatar.admin-av{background:linear-gradient(135deg,var(--admin),#e55a2b)}
+.sb-username{font-size:12px;font-weight:600;line-height:1.2}
+.sb-role{font-size:10px;font-family:var(--mono);color:var(--text3)}
+.sb-logout{width:100%;background:transparent;border:1px solid var(--border2);color:var(--text2);border-radius:var(--r);padding:7px;font-size:12px;font-family:var(--font);cursor:pointer;transition:all .15s}
+.sb-logout:hover{border-color:var(--danger);color:var(--danger)}
+
+/* ══ MAIN ══ */
+.main-content{flex:1;min-width:0;overflow-x:auto;overflow-y:auto;height:100vh;}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:15px 26px;border-bottom:1px solid var(--border);
+  background:var(--bg);position:sticky;top:0;z-index:10;
+}
+.tb-title{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.tb-sub{font-size:11px;color:var(--text2);font-family:var(--mono);margin-top:2px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.page{padding:22px 26px;padding-bottom:60px}
+
+/* ══ BUTTONS ══ */
+.btn{background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+.btn:hover:not(:disabled){background:#3a56d4;transform:translateY(-1px);box-shadow:0 4px 20px rgba(79,110,247,.3)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-sm{padding:7px 13px;font-size:12px}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border2);border-radius:var(--r);padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-ghost:hover:not(:disabled){border-color:var(--accent2);color:var(--accent2)}
+.btn-ghost:disabled{opacity:.4;cursor:not-allowed}
+.btn-success{background:rgba(0,208,132,.12);color:var(--success);border:1px solid rgba(0,208,132,.25);border-radius:var(--r);padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;display:inline-flex;align-items:center;gap:7px}
+.btn-success:hover:not(:disabled){background:rgba(0,208,132,.2)}
+.btn-success:disabled{opacity:.4;cursor:not-allowed}
+.btn-danger{background:rgba(255,77,106,.1);color:var(--danger);border:1px solid rgba(255,77,106,.2);border-radius:var(--r);padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s}
+.btn-danger:hover{background:rgba(255,77,106,.18)}
+.btn-orange{background:linear-gradient(135deg,var(--admin),#e55a2b);color:#fff;border:none;border-radius:var(--r);padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;display:inline-flex;align-items:center;gap:7px}
+.btn-orange:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(255,107,53,.3)}
+
+/* ══ FORM ══ */
+label{display:block;font-size:10px;font-family:var(--mono);letter-spacing:1.2px;color:var(--text3);margin-bottom:5px;text-transform:uppercase}
+input,select,textarea{background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r);padding:9px 12px;font-size:13px;font-family:var(--font);width:100%;transition:border-color .15s;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);background:var(--bg4)}
+input::placeholder,textarea::placeholder{color:var(--text3)}
+select option{background:var(--bg3)}
+textarea{resize:vertical;line-height:1.65}
+
+/* ══ CARDS ══ */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:20px 22px}
+
+/* ══ SECTION TITLE ══ */
+.st{font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:12px;margin-top:22px}
+.st:first-child{margin-top:0}
+
+/* ══ STATS ══ */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px;transition:border-color .2s}
+.stat:hover{border-color:var(--border2)}
+.stat-label{font-size:10px;font-family:var(--mono);letter-spacing:1px;color:var(--text3);text-transform:uppercase}
+.stat-val{font-size:32px;font-weight:800;letter-spacing:-2px;margin:5px 0 2px;line-height:1}
+.stat-sub{font-size:11px;font-family:var(--mono);color:var(--text2)}
+
+/* ══ PIPELINE ══ */
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.pipe-col{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:14px;min-height:160px}
+.pipe-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.pipe-lbl{font-size:10px;font-weight:700;font-family:var(--mono);letter-spacing:1.2px;text-transform:uppercase}
+.pipe-cnt{font-size:10px;font-family:var(--mono);background:var(--bg3);border:1px solid var(--border2);padding:2px 7px;border-radius:10px;color:var(--text2)}
+.pipe-empty{font-size:11px;font-family:var(--mono);color:var(--text3);text-align:center;padding:18px 0}
+
+/* ══ LEAD CARD ══ */
+.lc{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.lc:hover{border-color:var(--accent);background:rgba(79,110,247,.05)}
+.lc:last-child{margin-bottom:0}
+.lc-name{font-size:13px;font-weight:600;margin-bottom:1px}
+.lc-co{font-size:11px;color:var(--text2);font-family:var(--mono)}
+.lc-email{font-size:11px;color:var(--accent3);font-family:var(--mono);margin-top:3px}
+.lc-foot{display:flex;align-items:center;gap:6px;margin-top:7px;flex-wrap:wrap}
+
+/* ══ BADGES ══ */
+.badge{font-size:10px;font-family:var(--mono);font-weight:500;padding:2px 8px;border-radius:5px}
+.b-hot{background:rgba(255,107,53,.12);color:var(--hot);border:1px solid rgba(255,107,53,.25)}
+.b-warm{background:rgba(247,201,72,.1);color:var(--warm);border:1px solid rgba(247,201,72,.22)}
+.b-cold{background:rgba(79,110,247,.1);color:var(--cold);border:1px solid rgba(79,110,247,.2)}
+.b-new{background:rgba(0,229,192,.08);color:var(--accent3);border:1px solid rgba(0,229,192,.18)}
+.b-contacted{background:rgba(0,208,132,.1);color:var(--success);border:1px solid rgba(0,208,132,.2)}
+.b-active{background:rgba(0,208,132,.1);color:var(--success);border:1px solid rgba(0,208,132,.2)}
+.b-inactive{background:rgba(74,76,101,.15);color:var(--text3);border:1px solid var(--border)}
+
+/* ══ TABLE ══ */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:8px 12px;font-size:10px;font-family:var(--mono);letter-spacing:1px;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border2);white-space:nowrap}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover td{background:rgba(79,110,247,.03)}
+.td-name{font-weight:600}
+.td-mono{font-family:var(--mono);font-size:11px;color:var(--text2)}
+.td-email{font-family:var(--mono);font-size:11px;color:var(--accent3)}
+.td-right{text-align:right;white-space:nowrap}
+
+/* ══ COMPOSE ══ */
+.compose-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.email-hdr{display:grid;grid-template-columns:65px 1fr;align-items:center;gap:8px;margin-bottom:8px}
+.email-fld-lbl{font-size:11px;font-family:var(--mono);color:var(--text3);text-transform:uppercase}
+.email-body{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px;font-size:13px;font-family:var(--mono);line-height:1.75;color:var(--text);min-height:200px;outline:none;transition:border-color .15s;white-space:pre-wrap;overflow-y:auto;max-height:320px}
+.email-body:focus{border-color:var(--accent)}
+.email-body.ph{color:var(--text3);font-style:italic}
+
+/* ══ SENT ROW ══ */
+.sent-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;transition:border-color .15s}
+.sent-row:hover{border-color:var(--border2)}
+.sent-to{font-size:13px;font-weight:500}
+.sent-meta{font-size:11px;color:var(--text2);font-family:var(--mono);margin-top:2px}
+
+/* ══ ADMIN CLIENT CARD ══ */
+.client-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:18px 20px;margin-bottom:12px;transition:border-color .2s}
+.client-card:hover{border-color:var(--border2)}
+.client-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.client-info{display:flex;align-items:center;gap:12px}
+.client-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accentg));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.client-name{font-size:14px;font-weight:600}
+.client-username{font-size:11px;font-family:var(--mono);color:var(--text3)}
+.client-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.client-stat-val{font-size:18px;font-weight:700;letter-spacing:-0.5px}
+.client-stat-lbl{font-size:10px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:0.8px}
+
+/* ══ API KEY DISPLAY ══ */
+.api-key-row{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px}
+.api-key-label{font-size:11px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;width:140px;flex-shrink:0}
+.api-key-val{font-size:12px;font-family:var(--mono);color:var(--accent3);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.api-key-status{font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:10px;flex-shrink:0}
+.api-set{background:rgba(0,208,132,.1);color:var(--success);border:1px solid rgba(0,208,132,.2)}
+.api-unset{background:rgba(255,77,106,.08);color:var(--danger);border:1px solid rgba(255,77,106,.15)}
+
+/* ══ INFO BOXES ══ */
+.info-box{background:rgba(0,229,192,.05);border:1px solid rgba(0,229,192,.14);border-radius:var(--r);padding:12px 14px;font-size:12px;font-family:var(--mono);color:var(--accent3);line-height:1.7}
+.warn-box{background:rgba(247,201,72,.05);border:1px solid rgba(247,201,72,.14);border-radius:var(--r);padding:12px 14px;font-size:12px;font-family:var(--mono);color:var(--warn);line-height:1.7}
+.err-box{background:rgba(255,77,106,.05);border:1px solid rgba(255,77,106,.14);border-radius:var(--r);padding:12px 14px;font-size:12px;font-family:var(--mono);color:var(--danger);line-height:1.7}
+
+/* ══ MODAL ══ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:300;opacity:0;pointer-events:none;transition:opacity .2s}
+.overlay.open{opacity:1;pointer-events:auto}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rxl);padding:26px 28px;width:500px;max-width:95vw;max-height:88vh;overflow-y:auto;transform:translateY(8px);transition:transform .2s;position:relative}
+.overlay.open .modal{transform:translateY(0)}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:3px}
+.modal-sub{font-size:12px;font-family:var(--mono);color:var(--text2);margin-bottom:18px}
+.modal-x{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:color .15s}
+.modal-x:hover{color:var(--text)}
+
+/* ══ SPINNER ══ */
+.spin{display:inline-flex;gap:4px;align-items:center}
+.spin span{width:5px;height:5px;border-radius:50%;background:currentColor;animation:sp 1.1s ease infinite}
+.spin span:nth-child(2){animation-delay:.18s}
+.spin span:nth-child(3){animation-delay:.36s}
+@keyframes sp{0%,100%{opacity:.2;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}
+
+/* ══ TOAST ══ */
+.toast{position:fixed;bottom:20px;right:20px;padding:11px 18px;border-radius:var(--r);font-size:13px;font-family:var(--mono);font-weight:500;z-index:999;opacity:0;transform:translateY(6px) scale(.98);transition:all .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0) scale(1)}
+.toast.ok{background:var(--bg2);border:1px solid rgba(0,208,132,.35);color:var(--success)}
+.toast.err{background:var(--bg2);border:1px solid rgba(255,77,106,.35);color:var(--danger)}
+.toast.info{background:var(--bg2);border:1px solid var(--border2);color:var(--text2)}
+
+/* ══ GMAIL BADGE ══ */
+.g-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-family:var(--mono);font-weight:500;padding:5px 11px;border-radius:20px}
+.g-badge.on{background:rgba(0,208,132,.08);color:var(--success);border:1px solid rgba(0,208,132,.2)}
+.g-badge.off{background:rgba(255,77,106,.08);color:var(--danger);border:1px solid rgba(255,77,106,.2)}
+
+/* ══ ACTIVITY ══ */
+.act-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.act-item:last-child{border-bottom:none}
+.act-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px}
+.act-dot.orange{background:var(--admin)}
+.act-text{font-size:12px;color:var(--text2);font-family:var(--mono);line-height:1.5}
+.act-time{font-size:11px;color:var(--text3);font-family:var(--mono);flex-shrink:0;margin-left:auto;padding-left:10px}
+
+/* ══ SETUP STEPS ══ */
+.setup-step{display:flex;gap:14px;padding:16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px}
+.step-n{width:28px;height:28px;border-radius:50%;background:rgba(79,110,247,.15);border:1px solid rgba(79,110,247,.3);color:var(--accent2);font-size:12px;font-weight:700;font-family:var(--mono);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-t{font-size:13px;font-weight:600;margin-bottom:4px}
+.step-d{font-size:12px;color:var(--text2);font-family:var(--mono);line-height:1.65}
+.code-b{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:9px 13px;font-family:var(--mono);font-size:11px;color:var(--accent3);margin-top:8px;line-height:1.7;word-break:break-all}
+
+/* ══ UTILS ══ */
+hr{border:none;border-top:1px solid var(--border);margin:16px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.flex{display:flex}.aic{align-items:center}.jcb{justify-content:space-between}.gap8{gap:8px}.gap12{gap:12px}
+.fw6{font-weight:600}.mono{font-family:var(--mono)}.dim{color:var(--text3)}.muted{color:var(--text2)}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--success);animation:pulse 2.5s ease infinite;flex-shrink:0;display:inline-block}
+.pulse.off{background:var(--text3);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ══ FIREBASE SETUP BANNER ══ */
+.firebase-banner{background:linear-gradient(135deg,rgba(255,107,53,.1),rgba(247,201,72,.08));border:1px solid rgba(255,107,53,.25);border-radius:var(--rl);padding:20px 22px;margin-bottom:20px}
+.firebase-banner h3{font-size:14px;font-weight:700;color:var(--admin2);margin-bottom:6px}
+.firebase-banner p{font-size:12px;font-family:var(--mono);color:var(--text2);line-height:1.7}
+
+/* ── LOGIN TABS ── */
+.p-tab-btn{flex:1;padding:9px;border-radius:8px;font-size:13px;font-weight:600;
+  background:transparent;color:var(--text3);border:none;cursor:pointer;
+  transition:all .2s;font-family:var(--font);}
+.p-tab-btn.active-client{background:var(--bg3);color:var(--text);}
+.p-tab-btn.active-admin{background:var(--admin);color:#fff;}
+.p-tab-switcher{display:flex;background:var(--bg);border:1px solid var(--border2);
+  border-radius:11px;padding:4px;gap:4px;margin-bottom:24px;}
+.p-admin-notice{padding:10px 14px;border-radius:9px;margin-bottom:16px;
+  background:rgba(123,97,255,.1);border:1px solid rgba(123,97,255,.2);
+  color:var(--admin2);font-size:12px;display:none;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     SCREEN: LOGIN
+══════════════════════════════ -->
+<div id="screen-login" class="screen active">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:10px;">
+        <div style="width:42px;height:42px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="24" height="24" viewBox="0 0 22 22" fill="none">
+            <path d="M11 2L20 7V15L11 20L2 15V7L11 2Z" stroke="#080B12" stroke-width="2.2" fill="none"/>
+            <circle cx="11" cy="11" r="2.5" fill="#080B12"/>
+          </svg>
+        </div>
+        <div class="login-logo-mark">Prospekt</div>
+      </div>
+      <div class="login-logo-tag">AI-Powered B2B Lead Intelligence</div>
+    </div>
+
+    <!-- USER LOGIN -->
+    <div class="login-card" id="login-user-card">
+      <div class="login-title">Client Login</div>
+      <div class="login-sub">Sign in to your Prospekt account</div>
+      <div class="login-field">
+        <label>Username</label>
+        <input type="text" id="user-username" placeholder="your username" autocomplete="username" onkeydown="if(event.key==='Enter')loginUser()">
+      </div>
+      <div class="login-field">
+        <label>Password</label>
+        <input type="password" id="user-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')loginUser()">
+      </div>
+      <button class="login-btn user" onclick="loginUser()" id="user-login-btn">Sign In</button>
+      <div class="login-error" id="user-error"></div>
+    </div>
+
+    <div class="login-divider"><span>or</span></div>
+
+    <!-- ADMIN LOGIN -->
+    <div class="login-card" id="login-admin-card" style="border-color:rgba(255,107,53,0.2)">
+      <div class="login-title" style="color:var(--admin2)">Admin Access</div>
+      <div class="login-sub">Platform administrator only</div>
+      <div class="login-field">
+        <label>Admin Password</label>
+        <input type="password" id="admin-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')loginAdmin()">
+      </div>
+      <button class="login-btn admin" onclick="loginAdmin()" id="admin-login-btn">Admin Login</button>
+      <div class="login-error" id="admin-error"></div>
+    </div>
+
+    <div class="login-footer">Prospekt · Powered by AI · v1.0</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN: ADMIN DASHBOARD
+══════════════════════════════ -->
+<div id="screen-admin" class="screen">
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sb-logo">
+        <div class="sb-logo-mark admin-logo">Prospekt</div>
+        <div class="sb-logo-tag" style="color:var(--admin)">Admin Dashboard</div>
+      </div>
+      <div class="sb-nav">
+        <div class="sb-item admin-item active" data-atab="overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Overview
+        </div>
+        <div class="sb-section">Clients</div>
+        <div class="sb-item admin-item" data-atab="clients">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Manage Clients
+          <span class="sb-badge orange" id="admin-client-count">0</span>
+        </div>
+        <div class="sb-item admin-item" data-atab="add-client">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          Add Client
+        </div>
+        <div class="sb-section">System</div>
+        <div class="sb-item admin-item" data-atab="api-keys">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          API Keys
+        </div>
+        <div class="sb-item admin-item" data-atab="activity">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Activity Log
+        </div>
+        <div class="sb-item admin-item" data-atab="firebase">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          Firebase Setup
+        </div>
+      </div>
+      <div class="sb-foot">
+        <div class="sb-user">
+          <div class="sb-avatar admin-av">A</div>
+          <div>
+            <div class="sb-username">Admin</div>
+            <div class="sb-role">Platform Owner</div>
+          </div>
+        </div>
+        <button class="sb-logout" onclick="logout()">Sign Out</button>
+      </div>
+    </nav>
+
+    <!-- Main -->
+    <div class="main-content">
+
+      <!-- OVERVIEW -->
+      <div id="atab-overview" class="atab">
+        <div class="topbar">
+          <div><div class="tb-title">Admin Overview</div><div class="tb-sub">Platform-wide statistics</div></div>
+          <div class="tb-right">
+            <button class="btn-orange btn-sm" onclick="goAdminTab('add-client')">+ Add Client</button>
+          </div>
+        </div>
+        <div class="page">
+          <div class="stats">
+            <div class="stat"><div class="stat-label">Total Clients</div><div class="stat-val" id="a-total-clients" style="color:var(--admin2)">0</div><div class="stat-sub">Registered users</div></div>
+            <div class="stat"><div class="stat-label">Active Today</div><div class="stat-val" id="a-active-today" style="color:var(--success)">0</div><div class="stat-sub">Logged in today</div></div>
+            <div class="stat"><div class="stat-label">Total Leads</div><div class="stat-val" id="a-total-leads">0</div><div class="stat-sub">Across all clients</div></div>
+            <div class="stat"><div class="stat-label">Emails Sent</div><div class="stat-val" id="a-total-emails" style="color:var(--accent2)">0</div><div class="stat-sub">Total outreach</div></div>
+          </div>
+
+          <div class="st">API Key Status</div>
+          <div class="card" style="margin-bottom:22px">
+            <div class="api-key-row">
+              <span class="api-key-label">Google Places</span>
+              <span class="api-key-val" id="gp-key-display">Not configured</span>
+              <span class="api-key-status" id="gp-key-status-badge">Not Set</span>
+            </div>
+            <div class="api-key-row">
+              <span class="api-key-label">Anthropic (Claude)</span>
+              <span class="api-key-val" id="cl-key-display">Not configured</span>
+              <span class="api-key-status" id="cl-key-status-badge">Not Set</span>
+            </div>
+            <button class="btn-orange btn-sm mt12" onclick="goAdminTab('api-keys')">Manage API Keys →</button>
+          </div>
+
+          <div class="st">Recent Clients</div>
+          <div id="overview-clients-list">
+            <div style="font-size:12px;font-family:var(--mono);color:var(--text3);padding:14px 0">No clients yet. Add your first client to get started.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANAGE CLIENTS -->
+      <div id="atab-clients" class="atab" style="display:none">
+        <div class="topbar">
+          <div><div class="tb-title">Manage Clients</div><div class="tb-sub">View and manage all registered clients</div></div>
+          <div class="tb-right">
+            <button class="btn-orange btn-sm" onclick="goAdminTab('add-client')">+ Add Client</button>
+          </div>
+        </div>
+        <div class="page">
+          <div id="clients-list">
+            <div style="font-size:12px;font-family:var(--mono);color:var(--text3);padding:14px 0">No clients registered yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADD CLIENT -->
+      <div id="atab-add-client" class="atab" style="display:none">
+        <div class="topbar">
+          <div><div class="tb-title">Add New Client</div><div class="tb-sub">Register a client on the platform</div></div>
+        </div>
+        <div class="page">
+          <div class="card" style="max-width:500px">
+            <div class="st">Client Details</div>
+            <div style="display:grid;gap:12px">
+              <div class="grid2">
+                <div><label>Full Name</label><input id="new-client-name" type="text" placeholder="e.g. Thabo Nkosi"></div>
+                <div><label>Business Name</label><input id="new-client-biz" type="text" placeholder="e.g. Apex Solutions"></div>
+              </div>
+              <div><label>Email Address</label><input id="new-client-email" type="email" placeholder="client@email.com"></div>
+              <div><label>Username (they use this to log in)</label><input id="new-client-username" type="text" placeholder="e.g. thabo_nkosi"></div>
+              <div><label>Password</label><input id="new-client-password" type="text" placeholder="Create a password for them"></div>
+              <div><label>Phone (optional)</label><input id="new-client-phone" type="text" placeholder="+27 xx xxx xxxx"></div>
+              <div><label>Notes (optional)</label><textarea id="new-client-notes" rows="2" placeholder="Any notes about this client..."></textarea></div>
+              <button class="btn-orange" onclick="addClient()" id="add-client-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                Add Client
+              </button>
+              <div id="add-client-msg" style="display:none;font-size:12px;font-family:var(--mono)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API KEYS -->
+      <div id="atab-api-keys" class="atab" style="display:none">
+        <div class="topbar">
+          <div><div class="tb-title">API Keys</div><div class="tb-sub">Your keys — used automatically for all clients</div></div>
+        </div>
+        <div class="page">
+          <div class="info-box" style="margin-bottom:20px">
+            These keys are stored in your admin account and used automatically for all clients. Clients never see or need their own API keys.
+          </div>
+
+          <div class="st">Google Places API</div>
+          <div class="setup-step">
+            <div class="step-n">1</div>
+            <div><div class="step-t">Get your Google Places key</div><div class="step-d">Go to <strong style="color:var(--accent2)">console.cloud.google.com</strong> → Prospekt project → Enable "Places API" → Credentials → your API key.</div></div>
+          </div>
+          <div class="setup-step">
+            <div class="step-n">2</div>
+            <div><div class="step-t">Deploy your backend server</div><div class="step-d">Download the server zip from Claude, deploy to <strong style="color:var(--accent2)">render.com</strong> (free), add your Google Places key as environment variable GOOGLE_PLACES_KEY. Then paste your Render URL below.</div></div>
+          </div>
+          <div class="card mt8" style="margin-bottom:20px">
+            <div style="margin-bottom:12px">
+              <label>Your Render Server URL</label>
+              <input id="admin-server-url" type="text" placeholder="https://leadai-pro-api.onrender.com">
+            </div>
+            <div style="margin-bottom:12px">
+              <label>Google Places API Key (stored on your server)</label>
+              <input id="admin-gp-key" type="password" placeholder="AIzaSy...">
+            </div>
+            <div class="flex gap8">
+              <button class="btn-orange" onclick="saveAdminGPKey()">Save</button>
+              <button class="btn-ghost" onclick="testAdminGPKey()">Test Connection</button>
+            </div>
+            <div id="admin-gp-status" class="mt12" style="font-size:12px;font-family:var(--mono);color:var(--text3)"></div>
+          </div>
+
+          <div class="st">Anthropic (Claude AI) API</div>
+          <div class="setup-step">
+            <div class="step-n">1</div>
+            <div><div class="step-t">Get your Anthropic key</div><div class="step-d">Go to <strong style="color:var(--accent2)">console.anthropic.com</strong> → Sign up / Login → API Keys → Create Key. Used for AI lead scoring and email drafting.</div></div>
+          </div>
+          <div class="card mt8">
+            <div style="margin-bottom:12px">
+              <label>Anthropic API Key</label>
+              <input id="admin-cl-key" type="password" placeholder="sk-ant-...">
+            </div>
+            <div class="flex gap8">
+              <button class="btn-orange" onclick="saveAdminCLKey()">Save Key</button>
+              <button class="btn-ghost" onclick="testAdminCLKey()">Test</button>
+            </div>
+            <div id="admin-cl-status" class="mt12" style="font-size:12px;font-family:var(--mono);color:var(--text3)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY LOG -->
+      <div id="atab-activity" class="atab" style="display:none">
+        <div class="topbar">
+          <div><div class="tb-title">Activity Log</div><div class="tb-sub">All client actions across the platform</div></div>
+          <div class="tb-right"><button class="btn-ghost btn-sm" onclick="loadAdminActivity()">Refresh</button></div>
+        </div>
+        <div class="page">
+          <div id="admin-activity-log">
+            <div style="font-size:12px;font-family:var(--mono);color:var(--text3);text-align:center;padding:30px 0">No activity yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FIREBASE SETUP -->
+      <div id="atab-firebase" class="atab" style="display:none">
+        <div class="topbar">
+          <div><div class="tb-title">Firebase Setup</div><div class="tb-sub">Connect your free database — one time only</div></div>
+        </div>
+        <div class="page">
+          <div class="firebase-banner">
+            <h3>One-time setup required</h3>
+            <p>Firebase is free and takes 5 minutes to set up. Once done, all client logins, leads, and activity sync across devices automatically. You only do this once.</p>
+          </div>
+
+          <div class="st">Step by Step</div>
+          <div class="setup-step">
+            <div class="step-n">1</div>
+            <div><div class="step-t">Go to Firebase Console</div><div class="step-d">Visit <strong style="color:var(--accent2)">firebase.google.com</strong> and click "Get Started". Sign in with your Google account.</div></div>
+          </div>
+          <div class="setup-step">
+            <div class="step-n">2</div>
+            <div><div class="step-t">Create a new project</div><div class="step-d">Click "Add project" → Name it "Prospekt" → Disable Google Analytics (not needed) → Create project.</div></div>
+          </div>
+          <div class="setup-step">
+            <div class="step-n">3</div>
+            <div><div class="step-t">Enable Firestore Database</div><div class="step-d">In your project → Build → Firestore Database → Create database → Start in test mode → Choose a region (eur3 or us-central1) → Enable.</div></div>
+          </div>
+          <div class="setup-step">
+            <div class="step-n">4</div>
+            <div><div class="step-t">Get your config values</div><div class="step-d">Project Settings (gear icon) → General → Your apps → Click web icon (&lt;/&gt;) → Register app → Copy the firebaseConfig object values below.</div></div>
+          </div>
+          <div class="setup-step">
+            <div class="step-n">5</div>
+            <div><div class="step-t">Paste your config here</div><div class="step-d">Fill in the fields below and click Save. The app will immediately connect to your Firebase database.</div></div>
+          </div>
+
+          <div class="card mt8">
+            <div class="grid2" style="margin-bottom:12px;gap:12px">
+              <div><label>API Key</label><input id="fb-apiKey" type="text" placeholder="AIzaSy..."></div>
+              <div><label>Auth Domain</label><input id="fb-authDomain" type="text" placeholder="yourapp.firebaseapp.com"></div>
+              <div><label>Project ID</label><input id="fb-projectId" type="text" placeholder="your-project-id"></div>
+              <div><label>Storage Bucket</label><input id="fb-storageBucket" type="text" placeholder="yourapp.appspot.com"></div>
+              <div><label>Messaging Sender ID</label><input id="fb-messagingSenderId" type="text" placeholder="123456789"></div>
+              <div><label>App ID</label><input id="fb-appId" type="text" placeholder="1:123:web:abc123"></div>
+            </div>
+            <div style="margin-bottom:12px">
+              <label>Your Admin Password (set this now)</label>
+              <input id="fb-admin-pass" type="password" placeholder="Choose a strong admin password">
+            </div>
+            <div class="flex gap8">
+              <button class="btn-orange" onclick="saveFirebaseConfig()">Save & Connect Firebase</button>
+            </div>
+            <div id="fb-status" class="mt12" style="font-size:12px;font-family:var(--mono);color:var(--text3)"></div>
+          </div>
+
+          <div class="warn-box mt16">
+            Until Firebase is configured, the app runs in local mode (data stored in this browser only). Set up Firebase to get real cross-device sync and client management.
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-content -->
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN: CLIENT APP
+══════════════════════════════ -->
+<div id="screen-client" class="screen">
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sb-logo">
+        <div class="sb-logo-mark">Prospekt</div>
+        <div class="sb-logo-tag">Lead Generation</div>
+      </div>
+      <div class="sb-nav">
+        <div class="sb-item active" data-ctab="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </div>
+        <div class="sb-section">Leads</div>
+        <div class="sb-item" data-ctab="generate">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Find Leads
+        </div>
+        <div class="sb-item" data-ctab="pipeline">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12H3"/><path d="M6 15l-3-3 3-3"/><path d="M18 9l3 3-3 3"/></svg>
+          Pipeline
+          <span class="sb-badge" id="badge-pipe">0</span>
+        </div>
+        <div class="sb-section">Outreach</div>
+        <div class="sb-item" data-ctab="compose">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Compose & Send
+        </div>
+        <div class="sb-item" data-ctab="sent">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Sent Emails
+          <span class="sb-badge" id="badge-sent" style="background:rgba(0,208,132,.2);color:var(--success)">0</span>
+        </div>
+        <div class="sb-section">Settings</div>
+        <div class="sb-item" data-ctab="profile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          My Business
+        </div>
+      </div>
+      <div class="sb-foot">
+        <div class="sb-user">
+          <div class="sb-avatar" id="client-avatar">U</div>
+          <div>
+            <div class="sb-username" id="client-display-name">Client</div>
+            <div class="sb-role" id="client-display-biz">Prospekt</div>
+          </div>
+        </div>
+        <button class="sb-logout" onclick="logout()">Sign Out</button>
+      </div>
+    </nav>
+
+    <!-- Main -->
+    <div class="main-content">
+
+      <!-- DASHBOARD -->
+      <div id="ctab-dashboard" class="ctab">
+        <div class="topbar">
+          <div><div class="tb-title">Dashboard</div><div class="tb-sub">Your lead generation overview</div></div>
+          <div class="tb-right">
+            <span class="g-badge off" id="dash-gmail-badge">Gmail not set up</span>
+            <button class="btn btn-sm" onclick="goClientTab('generate')">Find Leads</button>
+          </div>
+        </div>
+        <div class="page">
+          <div class="stats">
+            <div class="stat"><div class="stat-label">Total Leads</div><div class="stat-val" id="s-total">0</div><div class="stat-sub" id="s-total-sub">None yet</div></div>
+            <div class="stat"><div class="stat-label">Hot Leads</div><div class="stat-val" style="color:var(--hot)" id="s-hot">0</div><div class="stat-sub">AI high intent</div></div>
+            <div class="stat"><div class="stat-label">Emails Sent</div><div class="stat-val" style="color:var(--success)" id="s-esent">0</div><div class="stat-sub">via Gmail</div></div>
+            <div class="stat"><div class="stat-label">Contacted</div><div class="stat-val" style="color:var(--accent2)" id="s-cont">0</div><div class="stat-sub">Leads reached out to</div></div>
+          </div>
+          <div class="st">Pipeline Snapshot</div>
+          <div class="pipe">
+            <div class="pipe-col"><div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--text2)">New</span><span class="pipe-cnt" id="dp-new-c">0</span></div><div id="dp-new"><div class="pipe-empty">Find leads to start</div></div></div>
+            <div class="pipe-col"><div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--accent2)">Contacted</span><span class="pipe-cnt" id="dp-cont-c">0</span></div><div id="dp-cont"><div class="pipe-empty">None contacted</div></div></div>
+            <div class="pipe-col"><div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--accent3)">Replied</span><span class="pipe-cnt">0</span></div><div class="pipe-empty">Update manually</div></div>
+            <div class="pipe-col"><div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--success)">Converted</span><span class="pipe-cnt">0</span></div><div class="pipe-empty">Closed deals</div></div>
+          </div>
+          <div class="st" style="margin-top:22px">Recent Activity</div>
+          <div id="dash-activity"><div style="font-size:12px;font-family:var(--mono);color:var(--text3);padding:14px 0">No activity yet.</div></div>
+        </div>
+      </div>
+
+      <!-- FIND LEADS -->
+      <div id="ctab-generate" class="ctab" style="display:none">
+        <div class="topbar">
+          <div><div class="tb-title">Find Real Leads</div><div class="tb-sub">Powered by Google Places + Claude AI scoring</div></div>
+        </div>
+        <div class="page">
+          <div id="no-keys-warn" class="warn-box" style="margin-bottom:16px;display:none">
+            API keys not configured yet. Please ask your admin to set up the API keys.
+          </div>
+          <div class="st">Search Parameters</div>
+          <div class="card">
+            <div class="grid3" style="margin-bottom:12px">
+              <div><label>Industry / Business Type</label><input id="g-type" type="text" placeholder="e.g. real estate agency, dental clinic"></div>
+              <div><label>City / Location</label><input id="g-city" type="text" placeholder="e.g. Johannesburg, Cape Town"></div>
+              <div><label>Results to Fetch</label>
+                <select id="g-count">
+                  <option value="10">10 companies</option>
+                  <option value="20" selected>20 companies</option>
+                  <option value="60">60 companies</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-bottom:14px"><label>Your Offering (used for AI scoring)</label><input id="g-offering" type="text" placeholder="e.g. social media marketing, web design"></div>
+            <div class="flex aic gap8">
+              <button class="btn" id="find-btn" onclick="findLeads()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                Find Leads
+              </button>
+              <button class="btn-ghost" onclick="clearAllLeads()">Clear All</button>
+              <button class="btn-ghost btn-sm" onclick="exportCSV()" id="export-btn" style="display:none">Export CSV</button>
+              <span id="find-status" style="font-size:12px;font-family:var(--mono);color:var(--text3);margin-left:4px"></span>
+            </div>
+          </div>
+          <div id="leads-wrap" style="display:none;margin-top:20px">
+            <div class="flex aic jcb" style="margin-bottom:10px">
+              <div class="st" style="margin:0">Found Leads <span id="leads-count-lbl" style="color:var(--accent2)"></span></div>
+              <div class="flex gap8">
+                <button class="btn-ghost btn-sm" onclick="scoreAllLeads()" id="score-all-btn">AI Score All</button>
+                <button class="btn btn-sm" onclick="goClientTab('compose')">Compose Emails →</button>
+              </div>
+            </div>
+            <div class="card" style="padding:0;overflow:hidden">
+              <table class="tbl">
+                <thead><tr><th>Company</th><th>Category</th><th>Location</th><th>Rating</th><th>AI Score</th><th>Contact</th><th></th></tr></thead>
+                <tbody id="leads-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PIPELINE -->
+      <div id="ctab-pipeline" class="ctab" style="display:none">
+        <div class="topbar">
+          <div><div class="tb-title">Lead Pipeline</div><div class="tb-sub">Track every lead through your sales process</div></div>
+          <div class="tb-right"><button class="btn btn-sm" onclick="goClientTab('generate')">+ Find More</button></div>
+        </div>
+        <div class="page">
+          <div class="pipe">
+            <div class="pipe-col"><div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--text2)">New</span><span class="pipe-cnt" id="pp-new-c">0</span></div><div id="pp-new"><div class="pipe-empty">No leads</div></div></div>
+            <div class="pipe-col"><div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--accent2)">Contacted</span><span class="pipe-cnt" id="pp-cont-c">0</span></div><div id="pp-cont"><div class="pipe-empty">None contacted</div></div></div>
+            <div class="pipe-col"><div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--accent3)">Replied</span><span class="pipe-cnt">0</span></div><div class="pipe-empty">Update manually</div></div>
+            <div class="pipe-col"><div class="pipe-hdr"><span class="pipe-lbl" style="color:var(--success)">Converted</span><span class="pipe-cnt">0</span></div><div class="pipe-empty">Closed deals</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPOSE -->
+      <div id="ctab-compose" class="ctab" style="display:none">
+        <div class="topbar">
+          <div><div class="tb-title">Compose & Send</div><div class="tb-sub">AI-personalised outreach via Gmail</div></div>
+          <div class="tb-right"><span class="g-badge off" id="compose-gmail-badge">Gmail not set up</span></div>
+        </div>
+        <div class="page">
+          <div class="compose-grid">
+            <div>
+              <div class="st">Select Lead</div>
+              <div class="card">
+                <div style="margin-bottom:10px"><label>From your lead list</label><select id="lead-sel" onchange="pickLead()"><option value="">— Select a lead —</option></select></div>
+                <div class="grid2" style="margin-bottom:10px">
+                  <div><label>Contact Name</label><input id="c-name" type="text" placeholder="e.g. John Smith"></div>
+                  <div><label>Job Title</label><input id="c-title" type="text" placeholder="e.g. Owner"></div>
+                </div>
+                <div style="margin-bottom:10px"><label>Company</label><input id="c-company" type="text" placeholder="Company name"></div>
+                <div><label>Company Website</label><input id="c-website" type="text" placeholder="www.company.com"></div>
+              </div>
+              <div class="st">Email Style</div>
+              <div class="card">
+                <div style="margin-bottom:10px"><label>Tone</label>
+                  <select id="e-tone">
+                    <option value="professional">Professional & Direct</option>
+                    <option value="friendly">Friendly & Conversational</option>
+                    <option value="consultative">Consultative / Advisory</option>
+                    <option value="urgent">Creating Urgency</option>
+                  </select>
+                </div>
+                <div style="margin-bottom:12px"><label>Template Type</label>
+                  <select id="e-template">
+                    <option value="intro">Cold Introduction</option>
+                    <option value="value">Value Proposition</option>
+                    <option value="problem">Problem to Solution</option>
+                    <option value="followup">Follow-Up (2nd touch)</option>
+                  </select>
+                </div>
+                <button class="btn" style="width:100%" id="ai-draft-btn" onclick="aiDraftEmail()">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                  AI Draft Email
+                </button>
+                <div id="draft-note" style="display:none" class="warn-box mt12">Using smart template.</div>
+              </div>
+            </div>
+            <div>
+              <div class="st">Gmail Setup</div>
+              <div class="card" style="margin-bottom:16px">
+                <div style="margin-bottom:10px">
+                  <label>Your Gmail Address</label>
+                  <input id="gm-email-client" type="email" placeholder="yourname@gmail.com">
+                </div>
+                <button class="btn-ghost btn-sm" style="width:100%" onclick="saveClientGmail()">Save Gmail</button>
+              </div>
+              <div class="st">Email Composer</div>
+              <div class="card">
+                <div class="email-hdr"><span class="email-fld-lbl">TO:</span><input id="c-to" type="email" placeholder="recipient@company.com"></div>
+                <div class="email-hdr"><span class="email-fld-lbl">FROM:</span><input id="c-from" type="email" placeholder="Set Gmail above" readonly style="color:var(--text2)"></div>
+                <div class="email-hdr" style="margin-bottom:12px"><span class="email-fld-lbl">SUBJECT:</span><input id="c-subject" type="text" placeholder="Email subject line"></div>
+                <hr>
+                <div id="c-body" class="email-body ph" contenteditable="true">Select a lead and click AI Draft Email to generate personalised outreach.</div>
+                <hr>
+                <div class="flex gap8" style="flex-wrap:wrap">
+                  <button class="btn-success" id="send-btn" onclick="sendEmail()">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    Send via Gmail
+                  </button>
+                  <button class="btn-ghost" onclick="copyEmail()">Copy</button>
+                  <button class="btn-ghost" onclick="clearCompose()">Clear</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SENT -->
+      <div id="ctab-sent" class="ctab" style="display:none">
+        <div class="topbar">
+          <div><div class="tb-title">Sent Emails</div><div class="tb-sub">All outreach sent via Gmail</div></div>
+          <div class="tb-right"><button class="btn-ghost btn-sm" onclick="clearSent()">Clear Log</button></div>
+        </div>
+        <div class="page">
+          <div id="sent-log"><div style="font-size:12px;font-family:var(--mono);color:var(--text3);text-align:center;padding:30px 0">No emails sent yet.</div></div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div id="ctab-profile" class="ctab" style="display:none">
+        <div class="topbar">
+          <div><div class="tb-title">My Business</div><div class="tb-sub">Personalises all AI-generated emails</div></div>
+        </div>
+        <div class="page">
+          <div class="st">Business Details</div>
+          <div class="card">
+            <div class="grid2" style="margin-bottom:12px">
+              <div><label>Business Name</label><input id="p-biz" type="text" placeholder="e.g. Apex Digital Solutions"></div>
+              <div><label>Your Full Name</label><input id="p-name" type="text" placeholder="e.g. Thabo Sithole"></div>
+            </div>
+            <div style="margin-bottom:12px"><label>Your Role / Title</label><input id="p-role" type="text" placeholder="e.g. Founder, CEO"></div>
+            <div style="margin-bottom:12px"><label>Core Offering</label><textarea id="p-offering" rows="2" placeholder="We help businesses grow through..."></textarea></div>
+            <div style="margin-bottom:12px"><label>Key Benefits</label><textarea id="p-benefits" rows="3" placeholder="• Benefit 1&#10;• Benefit 2&#10;• Benefit 3"></textarea></div>
+            <div class="grid2" style="margin-bottom:14px">
+              <div><label>Website</label><input id="p-web" type="text" placeholder="www.yourbusiness.com"></div>
+              <div><label>Phone</label><input id="p-phone" type="text" placeholder="+27 xx xxx xxxx"></div>
+            </div>
+            <button class="btn" onclick="saveProfile()">Save Profile</button>
+          </div>
+          <div class="st">Email Signature Preview</div>
+          <div class="card"><div id="sig-preview" style="font-size:13px;line-height:1.9;font-family:var(--mono);color:var(--text2)">Fill in your profile to see your signature.</div></div>
+        </div>
+      </div>
+
+    </div><!-- /main-content -->
+  </div>
+</div>
+
+<!-- LEAD MODAL -->
+<div class="overlay" id="lead-modal" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-x" onclick="closeLeadModal()">&#x2715;</button>
+    <div class="modal-title" id="m-title">Company</div>
+    <div class="modal-sub" id="m-sub">Category</div>
+    <div id="m-body"></div>
+  </div>
+</div>
+
+<!-- CLIENT DETAIL MODAL (admin) -->
+<div class="overlay" id="client-modal" onclick="closeClientModal(event)">
+  <div class="modal">
+    <button class="modal-x" onclick="closeClientModal()">&#x2715;</button>
+    <div class="modal-title" id="cm-title">Client</div>
+    <div class="modal-sub" id="cm-sub">Details</div>
+    <div id="cm-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+// ════════════════════════════════
+// FIREBASE CONFIG
+// Edit these values after setting up Firebase
+// Leave as-is to run in local mode
+// ════════════════════════════════
+const FB_CONFIG = {
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+
+// ADMIN PASSWORD — change this to your own password
+const ADMIN_PASSWORD = "admin123";
+
+// ════════════════════════════════
+// STATE
+// ════════════════════════════════
+let db = null;
+let firebaseMode = false;
+let currentUser = null;
+let currentRole = null;
+let leads = [];
+let sentEmails = [];
+let profile = {};
+let clientConfig = {};
+let activity = [];
+let clients = [];
+let adminKeys = {};
+
+// ════════════════════════════════
+// FIREBASE INIT
+// ════════════════════════════════
+async function initFirebase() {
+  const cfg = getFirebaseConfig();
+  if (!cfg || !cfg.projectId) {
+    console.log('Running in local mode — Firebase not configured');
+    return false;
+  }
+  try {
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
+    const { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, query, orderBy, limit } =
+      await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+
+    const app = initializeApp(cfg);
+    db = getFirestore(app);
+    window._fb = { doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, query, orderBy, limit };
+    firebaseMode = true;
+    console.log('Firebase connected');
+    return true;
+  } catch (e) {
+    console.warn('Firebase init failed:', e.message);
+    return false;
+  }
+}
+
+function getFirebaseConfig() {
+  try {
+    const stored = localStorage.getItem('lai_fb_config');
+    if (stored) return JSON.parse(stored);
+  } catch(e){}
+  return FB_CONFIG;
+}
+
+// ════════════════════════════════
+// STORAGE HELPERS
+// Unified: Firebase or localStorage
+// ════════════════════════════════
+async function dbGet(path) {
+  if (firebaseMode && db) {
+    try {
+      const parts = path.split('/');
+      const ref = window._fb.doc(db, ...parts);
+      const snap = await window._fb.getDoc(ref);
+      return snap.exists() ? snap.data() : null;
+    } catch(e) { console.warn('dbGet error', e); return null; }
+  }
+  try { return JSON.parse(localStorage.getItem('lai_' + path.replace(/\//g,'_')) || 'null'); }
+  catch(e) { return null; }
+}
+
+async function dbSet(path, data) {
+  if (firebaseMode && db) {
+    try {
+      const parts = path.split('/');
+      const ref = window._fb.doc(db, ...parts);
+      await window._fb.setDoc(ref, data, { merge: true });
+      return true;
+    } catch(e) { console.warn('dbSet error', e); return false; }
+  }
+  localStorage.setItem('lai_' + path.replace(/\//g,'_'), JSON.stringify(data));
+  return true;
+}
+
+async function dbGetAll(collection) {
+  if (firebaseMode && db) {
+    try {
+      const ref = window._fb.collection(db, collection);
+      const snap = await window._fb.getDocs(ref);
+      const results = [];
+      snap.forEach(d => results.push({ id: d.id, ...d.data() }));
+      return results;
+    } catch(e) { console.warn('dbGetAll error', e); return []; }
+  }
+  try { return JSON.parse(localStorage.getItem('lai_col_' + collection) || '[]'); }
+  catch(e) { return []; }
+}
+
+async function dbSetCollection(col, data) {
+  if (!firebaseMode) {
+    localStorage.setItem('lai_col_' + col, JSON.stringify(data));
+  }
+}
+
+// ════════════════════════════════
+// INIT
+// ════════════════════════════════
+window.onload = async () => {
+  await initFirebase();
+  adminKeys = (await dbGet('admin/keys')) || {};
+  // Restore saved FB config fields
+  const fbCfg = getFirebaseConfig();
+  if (fbCfg) {
+    ['apiKey','authDomain','projectId','storageBucket','messagingSenderId','appId'].forEach(k => {
+      const el = document.getElementById('fb-' + k);
+      if (el && fbCfg[k]) el.value = fbCfg[k];
+    });
+  }
+  if (adminKeys.gpKey) document.getElementById('admin-gp-key').value = adminKeys.gpKey;
+  if (adminKeys.serverUrl) { const el = document.getElementById('admin-server-url'); if(el) el.value = adminKeys.serverUrl; }
+  if (adminKeys.clKey) document.getElementById('admin-cl-key').value = adminKeys.clKey;
+  updateAdminKeyDisplay();
+  // Check saved session
+  const session = localStorage.getItem('lai_session');
+  if (session) {
+    try {
+      const s = JSON.parse(session);
+      if (s.role === 'admin') { enterAdmin(); return; }
+      if (s.role === 'client') { await enterClient(s.username, s.displayName, s.bizName); return; }
+    } catch(e) {}
+  }
+  showScreen('login');
+};
+
+// ════════════════════════════════
+// SCREENS
+// ════════════════════════════════
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+// ════════════════════════════════
+// LOGIN
+// ════════════════════════════════
+window.switchLoginTab = function(tab) {
+  const clientFields = document.getElementById('client-login-fields');
+  const adminFields = document.getElementById('admin-login-fields');
+  const adminNotice = document.getElementById('admin-notice');
+  const btnClient = document.getElementById('btn-client-tab');
+  const btnAdmin = document.getElementById('btn-admin-tab');
+  if (tab === 'admin') {
+    clientFields.style.display = 'none';
+    adminFields.style.display = 'block';
+    adminNotice.style.display = 'block';
+    btnClient.className = 'p-tab-btn';
+    btnAdmin.className = 'p-tab-btn active-admin';
+  } else {
+    clientFields.style.display = 'block';
+    adminFields.style.display = 'none';
+    adminNotice.style.display = 'none';
+    btnClient.className = 'p-tab-btn active-client';
+    btnAdmin.className = 'p-tab-btn';
+  }
+};
+
+window.loginAdmin = async function() {
+  const pass = document.getElementById('admin-password').value;
+  const btn = document.getElementById('admin-login-btn');
+  const err = document.getElementById('admin-error');
+  err.style.display = 'none';
+  if (!pass) { showErr(err, 'Enter your admin password'); return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"><span></span><span></span><span></span></span>';
+  const storedPass = (await dbGet('admin/config'))?.adminPassword || ADMIN_PASSWORD;
+  await new Promise(r => setTimeout(r, 600));
+  if (pass === storedPass) {
+    localStorage.setItem('lai_session', JSON.stringify({ role: 'admin' }));
+    enterAdmin();
+  } else {
+    showErr(err, 'Incorrect admin password');
+    btn.disabled = false;
+    btn.textContent = 'Admin Login';
+  }
+};
+
+window.loginUser = async function() {
+  const username = document.getElementById('user-username').value.trim();
+  const pass = document.getElementById('user-password').value;
+  const btn = document.getElementById('user-login-btn');
+  const err = document.getElementById('user-error');
+  err.style.display = 'none';
+  if (!username || !pass) { showErr(err, 'Enter your username and password'); return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"><span></span><span></span><span></span></span>';
+  // Load clients
+  const clientsList = await loadClients();
+  const client = clientsList.find(c => c.username === username && c.password === pass);
+  await new Promise(r => setTimeout(r, 600));
+  if (client) {
+    localStorage.setItem('lai_session', JSON.stringify({ role: 'client', username: client.username, displayName: client.name, bizName: client.biz }));
+    await enterClient(client.username, client.name, client.biz);
+  } else {
+    showErr(err, 'Invalid username or password');
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
+};
+
+function showErr(el, msg) {
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ════════════════════════════════
+// ENTER ADMIN
+// ════════════════════════════════
+function enterAdmin() {
+  currentRole = 'admin';
+  showScreen('admin');
+  setupAdminNav();
+  loadAdminDashboard();
+}
+
+function setupAdminNav() {
+  document.querySelectorAll('.sb-item[data-atab]').forEach(el => {
+    el.addEventListener('click', () => goAdminTab(el.dataset.atab));
+  });
+}
+
+window.goAdminTab = function(name) {
+  document.querySelectorAll('.atab').forEach(t => t.style.display = 'none');
+  document.querySelectorAll('.sb-item[data-atab]').forEach(n => n.classList.remove('active'));
+  document.getElementById('atab-' + name).style.display = 'block';
+  const nav = document.querySelector(`.sb-item[data-atab="${name}"]`);
+  if (nav) nav.classList.add('active');
+  if (name === 'clients') renderClientsList();
+  if (name === 'activity') loadAdminActivity();
+  if (name === 'overview') loadAdminDashboard();
+};
+
+async function loadAdminDashboard() {
+  const clientsList = await loadClients();
+  document.getElementById('a-total-clients').textContent = clientsList.length;
+  document.getElementById('admin-client-count').textContent = clientsList.length;
+  document.getElementById('a-active-today').textContent = clientsList.filter(c => c.lastActive && isToday(c.lastActive)).length;
+  let totalLeads = 0, totalEmails = 0;
+  clientsList.forEach(c => { totalLeads += c.leadCount || 0; totalEmails += c.emailCount || 0; });
+  document.getElementById('a-total-leads').textContent = totalLeads;
+  document.getElementById('a-total-emails').textContent = totalEmails;
+  updateAdminKeyDisplay();
+  // Recent clients
+  const el = document.getElementById('overview-clients-list');
+  if (!clientsList.length) { el.innerHTML = '<div style="font-size:12px;font-family:var(--mono);color:var(--text3);padding:14px 0">No clients yet.</div>'; return; }
+  el.innerHTML = clientsList.slice(0,5).map(c => `
+    <div class="client-card" onclick="openClientModal('${c.id}')">
+      <div class="client-card-top">
+        <div class="client-info">
+          <div class="client-avatar">${(c.name||'?')[0].toUpperCase()}</div>
+          <div>
+            <div class="client-name">${c.name || 'Unnamed'}</div>
+            <div class="client-username">@${c.username}</div>
+          </div>
+        </div>
+        <span class="badge ${c.lastActive && isToday(c.lastActive) ? 'b-active' : 'b-inactive'}">${c.lastActive && isToday(c.lastActive) ? 'Active Today' : 'Inactive'}</span>
+      </div>
+      <div class="client-stats">
+        <div><div class="client-stat-val">${c.leadCount||0}</div><div class="client-stat-lbl">Leads</div></div>
+        <div><div class="client-stat-val">${c.emailCount||0}</div><div class="client-stat-lbl">Emails Sent</div></div>
+        <div><div class="client-stat-val">${c.biz||'—'}</div><div class="client-stat-lbl">Business</div></div>
+      </div>
+    </div>`).join('');
+}
+
+function isToday(ts) {
+  const d = new Date(ts);
+  const n = new Date();
+  return d.toDateString() === n.toDateString();
+}
+
+async function loadClients() {
+  if (firebaseMode) {
+    clients = await dbGetAll('clients');
+  } else {
+    clients = JSON.parse(localStorage.getItem('lai_clients') || '[]');
+  }
+  return clients;
+}
+
+function renderClientsList() {
+  const el = document.getElementById('clients-list');
+  if (!clients.length) { el.innerHTML = '<div style="font-size:12px;font-family:var(--mono);color:var(--text3);padding:14px 0">No clients registered yet.</div>'; return; }
+  el.innerHTML = clients.map(c => `
+    <div class="client-card">
+      <div class="client-card-top">
+        <div class="client-info">
+          <div class="client-avatar">${(c.name||'?')[0].toUpperCase()}</div>
+          <div>
+            <div class="client-name">${c.name || 'Unnamed'}</div>
+            <div class="client-username">@${c.username} &nbsp;·&nbsp; ${c.email||''}</div>
+          </div>
+        </div>
+        <div class="flex gap8 aic">
+          <span class="badge ${c.lastActive && isToday(c.lastActive) ? 'b-active' : 'b-inactive'}">${c.lastActive && isToday(c.lastActive) ? 'Active Today' : 'Inactive'}</span>
+          <button class="btn-ghost btn-sm" onclick="openClientModal('${c.id}')">View</button>
+          <button class="btn-danger btn-sm" onclick="deleteClient('${c.id}')">Delete</button>
+        </div>
+      </div>
+      <div class="client-stats">
+        <div><div class="client-stat-val">${c.leadCount||0}</div><div class="client-stat-lbl">Leads Found</div></div>
+        <div><div class="client-stat-val">${c.emailCount||0}</div><div class="client-stat-lbl">Emails Sent</div></div>
+        <div><div class="client-stat-val">${c.phone||'—'}</div><div class="client-stat-lbl">Phone</div></div>
+      </div>
+    </div>`).join('');
+}
+
+window.addClient = async function() {
+  const name = document.getElementById('new-client-name').value.trim();
+  const biz = document.getElementById('new-client-biz').value.trim();
+  const email = document.getElementById('new-client-email').value.trim();
+  const username = document.getElementById('new-client-username').value.trim().toLowerCase();
+  const password = document.getElementById('new-client-password').value.trim();
+  const phone = document.getElementById('new-client-phone').value.trim();
+  const notes = document.getElementById('new-client-notes').value.trim();
+  const msg = document.getElementById('add-client-msg');
+  const btn = document.getElementById('add-client-btn');
+
+  if (!name || !username || !password) { toast('Name, username and password are required', 'err'); return; }
+  const existing = clients.find(c => c.username === username);
+  if (existing) { toast('Username already taken', 'err'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"><span></span><span></span><span></span></span> Adding...';
+
+  const newClient = {
+    id: 'c_' + Date.now(),
+    name, biz, email, username, password, phone, notes,
+    leadCount: 0, emailCount: 0,
+    createdAt: new Date().toISOString(),
+    lastActive: null
+  };
+
+  if (firebaseMode) {
+    await window._fb.setDoc(window._fb.doc(db, 'clients', newClient.id), newClient);
+  } else {
+    clients.push(newClient);
+    localStorage.setItem('lai_clients', JSON.stringify(clients));
+  }
+
+  await logAdminActivity(`New client added: ${name} (@${username})`);
+
+  ['new-client-name','new-client-biz','new-client-email','new-client-username','new-client-password','new-client-phone','new-client-notes'].forEach(id => document.getElementById(id).value = '');
+
+  msg.style.display = 'block';
+  msg.style.color = 'var(--success)';
+  msg.textContent = 'Client added successfully! They can now log in with @' + username;
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg> Add Client';
+  toast('Client ' + name + ' added!', 'ok');
+  await loadClients();
+  loadAdminDashboard();
+};
+
+window.deleteClient = async function(id) {
+  if (!confirm('Delete this client? This cannot be undone.')) return;
+  if (firebaseMode) {
+    await window._fb.deleteDoc(window._fb.doc(db, 'clients', id));
+  } else {
+    clients = clients.filter(c => c.id !== id);
+    localStorage.setItem('lai_clients', JSON.stringify(clients));
+  }
+  await loadClients();
+  renderClientsList();
+  loadAdminDashboard();
+  toast('Client deleted', 'info');
+};
+
+window.openClientModal = function(id) {
+  const c = clients.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('cm-title').textContent = c.name || 'Client';
+  document.getElementById('cm-sub').textContent = (c.biz||'') + ' · @' + c.username;
+  document.getElementById('cm-body').innerHTML = `
+    <div style="display:grid;gap:12px">
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;font-size:12px">
+        <span class="dim mono">Username</span><span>@${c.username}</span>
+        <span class="dim mono">Password</span><span class="mono">${c.password}</span>
+        <span class="dim mono">Email</span><span>${c.email||'—'}</span>
+        <span class="dim mono">Phone</span><span>${c.phone||'—'}</span>
+        <span class="dim mono">Business</span><span>${c.biz||'—'}</span>
+        <span class="dim mono">Leads Found</span><span>${c.leadCount||0}</span>
+        <span class="dim mono">Emails Sent</span><span>${c.emailCount||0}</span>
+        <span class="dim mono">Joined</span><span>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</span>
+        <span class="dim mono">Last Active</span><span>${c.lastActive ? new Date(c.lastActive).toLocaleString() : 'Never'}</span>
+        ${c.notes ? '<span class="dim mono">Notes</span><span>' + c.notes + '</span>' : ''}
+      </div>
+      <hr>
+      <div>
+        <label>Reset Password</label>
+        <div class="flex gap8">
+          <input type="text" id="reset-pass-input" placeholder="New password" style="flex:1">
+          <button class="btn-orange btn-sm" onclick="resetClientPass('${c.id}')">Reset</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('client-modal').classList.add('open');
+};
+
+window.resetClientPass = async function(id) {
+  const newPass = document.getElementById('reset-pass-input').value.trim();
+  if (!newPass) { toast('Enter a new password', 'err'); return; }
+  const client = clients.find(c => c.id === id);
+  if (!client) return;
+  client.password = newPass;
+  if (firebaseMode) {
+    await window._fb.setDoc(window._fb.doc(db, 'clients', id), { password: newPass }, { merge: true });
+  } else {
+    localStorage.setItem('lai_clients', JSON.stringify(clients));
+  }
+  toast('Password updated for @' + client.username, 'ok');
+  document.getElementById('client-modal').classList.remove('open');
+};
+
+window.closeClientModal = function(e) {
+  if (!e || e.target.id === 'client-modal') document.getElementById('client-modal').classList.remove('open');
+};
+
+// ════════════════════════════════
+// ADMIN API KEYS
+// ════════════════════════════════
+window.saveAdminGPKey = async function() {
+  const key = document.getElementById('admin-gp-key').value.trim();
+  const serverUrl = document.getElementById('admin-server-url').value.trim();
+  if (!serverUrl) { toast('Enter your Render server URL', 'err'); return; }
+  if (!key) { toast('Enter your Google Places key', 'err'); return; }
+  adminKeys.gpKey = key;
+  adminKeys.serverUrl = serverUrl;
+  await dbSet('admin/keys', adminKeys);
+  updateAdminKeyDisplay();
+  document.getElementById('admin-gp-status').textContent = 'Saved! Click Test to verify connection.';
+  document.getElementById('admin-gp-status').style.color = 'var(--success)';
+  toast('Settings saved!', 'ok');
+};
+
+window.testAdminGPKey = async function() {
+  const key = document.getElementById('admin-gp-key').value.trim();
+  if (!key) { toast('Enter a key first', 'err'); return; }
+  document.getElementById('admin-gp-status').textContent = 'Testing...';
+  try {
+    const url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?query=coffee+shop&key=' + key;
+    const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url));
+    const data = await res.json();
+    if (data.status === 'OK' || data.status === 'ZERO_RESULTS') {
+      document.getElementById('admin-gp-status').textContent = 'Connected successfully!';
+      document.getElementById('admin-gp-status').style.color = 'var(--success)';
+      toast('Google Places connected!', 'ok');
+    } else {
+      document.getElementById('admin-gp-status').textContent = 'Error: ' + (data.error_message || data.status);
+      document.getElementById('admin-gp-status').style.color = 'var(--danger)';
+    }
+  } catch(e) {
+    document.getElementById('admin-gp-status').textContent = 'Network error';
+    document.getElementById('admin-gp-status').style.color = 'var(--danger)';
+  }
+};
+
+window.saveAdminCLKey = async function() {
+  const key = document.getElementById('admin-cl-key').value.trim();
+  if (!key) { toast('Enter your Anthropic key', 'err'); return; }
+  adminKeys.clKey = key;
+  await dbSet('admin/keys', adminKeys);
+  updateAdminKeyDisplay();
+  document.getElementById('admin-cl-status').textContent = 'Anthropic key saved!';
+  document.getElementById('admin-cl-status').style.color = 'var(--success)';
+  toast('Anthropic key saved!', 'ok');
+};
+
+window.testAdminCLKey = async function() {
+  const key = document.getElementById('admin-cl-key').value.trim();
+  if (!key) { toast('Enter a key first', 'err'); return; }
+  document.getElementById('admin-cl-status').textContent = 'Testing...';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},
+      body: JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:10, messages:[{role:'user',content:'Hi'}] })
+    });
+    const data = await res.json();
+    if (data.content) {
+      document.getElementById('admin-cl-status').textContent = 'Claude AI connected!';
+      document.getElementById('admin-cl-status').style.color = 'var(--success)';
+      toast('Claude AI connected!', 'ok');
+    } else {
+      document.getElementById('admin-cl-status').textContent = 'Error: ' + (data.error?.message||'Invalid key');
+      document.getElementById('admin-cl-status').style.color = 'var(--danger)';
+    }
+  } catch(e) {
+    document.getElementById('admin-cl-status').textContent = 'Network error';
+  }
+};
+
+function updateAdminKeyDisplay() {
+  const gpSet = !!adminKeys.gpKey;
+  const clSet = !!adminKeys.clKey;
+  const gpDisp = document.getElementById('gp-key-display');
+  const clDisp = document.getElementById('cl-key-display');
+  const gpBadge = document.getElementById('gp-key-status-badge');
+  const clBadge = document.getElementById('cl-key-status-badge');
+  if (gpDisp) gpDisp.textContent = gpSet ? adminKeys.gpKey.substring(0,8) + '••••••••••••••••' : 'Not configured';
+  if (clDisp) clDisp.textContent = clSet ? adminKeys.clKey.substring(0,10) + '••••••••••••••••' : 'Not configured';
+  if (gpBadge) { gpBadge.textContent = gpSet ? 'Active' : 'Not Set'; gpBadge.className = 'api-key-status ' + (gpSet ? 'api-set' : 'api-unset'); }
+  if (clBadge) { clBadge.textContent = clSet ? 'Active' : 'Not Set'; clBadge.className = 'api-key-status ' + (clSet ? 'api-set' : 'api-unset'); }
+}
+
+// ════════════════════════════════
+// ADMIN ACTIVITY LOG
+// ════════════════════════════════
+async function logAdminActivity(msg) {
+  const entry = { msg, time: new Date().toISOString(), ts: Date.now() };
+  if (firebaseMode) {
+    await window._fb.addDoc(window._fb.collection(db, 'activity'), entry);
+  } else {
+    const log = JSON.parse(localStorage.getItem('lai_activity_log') || '[]');
+    log.unshift(entry);
+    if (log.length > 100) log.pop();
+    localStorage.setItem('lai_activity_log', JSON.stringify(log));
+  }
+}
+
+window.loadAdminActivity = async function() {
+  let log = [];
+  if (firebaseMode) {
+    const q = window._fb.query(window._fb.collection(db, 'activity'), window._fb.orderBy('ts','desc'), window._fb.limit(50));
+    const snap = await window._fb.getDocs(q);
+    snap.forEach(d => log.push(d.data()));
+  } else {
+    log = JSON.parse(localStorage.getItem('lai_activity_log') || '[]');
+  }
+  const el = document.getElementById('admin-activity-log');
+  if (!log.length) { el.innerHTML = '<div style="font-size:12px;font-family:var(--mono);color:var(--text3);text-align:center;padding:30px 0">No activity yet.</div>'; return; }
+  el.innerHTML = log.map(a => `
+    <div class="act-item">
+      <div class="act-dot orange"></div>
+      <div class="act-text">${a.msg}</div>
+      <div class="act-time">${new Date(a.time).toLocaleString('en-ZA',{dateStyle:'short',timeStyle:'short'})}</div>
+    </div>`).join('');
+};
+
+// ════════════════════════════════
+// FIREBASE SETUP (from UI)
+// ════════════════════════════════
+window.saveFirebaseConfig = async function() {
+  const cfg = {
+    apiKey: document.getElementById('fb-apiKey').value.trim(),
+    authDomain: document.getElementById('fb-authDomain').value.trim(),
+    projectId: document.getElementById('fb-projectId').value.trim(),
+    storageBucket: document.getElementById('fb-storageBucket').value.trim(),
+    messagingSenderId: document.getElementById('fb-messagingSenderId').value.trim(),
+    appId: document.getElementById('fb-appId').value.trim()
+  };
+  const adminPass = document.getElementById('fb-admin-pass').value.trim();
+  if (!cfg.projectId) { toast('Enter your Firebase Project ID at minimum', 'err'); return; }
+  localStorage.setItem('lai_fb_config', JSON.stringify(cfg));
+  if (adminPass) {
+    localStorage.setItem('lai_admin_pass_override', adminPass);
+  }
+  document.getElementById('fb-status').textContent = 'Config saved! Reloading to connect...';
+  document.getElementById('fb-status').style.color = 'var(--success)';
+  setTimeout(() => location.reload(), 1500);
+};
+
+// ════════════════════════════════
+// ENTER CLIENT
+// ════════════════════════════════
+async function enterClient(username, displayName, bizName) {
+  currentRole = 'client';
+  currentUser = username;
+  showScreen('client');
+  // Set sidebar info
+  const initials = (displayName||'U')[0].toUpperCase();
+  document.getElementById('client-avatar').textContent = initials;
+  document.getElementById('client-display-name').textContent = displayName || username;
+  document.getElementById('client-display-biz').textContent = bizName || 'Prospekt';
+  // Load client data
+  const data = await dbGet('clientData/' + username) || {};
+  leads = data.leads || [];
+  sentEmails = data.sentEmails || [];
+  profile = data.profile || {};
+  activity = data.activity || [];
+  clientConfig = data.config || {};
+  // Restore Gmail
+  if (clientConfig.gmEmail) {
+    document.getElementById('c-from').value = clientConfig.gmEmail;
+    document.getElementById('gm-email-client').value = clientConfig.gmEmail;
+  }
+  // Restore profile fields
+  ['p-biz','p-name','p-role','p-offering','p-benefits','p-web','p-phone'].forEach(f => {
+    if (profile[f]) document.getElementById(f).value = profile[f];
+  });
+  // Mark active
+  await updateClientActivity(username);
+  setupClientNav();
+  updateClientUI();
+  checkNoKeys();
+}
+
+async function updateClientActivity(username) {
+  const now = new Date().toISOString();
+  if (firebaseMode) {
+    await window._fb.setDoc(window._fb.doc(db, 'clients', 'c_' + username), { lastActive: now }, { merge: true });
+    // Try by scanning for matching username
+    const clientsList = await loadClients();
+    const c = clientsList.find(x => x.username === username);
+    if (c) {
+      await window._fb.setDoc(window._fb.doc(db, 'clients', c.id), { lastActive: now }, { merge: true });
+    }
+  } else {
+    const cls = JSON.parse(localStorage.getItem('lai_clients') || '[]');
+    const c = cls.find(x => x.username === username);
+    if (c) { c.lastActive = now; localStorage.setItem('lai_clients', JSON.stringify(cls)); }
+  }
+}
+
+async function saveClientData() {
+  await dbSet('clientData/' + currentUser, { leads, sentEmails, profile, activity, config: clientConfig });
+  // Update stats on client record
+  const cls = firebaseMode ? await loadClients() : JSON.parse(localStorage.getItem('lai_clients') || '[]');
+  const c = cls.find(x => x.username === currentUser);
+  if (c) {
+    c.leadCount = leads.length;
+    c.emailCount = sentEmails.length;
+    if (firebaseMode) {
+      await window._fb.setDoc(window._fb.doc(db, 'clients', c.id), { leadCount: leads.length, emailCount: sentEmails.length }, { merge: true });
+    } else {
+      localStorage.setItem('lai_clients', JSON.stringify(cls));
+    }
+  }
+}
+
+function checkNoKeys() {
+  const warn = document.getElementById('no-keys-warn');
+  if (warn) warn.style.display = (!adminKeys.gpKey) ? 'block' : 'none';
+}
+
+function setupClientNav() {
+  document.querySelectorAll('.sb-item[data-ctab]').forEach(el => {
+    el.addEventListener('click', () => goClientTab(el.dataset.ctab));
+  });
+}
+
+window.goClientTab = function(name) {
+  document.querySelectorAll('.ctab').forEach(t => t.style.display = 'none');
+  document.querySelectorAll('.sb-item[data-ctab]').forEach(n => n.classList.remove('active'));
+  document.getElementById('ctab-' + name).style.display = 'block';
+  const nav = document.querySelector(`.sb-item[data-ctab="${name}"]`);
+  if (nav) nav.classList.add('active');
+  if (name === 'pipeline') renderPipeline();
+  if (name === 'sent') renderSentLog();
+  if (name === 'compose') buildLeadSel();
+  if (name === 'dashboard') { updateStats(); renderDashPipe(); renderDashActivity(); }
+};
+
+function updateClientUI() {
+  updateGmailUI();
+  updateStats();
+  renderDashPipe();
+  renderPipeline();
+  renderSentLog();
+  buildLeadSel();
+  updateSig();
+}
+
+// ════════════════════════════════
+// LOGOUT
+// ════════════════════════════════
+window.logout = function() {
+  localStorage.removeItem('lai_session');
+  currentUser = null;
+  currentRole = null;
+  leads = []; sentEmails = []; profile = {}; activity = [];
+  document.getElementById('user-username').value = '';
+  document.getElementById('user-password').value = '';
+  document.getElementById('admin-password').value = '';
+  document.getElementById('user-error').style.display = 'none';
+  document.getElementById('admin-error').style.display = 'none';
+  showScreen('login');
+};
+
+// ════════════════════════════════
+// FIND LEADS (Google Places)
+// ════════════════════════════════
+// ════════════════════════════════
+// PLACES API — calls your own backend server
+// Set your Render.com server URL in Admin > API Keys
+// ════════════════════════════════
+async function fetchWithProxy(url) {
+  // Extract the query and key from the URL
+  const urlObj = new URL(url);
+  const query = urlObj.searchParams.get('query');
+  const serverUrl = adminKeys.serverUrl || '';
+  if (!serverUrl) throw new Error('Backend server URL not set. Go to Admin > API Keys and add your Render server URL.');
+  const proxyUrl = serverUrl.replace(/\/$/, '') + '/places?query=' + encodeURIComponent(query);
+  const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
+  if (!res.ok) throw new Error('Server returned ' + res.status);
+  return await res.json();
+}
+
+window.findLeads = async function() {
+  const type = document.getElementById('g-type').value.trim();
+  const city = document.getElementById('g-city').value.trim();
+  const count = parseInt(document.getElementById('g-count').value);
+  const offering = document.getElementById('g-offering').value.trim();
+  if (!type) { toast('Enter a business type', 'err'); return; }
+  if (!city) { toast('Enter a city', 'err'); return; }
+  const gpKey = adminKeys.gpKey;
+  if (!gpKey) { toast('Google Places not configured yet — ask your admin', 'err'); return; }
+
+  const btn = document.getElementById('find-btn');
+  const status = document.getElementById('find-status');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"><span></span><span></span><span></span></span> Searching...';
+  status.textContent = '';
+
+  try {
+    const data = await fetchWithProxy('https://maps.googleapis.com/maps/api/place/textsearch/json?query=' + encodeURIComponent(type + ' in ' + city) + '&key=' + gpKey);
+    if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') throw new Error(data.error_message || data.status || 'API error');
+    const places = (data.results || []).slice(0, count);
+    if (!places.length) { status.textContent = 'No results found. Try different search terms.'; btn.disabled = false; btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Find Leads'; return; }
+
+    const newLeads = places.map(p => ({
+      id: Date.now() + Math.random(),
+      name: p.name,
+      address: p.formatted_address || p.vicinity || city,
+      rating: p.rating || null,
+      totalRatings: p.user_ratings_total || 0,
+      types: (p.types||[]).filter(t => !['establishment','point_of_interest'].includes(t)).slice(0,2),
+      placeId: p.place_id,
+      website: '', phone: '', contactName: '', contactEmail: '',
+      aiScore: null, aiReason: '', offering, status: 'new', city, type
+    }));
+
+    leads = [...leads, ...newLeads];
+    await saveClientData();
+    renderLeadsTable(newLeads);
+    document.getElementById('leads-wrap').style.display = 'block';
+    document.getElementById('leads-count-lbl').textContent = '(' + newLeads.length + ' found)';
+    document.getElementById('export-btn').style.display = 'inline-flex';
+    updateStats();
+    renderDashPipe();
+    buildLeadSel();
+    addClientActivity('Found ' + newLeads.length + ' real companies — "' + type + '" in ' + city);
+    await logAdminActivity(currentUser + ' found ' + newLeads.length + ' leads: "' + type + '" in ' + city);
+    toast(newLeads.length + ' real companies found!', 'ok');
+    if (adminKeys.clKey && newLeads.length) setTimeout(() => scoreAllLeads(newLeads), 500);
+  } catch(err) {
+    status.textContent = 'Error: ' + (err.message || 'Could not connect');
+    toast('Search failed', 'err');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Find Leads';
+};
+
+function renderLeadsTable(leadsArr) {
+  const tbody = document.getElementById('leads-tbody');
+  tbody.innerHTML = '';
+  leadsArr.forEach(lead => {
+    const tr = document.createElement('tr');
+    tr.onclick = () => openLeadModal(lead);
+    const scoreHtml = lead.aiScore ? '<span class="badge b-' + lead.aiScore + '">' + scoreLabel(lead.aiScore) + '</span>' : '<span class="badge b-cold" style="opacity:.5">Pending</span>';
+    const ratingHtml = lead.rating ? '<span style="color:var(--warn);font-family:var(--mono);font-size:11px">&#9733; ' + lead.rating + '</span>' : '<span style="color:var(--text3);font-size:11px;font-family:var(--mono)">&#8212;</span>';
+    const typeTxt = (lead.types||[]).map(t => t.replace(/_/g,' ')).join(', ') || lead.type;
+    tr.innerHTML = '<td class="td-name">' + lead.name + '</td><td class="td-mono">' + typeTxt + '</td><td class="td-mono">' + lead.city + '</td><td>' + ratingHtml + '</td><td id="score-' + lead.id + '">' + scoreHtml + '</td><td class="td-email">' + (lead.contactEmail || '<span style="color:var(--text3)">&#8212;</span>') + '</td><td class="td-right"><button class="btn-ghost btn-sm" onclick="event.stopPropagation();prefillCompose(\'' + lead.id + '\')">Email &#8594;</button></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+// ════════════════════════════════
+// AI SCORING
+// ════════════════════════════════
+const scoreLabel = s => ({hot:'🔥 Hot', warm:'◈ Warm', cold:'· Cold'}[s] || s);
+const scoreBadge = s => ({hot:'b-hot', warm:'b-warm', cold:'b-cold'}[s] || 'b-cold');
+
+window.scoreAllLeads = async function(leadsToScore) {
+  const arr = leadsToScore || leads.filter(l => !l.aiScore);
+  if (!arr.length) { toast('All leads already scored', 'info'); return; }
+  const clKey = adminKeys.clKey;
+  if (!clKey) { toast('Anthropic key not configured — ask your admin', 'err'); return; }
+  const btn = document.getElementById('score-all-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"><span></span><span></span><span></span></span> Scoring...';
+  const offering = document.getElementById('g-offering').value || profile['p-offering'] || 'business services';
+  for (let i = 0; i < arr.length; i += 5) {
+    await scoreBatch(arr.slice(i, i+5), offering, clKey);
+    if (i + 5 < arr.length) await sleep(500);
+  }
+  await saveClientData();
+  updateStats();
+  addClientActivity('AI scored ' + arr.length + ' leads');
+  toast(arr.length + ' leads scored!', 'ok');
+  btn.disabled = false;
+  btn.innerHTML = 'AI Score All';
+};
+
+async function scoreBatch(batch, offering, clKey) {
+  // Pull full profile context for smarter scoring
+  const bizName = profile['p-biz'] || '';
+  const bizRole = profile['p-role'] || '';
+  const bizOffering = profile['p-offering'] || offering || '';
+  const bizBenefits = profile['p-benefits'] || '';
+
+  const prompt = 'You are an expert B2B sales analyst. Your job is to score leads for a specific business and tell them exactly how likely each lead is to need their service RIGHT NOW.\n\n' +
+    'THE BUSINESS LOOKING FOR CLIENTS:\n' +
+    'Business: ' + (bizName || 'Unknown') + '\n' +
+    'Role/Type: ' + (bizRole || 'Unknown') + '\n' +
+    'What they offer: ' + bizOffering + '\n' +
+    (bizBenefits ? 'Key benefits they provide: ' + bizBenefits + '\n' : '') +
+    '\nSCORING CRITERIA — score each lead Hot/Warm/Cold based on:\n' +
+    '- HOT: This lead DIRECTLY needs the offering right now. High activity (many reviews), growing business, industry is an obvious match. They would likely respond to outreach immediately.\n' +
+    '- WARM: This lead PROBABLY needs the offering at some point. Moderate match, may need convincing, or less urgent need.\n' +
+    '- COLD: This lead is unlikely to need the offering, wrong industry, or too small/inactive to be worth pursuing now.\n\n' +
+    'LEADS TO SCORE:\n' +
+    batch.map((l,i) =>
+      (i+1) + '. ' + l.name +
+      ' | Category: ' + (l.types||[l.type]).map(t => t.replace(/_/g,' ')).join(', ') +
+      ' | Rating: ' + (l.rating || 'no rating') +
+      ' | Reviews: ' + (l.totalRatings || 0) + ' (higher = more active/established business)' +
+      ' | Location: ' + l.city +
+      (l.website ? ' | Has website: yes' : ' | Has website: no')
+    ).join('\n') +
+    '\n\nIMPORTANT: Think carefully about whether each specific business type ACTUALLY needs what this company offers. Be specific in your reasoning — mention the business type and why it does or does not need this service urgently.\n\n' +
+    'Respond ONLY with a valid JSON array — no markdown, no explanation outside the JSON:\n' +
+    '[{"index":1,"score":"hot","reason":"One specific sentence explaining why this lead needs the service urgently or not"},...]';
+
+  try {
+    const res = await callClaude(prompt, 600, clKey);
+    const clean = res.replace(/```json|```/g,'').trim();
+    const scores = JSON.parse(clean);
+    scores.forEach(s => {
+      const lead = batch[s.index - 1];
+      if (!lead) return;
+      lead.aiScore = s.score;
+      lead.aiReason = s.reason;
+      const cell = document.getElementById('score-' + lead.id);
+      if (cell) cell.innerHTML = '<span class="badge ' + scoreBadge(s.score) + '">' + scoreLabel(s.score) + '</span>';
+    });
+  } catch(e) {
+    console.warn('Score batch error:', e);
+    batch.forEach(l => { if (!l.aiScore) { l.aiScore = 'warm'; l.aiReason = 'Could not score — check Anthropic API key'; } });
+  }
+}
+
+async function callClaude(prompt, maxTokens, key) {
+  const clKey = key || adminKeys.clKey;
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':clKey,'anthropic-version':'2023-06-01'},
+    body: JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:maxTokens, messages:[{role:'user',content:prompt}] })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content[0].text;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ════════════════════════════════
+// AI EMAIL DRAFTING
+// ════════════════════════════════
+window.aiDraftEmail = async function() {
+  const name = document.getElementById('c-name').value;
+  const company = document.getElementById('c-company').value;
+  const title = document.getElementById('c-title').value;
+  const website = document.getElementById('c-website').value;
+  const tone = document.getElementById('e-tone').value;
+  const template = document.getElementById('e-template').value;
+  const bizName = profile['p-biz'] || '[Your Business]';
+  const yourName = profile['p-name'] || '[Your Name]';
+  const offering = profile['p-offering'] || document.getElementById('g-offering').value || 'our services';
+  const benefits = profile['p-benefits'] || '';
+  const role = profile['p-role'] || '';
+  const phone = profile['p-phone'] || '';
+  const web = profile['p-web'] || '';
+  const btn = document.getElementById('ai-draft-btn');
+  const bodyEl = document.getElementById('c-body');
+  const draftNote = document.getElementById('draft-note');
+  draftNote.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"><span></span><span></span><span></span></span> Drafting...';
+  if (!adminKeys.clKey) {
+    draftNote.style.display = 'block';
+    applyFallbackTemplate(template, {name,company,title,bizName,yourName,offering,benefits,role,phone,web});
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg> AI Draft Email';
+    return;
+  }
+  const toneMap = {professional:'professional and direct',friendly:'friendly and conversational',consultative:'consultative and advisory',urgent:'creating gentle urgency'};
+  const templateMap = {intro:'cold introduction email',value:'value proposition focused email',problem:'problem-solution email',followup:'warm follow-up second touch email'};
+  const leadType = document.getElementById('g-type')?.value || '';
+  const leadCity = document.getElementById('g-city')?.value || '';
+  const prompt = 'Write a ' + toneMap[tone] + ' B2B ' + templateMap[template] + ' that feels personal, specific and human — not like a template.\n\n' +
+    'SENDER DETAILS:\n' +
+    'Name: ' + yourName + (role ? ', ' + role : '') + '\n' +
+    'Business: ' + bizName + '\n' +
+    'Offering: ' + offering + '\n' +
+    (benefits ? 'Key results/benefits: ' + benefits + '\n' : '') +
+    (web ? 'Website: ' + web + '\n' : '') +
+    (phone ? 'Phone: ' + phone + '\n' : '') +
+    '\nRECIPIENT DETAILS:\n' +
+    'Contact: ' + (name || 'Business Owner') + (title ? ' (' + title + ')' : '') + '\n' +
+    'Company: ' + (company || 'their company') + '\n' +
+    (website ? 'Their website: ' + website + '\n' : '') +
+    (leadType ? 'Their industry: ' + leadType + '\n' : '') +
+    (leadCity ? 'Their location: ' + leadCity + '\n' : '') +
+    '\nEMAIL REQUIREMENTS:\n' +
+    '- Subject line that feels personal and gets opened (not clickbait, no ALL CAPS)\n' +
+    '- Open with ONE specific observation about their business or industry\n' +
+    '- Clearly connect their specific need to what the sender offers\n' +
+    '- 3-4 short paragraphs max — keep it concise\n' +
+    '- One clear CTA: suggest a 15-minute call or a quick reply\n' +
+    '- End with a professional signature\n' +
+    '- Sound like a real person who did their research, not a template\n\n' +
+    'Return EXACTLY in this format (nothing else):\nSUBJECT: [subject line]\nBODY:\n[full email body including signature]';
+  try {
+    const text = await callClaude(prompt, 700);
+    const subjMatch = text.match(/SUBJECT:\s*(.+)/);
+    const bodyMatch = text.match(/BODY:\s*([\s\S]+)/);
+    document.getElementById('c-subject').value = subjMatch ? subjMatch[1].trim() : 'A quick introduction';
+    bodyEl.textContent = bodyMatch ? bodyMatch[1].trim() : text;
+    bodyEl.classList.remove('ph');
+    addClientActivity('AI drafted email for ' + (company||'lead'));
+    toast('Email drafted!', 'ok');
+  } catch(e) {
+    draftNote.style.display = 'block';
+    applyFallbackTemplate(template, {name,company,title,bizName,yourName,offering,benefits,role,phone,web});
+    toast('Used smart template', 'info');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg> AI Draft Email';
+};
+
+function applyFallbackTemplate(type, d) {
+  var fn = d.name ? d.name.split(' ')[0] : 'there';
+  var sig = '\n' + (d.yourName||'') + '\n' + (d.role ? d.role + '\n' : '') + (d.bizName||'') + (d.phone ? '\n' + d.phone : '') + (d.web ? '\n' + d.web : '');
+  var templates = {
+    intro: { s: 'Quick intro from ' + (d.bizName||'us'), b: 'Hi ' + fn + ',\n\nMy name is ' + (d.yourName||'') + (d.role ? ', ' + d.role : '') + ' at ' + (d.bizName||'') + '.\n\nI came across ' + (d.company||'your business') + ' and wanted to reach out personally.\n\n' + (d.offering||'') + '\n\nWould you be open to a quick 15-minute call this week?' + sig },
+    value: { s: 'How ' + (d.bizName||'we') + ' can help ' + (d.company||'your business'), b: 'Hi ' + fn + ',\n\nI will get straight to the point. ' + (d.bizName||'We') + ' helps businesses like ' + (d.company||'yours') + ' ' + (d.offering||'grow faster') + '.\n\n' + (d.benefits||'') + '\n\nWould a 15-minute call work this week?' + sig },
+    problem: { s: 'A common challenge in your industry', b: 'Hi ' + fn + ',\n\nMost business owners I speak to want to grow but struggle with consistent outreach and lead generation.\n\nThat is exactly what ' + (d.bizName||'we') + ' solves. ' + (d.offering||'') + '\n\nWould a quick call this week work for you?' + sig },
+    followup: { s: 'Following up from ' + (d.bizName||'us'), b: 'Hi ' + fn + ',\n\nI reached out recently and wanted to follow up briefly.\n\n' + (d.bizName||'We') + ' helps businesses like ' + (d.company||'yours') + ' and I think there is genuine value we can add.\n\nWould a 15-minute call work this week?' + sig }
+  };
+  var t = templates[type] || templates.intro;
+  document.getElementById('c-subject').value = t.s;
+  var bodyEl = document.getElementById('c-body');
+  bodyEl.textContent = t.b;
+  bodyEl.classList.remove('ph');
+}
+
+// ════════════════════════════════
+// LEAD PICKER
+// ════════════════════════════════
+function buildLeadSel() {
+  const sel = document.getElementById('lead-sel');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Select a lead —</option>';
+  leads.forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.id;
+    opt.textContent = l.name + ' · ' + l.city;
+    sel.appendChild(opt);
+  });
+  if (cur) sel.value = cur;
+}
+
+window.pickLead = function() {
+  const id = document.getElementById('lead-sel').value;
+  if (!id) return;
+  const lead = leads.find(l => l.id == id);
+  if (!lead) return;
+  document.getElementById('c-company').value = lead.name;
+  document.getElementById('c-website').value = lead.website || '';
+  if (lead.contactEmail) document.getElementById('c-to').value = lead.contactEmail;
+  if (lead.contactName) document.getElementById('c-name').value = lead.contactName;
+};
+
+window.prefillCompose = function(id) {
+  goClientTab('compose');
+  setTimeout(() => { document.getElementById('lead-sel').value = id; window.pickLead(); }, 60);
+};
+
+window.clearCompose = function() {
+  ['c-name','c-title','c-company','c-website','c-to','c-subject'].forEach(i => document.getElementById(i).value = '');
+  const b = document.getElementById('c-body');
+  b.textContent = 'Select a lead and click AI Draft Email to generate personalised outreach.';
+  b.classList.add('ph');
+  document.getElementById('lead-sel').value = '';
+};
+
+window.copyEmail = function() {
+  const subj = document.getElementById('c-subject').value;
+  const body = document.getElementById('c-body').textContent;
+  navigator.clipboard.writeText('Subject: ' + subj + '\n\n' + body).then(() => toast('Copied!', 'ok'));
+};
+
+// ════════════════════════════════
+// GMAIL SETUP (client)
+// ════════════════════════════════
+window.saveClientGmail = async function() {
+  const email = document.getElementById('gm-email-client').value.trim();
+  if (!email) { toast('Enter your Gmail address', 'err'); return; }
+  clientConfig.gmEmail = email;
+  document.getElementById('c-from').value = email;
+  await saveClientData();
+  updateGmailUI();
+  toast('Gmail saved!', 'ok');
+};
+
+function updateGmailUI() {
+  const on = !!clientConfig.gmEmail;
+  const dashBadge = document.getElementById('dash-gmail-badge');
+  const composeBadge = document.getElementById('compose-gmail-badge');
+  const cls = on ? 'g-badge on' : 'g-badge off';
+  const txt = on ? '&#9679; Gmail: ' + clientConfig.gmEmail : 'Gmail not set up';
+  if (dashBadge) { dashBadge.className = cls; dashBadge.innerHTML = txt; }
+  if (composeBadge) { composeBadge.className = cls; composeBadge.innerHTML = txt; }
+  if (on && document.getElementById('c-from')) document.getElementById('c-from').value = clientConfig.gmEmail;
+}
+
+// ════════════════════════════════
+// SEND EMAIL
+// ════════════════════════════════
+window.sendEmail = async function() {
+  const to = document.getElementById('c-to').value.trim();
+  const subject = document.getElementById('c-subject').value.trim();
+  const body = document.getElementById('c-body');
+  const bodyTxt = body.textContent.trim();
+  if (!to) { toast('Enter recipient email', 'err'); return; }
+  if (!subject) { toast('Enter a subject', 'err'); return; }
+  if (!bodyTxt || body.classList.contains('ph')) { toast('Write your email first', 'err'); return; }
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"><span></span><span></span><span></span></span> Opening...';
+  setTimeout(async () => {
+    const gmailUrl = 'https://mail.google.com/mail/?view=cm&to=' + encodeURIComponent(to) + '&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(bodyTxt);
+    window.open(gmailUrl, '_blank');
+    sentEmails.unshift({ id: Date.now(), to, subject, body: bodyTxt, time: new Date().toLocaleString('en-ZA',{dateStyle:'short',timeStyle:'short'}) });
+    const selId = document.getElementById('lead-sel').value;
+    if (selId) { const lead = leads.find(l => l.id == selId); if (lead) lead.status = 'contacted'; }
+    await saveClientData();
+    updateStats();
+    renderDashPipe();
+    renderPipeline();
+    renderSentLog();
+    addClientActivity('Email sent to ' + to + ' — "' + subject + '"');
+    await logAdminActivity(currentUser + ' sent email to ' + to);
+    document.getElementById('badge-sent').textContent = sentEmails.length;
+    toast('Gmail opened!', 'ok');
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send via Gmail';
+  }, 400);
+};
+
+// ════════════════════════════════
+// STATS & PIPELINE
+// ════════════════════════════════
+function updateStats() {
+  const total = leads.length, hot = leads.filter(l => l.aiScore==='hot').length;
+  const contacted = leads.filter(l => l.status==='contacted').length, sent = sentEmails.length;
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-total-sub').textContent = total ? total + ' in pipeline' : 'None yet';
+  document.getElementById('s-hot').textContent = hot;
+  document.getElementById('s-esent').textContent = sent;
+  document.getElementById('s-cont').textContent = contacted;
+  document.getElementById('badge-pipe').textContent = total;
+  document.getElementById('badge-sent').textContent = sent;
+}
+
+function renderDashPipe() {
+  const newL = leads.filter(l => l.status==='new').slice(0,5);
+  const contL = leads.filter(l => l.status==='contacted').slice(0,5);
+  document.getElementById('dp-new-c').textContent = leads.filter(l => l.status==='new').length;
+  document.getElementById('dp-cont-c').textContent = leads.filter(l => l.status==='contacted').length;
+  document.getElementById('dp-new').innerHTML = newL.length ? newL.map(l => '<div class="lc" onclick="prefillCompose(\'' + l.id + '\')"><div class="lc-name">' + l.name + '</div><div class="lc-co">' + l.city + '</div><div class="lc-foot">' + (l.aiScore ? '<span class="badge ' + scoreBadge(l.aiScore) + '">' + scoreLabel(l.aiScore) + '</span>' : '') + '</div></div>').join('') : '<div class="pipe-empty">Find leads to start</div>';
+  document.getElementById('dp-cont').innerHTML = contL.length ? contL.map(l => '<div class="lc"><div class="lc-name">' + l.name + '</div><div class="lc-co">' + l.city + '</div><div class="lc-foot"><span class="badge b-contacted">Contacted</span></div></div>').join('') : '<div class="pipe-empty">None yet</div>';
+}
+
+function renderPipeline() {
+  const newL = leads.filter(l => l.status==='new'), contL = leads.filter(l => l.status==='contacted');
+  document.getElementById('pp-new-c').textContent = newL.length;
+  document.getElementById('pp-cont-c').textContent = contL.length;
+  document.getElementById('pp-new').innerHTML = newL.length ? newL.map(l => '<div class="lc" onclick="prefillCompose(\'' + l.id + '\')"><div class="lc-name">' + l.name + '</div><div class="lc-co">' + l.type + ' · ' + l.city + '</div>' + (l.contactEmail ? '<div class="lc-email">' + l.contactEmail + '</div>' : '') + '<div class="lc-foot">' + (l.aiScore ? '<span class="badge ' + scoreBadge(l.aiScore) + '">' + scoreLabel(l.aiScore) + '</span>' : '') + '<span class="badge b-new">' + l.city + '</span></div></div>').join('') : '<div class="pipe-empty">No leads</div>';
+  document.getElementById('pp-cont').innerHTML = contL.length ? contL.map(l => '<div class="lc"><div class="lc-name">' + l.name + '</div><div class="lc-co">' + l.city + '</div><div class="lc-foot"><span class="badge b-contacted">Contacted</span></div></div>').join('') : '<div class="pipe-empty">None contacted</div>';
+}
+
+function renderSentLog() {
+  const log = document.getElementById('sent-log');
+  if (!sentEmails.length) { log.innerHTML = '<div style="font-size:12px;font-family:var(--mono);color:var(--text3);text-align:center;padding:30px 0">No emails sent yet.</div>'; return; }
+  log.innerHTML = sentEmails.map(e => '<div class="sent-row"><div><div class="sent-to">' + e.to + '</div><div class="sent-meta">' + e.time + ' &nbsp;·&nbsp; "' + e.subject + '"</div></div><span class="badge b-contacted">Sent</span></div>').join('');
+}
+
+window.clearSent = async function() {
+  if (!confirm('Clear sent log?')) return;
+  sentEmails = [];
+  await saveClientData();
+  renderSentLog();
+  updateStats();
+  toast('Log cleared', 'info');
+};
+
+window.clearAllLeads = async function() {
+  if (!leads.length) return;
+  if (!confirm('Clear all leads?')) return;
+  leads = [];
+  await saveClientData();
+  document.getElementById('leads-wrap').style.display = 'none';
+  document.getElementById('leads-tbody').innerHTML = '';
+  updateStats(); renderDashPipe(); renderPipeline(); buildLeadSel();
+  toast('Leads cleared', 'info');
+};
+
+window.exportCSV = function() {
+  if (!leads.length) { toast('No leads to export', 'err'); return; }
+  const hdr = 'Company,Category,City,Rating,Reviews,AI Score,AI Reason,Contact Email,Status\n';
+  const rows = leads.map(l => '"' + l.name + '","' + (l.types||[l.type]).join(';') + '","' + l.city + '","' + (l.rating||'') + '","' + (l.totalRatings||'') + '","' + (l.aiScore||'') + '","' + (l.aiReason||'').replace(/"/g,"'") + '","' + (l.contactEmail||'') + '","' + l.status + '"').join('\n');
+  const blob = new Blob([hdr+rows], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'leadai-leads.csv';
+  a.click();
+  toast('CSV exported!', 'ok');
+};
+
+// ════════════════════════════════
+// ACTIVITY
+// ════════════════════════════════
+function addClientActivity(msg) {
+  activity.unshift({ msg, time: new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'}) });
+  if (activity.length > 20) activity.pop();
+  renderDashActivity();
+}
+
+function renderDashActivity() {
+  const el = document.getElementById('dash-activity');
+  if (!activity.length) { el.innerHTML = '<div style="font-size:12px;font-family:var(--mono);color:var(--text3);padding:14px 0">No activity yet.</div>'; return; }
+  el.innerHTML = activity.slice(0,8).map(a => '<div class="act-item"><div class="act-dot"></div><div class="act-text">' + a.msg + '</div><div class="act-time">' + a.time + '</div></div>').join('');
+}
+
+// ════════════════════════════════
+// PROFILE
+// ════════════════════════════════
+window.saveProfile = async function() {
+  ['p-biz','p-name','p-role','p-offering','p-benefits','p-web','p-phone'].forEach(f => {
+    const el = document.getElementById(f);
+    if (el) profile[f] = el.value;
+  });
+  await saveClientData();
+  updateSig();
+  toast('Profile saved!', 'ok');
+};
+
+function updateSig() {
+  const el = document.getElementById('sig-preview');
+  if (!el) return;
+  const n = profile['p-name'] || '[Your Name]', r = profile['p-role'] || '', b = profile['p-biz'] || '[Business]', ph = profile['p-phone'] || '', w = profile['p-web'] || '';
+  el.innerHTML = '<strong style="color:var(--text);font-family:var(--font)">' + n + '</strong>' + (r ? '<br><span style="color:var(--text2)">' + r + '</span>' : '') + '<br><span style="color:var(--accent2)">' + b + '</span>' + (ph ? '<br>' + ph : '') + (w ? '<br><span style="color:var(--accent3)">' + w + '</span>' : '');
+}
+
+// ════════════════════════════════
+// LEAD MODAL
+// ════════════════════════════════
+window.openLeadModal = function(lead) {
+  document.getElementById('m-title').textContent = lead.name;
+  document.getElementById('m-sub').textContent = (lead.types||[lead.type]).join(', ') + ' · ' + lead.city;
+  document.getElementById('m-body').innerHTML = '<div style="display:grid;gap:10px;font-size:13px"><div style="display:grid;grid-template-columns:120px 1fr;gap:8px;font-size:12px"><span class="dim mono">Address</span><span>' + lead.address + '</span><span class="dim mono">Rating</span><span>' + (lead.rating ? '&#9733; ' + lead.rating + ' (' + lead.totalRatings + ' reviews)' : 'Not rated') + '</span><span class="dim mono">AI Score</span><span>' + (lead.aiScore ? '<span class="badge ' + scoreBadge(lead.aiScore) + '">' + scoreLabel(lead.aiScore) + '</span>' : 'Not scored') + '</span>' + (lead.aiReason ? '<span class="dim mono">AI Reason</span><span style="color:var(--text2);font-family:var(--mono);font-size:11px">' + lead.aiReason + '</span>' : '') + '<span class="dim mono">Status</span><span><span class="badge ' + (lead.status==='contacted'?'b-contacted':'b-new') + '">' + lead.status + '</span></span></div><hr><div><label>Contact Email</label><div class="flex gap8"><input type="email" id="modal-email" value="' + (lead.contactEmail||'') + '" placeholder="contact@company.com" style="flex:1"><button class="btn btn-sm" onclick="saveLeadEmail(\'' + lead.id + '\')">Save</button></div></div><hr><button class="btn btn-sm" style="width:fit-content" onclick="closeLeadModal();prefillCompose(\'' + lead.id + '\')">Compose Email &#8594;</button></div>';
+  document.getElementById('lead-modal').classList.add('open');
+};
+
+window.saveLeadEmail = async function(id) {
+  const lead = leads.find(l => l.id == id);
+  if (!lead) return;
+  lead.contactEmail = document.getElementById('modal-email').value.trim();
+  await saveClientData();
+  buildLeadSel();
+  toast('Contact saved!', 'ok');
+};
+
+window.closeLeadModal = function() { document.getElementById('lead-modal').classList.remove('open'); };
+window.closeModal = function(e) { if (e.target.id === 'lead-modal') window.closeLeadModal(); };
+
+// ════════════════════════════════
+// TOAST
+// ════════════════════════════════
+let toastTimer;
+window.toast = function(msg, type='ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type + ' show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = 'toast ' + type, 3200);
+};
+</script>
+</body>
+</html>

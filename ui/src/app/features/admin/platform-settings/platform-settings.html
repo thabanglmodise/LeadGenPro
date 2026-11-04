@@ -1,0 +1,42 @@
+<div class="page">
+  <div class="page__header">
+    <h1 class="page__title">Platform Settings</h1>
+    <p class="page__subtitle">Global configuration for this Prospekt instance</p>
+  </div>
+
+  @if (loading()) {
+    <p class="admin-page__loading">Loading…</p>
+  } @else {
+    <div class="admin-settings-section">
+      <h2 class="admin-settings-section__title">Registration</h2>
+
+      <div class="admin-setting-row">
+        <div class="admin-setting-row__info">
+          <span class="admin-setting-row__label">Auto-approve new registrations</span>
+          <span class="admin-setting-row__hint">
+            When ON, users become active immediately after email verification.
+            When OFF, they wait in the approval queue.
+          </span>
+        </div>
+
+        <button
+          class="admin-toggle"
+          [class.admin-toggle--on]="autoApprove()"
+          (click)="toggleAutoApprove()"
+          [disabled]="saving()"
+          [attr.aria-pressed]="autoApprove()"
+        >
+          <span class="admin-toggle__thumb"></span>
+        </button>
+      </div>
+
+      @if (saved()) {
+        <p class="admin-page__saved">Settings saved.</p>
+      }
+
+      @if (error()) {
+        <p class="admin-page__error">{{ error() }}</p>
+      }
+    </div>
+  }
+</div>

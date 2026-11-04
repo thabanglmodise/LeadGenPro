@@ -9,5 +9,9 @@ export const supabaseAdmin = createClient(
 export async function getUserFromToken(token: string) {
   const { data, error } = await supabaseAdmin.auth.getUser(token);
   if (error || !data.user) return null;
-  return { id: data.user.id, email: data.user.email! };
+  return {
+    id: data.user.id,
+    email: data.user.email!,
+    role: (data.user.app_metadata?.['role'] as string) ?? null,
+  };
 }

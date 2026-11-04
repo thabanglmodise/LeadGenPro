@@ -1,0 +1,30 @@
+# Render Blueprint — single web service: Express serves /api (tRPC) + static Angular build.
+# See DOCS/phase8-render-deploy.md. Secrets (sync: false) are set in the Render dashboard.
+services:
+  - type: web
+    name: prospekt
+    runtime: node
+    plan: free
+    branch: more-cowbell
+    # api builds first: ui tsconfig maps @api/* → ../api/dist/*
+    buildCommand: >-
+      cd api && npm ci --include=dev && npm run build &&
+      cd ../ui && npm ci --include=dev && node scripts/write-env.js &&
+      npm run build -- --output-mode=static
+    startCommand: cd api && npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: NODE_ENV
+        value: production
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: API_KEY_ENCRYPTION_SECRET
+        sync: false

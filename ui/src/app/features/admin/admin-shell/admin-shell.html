@@ -1,0 +1,74 @@
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar__brand">
+      <div class="admin-sidebar__logo">P</div>
+      <div class="admin-sidebar__brand-text">
+        <span class="admin-sidebar__title">Prospekt</span>
+        <span class="admin-sidebar__role-label">Admin</span>
+      </div>
+    </div>
+
+    <nav class="admin-sidebar__nav">
+      <a routerLink="/admin/overview" routerLinkActive="admin-sidebar__link--active" class="admin-sidebar__link">
+        <span class="admin-sidebar__link-icon">📊</span>
+        <span>Overview</span>
+      </a>
+
+      <div class="admin-sidebar__section-label">Users</div>
+
+      <a routerLink="/admin/users" routerLinkActive="admin-sidebar__link--active" class="admin-sidebar__link">
+        <span class="admin-sidebar__link-icon">👥</span>
+        <span>Manage Users</span>
+      </a>
+
+      <a routerLink="/admin/approval-queue" routerLinkActive="admin-sidebar__link--active" class="admin-sidebar__link">
+        <span class="admin-sidebar__link-icon">⏳</span>
+        <span>Approval Queue</span>
+        @if (pendingCount() > 0) {
+          <span class="admin-sidebar__badge">{{ pendingCount() }}</span>
+        }
+      </a>
+
+      <a routerLink="/admin/invite" routerLinkActive="admin-sidebar__link--active" class="admin-sidebar__link">
+        <span class="admin-sidebar__link-icon">✉️</span>
+        <span>Invite User</span>
+      </a>
+
+      <div class="admin-sidebar__section-label">System</div>
+
+      <a routerLink="/admin/platform-setup" routerLinkActive="admin-sidebar__link--active" class="admin-sidebar__link">
+        <span class="admin-sidebar__link-icon">🖥️</span>
+        <span>Platform Setup</span>
+      </a>
+
+      <a routerLink="/admin/platform-settings" routerLinkActive="admin-sidebar__link--active" class="admin-sidebar__link">
+        <span class="admin-sidebar__link-icon">⚙️</span>
+        <span>Platform Settings</span>
+      </a>
+
+      <a routerLink="/admin/api-keys" routerLinkActive="admin-sidebar__link--active" class="admin-sidebar__link">
+        <span class="admin-sidebar__link-icon">🔑</span>
+        <span>API Keys</span>
+      </a>
+    </nav>
+
+    <div class="admin-sidebar__footer">
+      <a routerLink="/dashboard" class="admin-sidebar__client-link">← Client view</a>
+      <span class="admin-sidebar__user">{{ auth.user()?.email }}</span>
+      <div class="admin-sidebar__actions">
+        <button class="admin-sidebar__signout" (click)="signOut()">Sign out</button>
+        <button
+          class="admin-sidebar__theme-toggle"
+          (click)="toggleTheme()"
+          [title]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+        >
+          {{ isDark() ? '☀️' : '🌙' }}
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="admin-shell__content">
+    <router-outlet />
+  </main>
+</div>
