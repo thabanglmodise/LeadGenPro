@@ -11,12 +11,13 @@ import { ConfigService } from '../../../core/services/config.service';
 import { LeadsService } from '../../../core/services/leads.service';
 import { PlacesService } from '../../../core/services/places.service';
 import { LeadScoreBadgeComponent } from '../../../shared/components/lead-score-badge/lead-score-badge';
+import { SkeletonComponent } from '../../../shared/components/skeleton/skeleton';
 
 @Component({
   selector: 'app-find-leads',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, RouterLink, LeadScoreBadgeComponent],
+  imports: [ReactiveFormsModule, RouterLink, LeadScoreBadgeComponent, SkeletonComponent],
   templateUrl: './find-leads.html',
 })
 export class FindLeadsComponent implements OnInit {

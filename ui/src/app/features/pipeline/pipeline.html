@@ -4,61 +4,81 @@
     <p class="page__subtitle">Track your leads through the sales funnel</p>
   </div>
 
-  <div class="kanban">
-    <div class="kanban__col">
-      <p class="kanban__col-title">New ({{ leadsService.newLeads().length }})</p>
-      @for (lead of leadsService.newLeads(); track lead.id) {
-        <app-pipeline-card
-          #card
-          [lead]="lead"
-          (statusChange)="onStatusChange(lead.id, $event, card)"
-        />
-      }
-      @if (leadsService.newLeads().length === 0) {
-        <p class="kanban__empty">No new leads</p>
-      }
-    </div>
+  @if (leadsService.loaded()) {
+    <div class="kanban">
+      <div class="kanban__col">
+        <p class="kanban__col-title">New ({{ leadsService.newLeads().length }})</p>
+        @for (lead of leadsService.newLeads(); track lead.id) {
+          <app-pipeline-card
+            #card
+            [lead]="lead"
+            (statusChange)="onStatusChange(lead.id, $event, card)"
+          />
+        }
+        @if (leadsService.newLeads().length === 0) {
+          <p class="kanban__empty">No new leads</p>
+        }
+      </div>
 
-    <div class="kanban__col">
-      <p class="kanban__col-title">Contacted ({{ leadsService.contactedList().length }})</p>
-      @for (lead of leadsService.contactedList(); track lead.id) {
-        <app-pipeline-card
-          #card
-          [lead]="lead"
-          (statusChange)="onStatusChange(lead.id, $event, card)"
-        />
-      }
-      @if (leadsService.contactedList().length === 0) {
-        <p class="kanban__empty">No contacted leads</p>
-      }
-    </div>
+      <div class="kanban__col">
+        <p class="kanban__col-title">Contacted ({{ leadsService.contactedList().length }})</p>
+        @for (lead of leadsService.contactedList(); track lead.id) {
+          <app-pipeline-card
+            #card
+            [lead]="lead"
+            (statusChange)="onStatusChange(lead.id, $event, card)"
+          />
+        }
+        @if (leadsService.contactedList().length === 0) {
+          <p class="kanban__empty">No contacted leads</p>
+        }
+      </div>
 
-    <div class="kanban__col">
-      <p class="kanban__col-title">Replied ({{ leadsService.repliedList().length }})</p>
-      @for (lead of leadsService.repliedList(); track lead.id) {
-        <app-pipeline-card
-          #card
-          [lead]="lead"
-          (statusChange)="onStatusChange(lead.id, $event, card)"
-        />
-      }
-      @if (leadsService.repliedList().length === 0) {
-        <p class="kanban__empty">None yet</p>
-      }
-    </div>
+      <div class="kanban__col">
+        <p class="kanban__col-title">Replied ({{ leadsService.repliedList().length }})</p>
+        @for (lead of leadsService.repliedList(); track lead.id) {
+          <app-pipeline-card
+            #card
+            [lead]="lead"
+            (statusChange)="onStatusChange(lead.id, $event, card)"
+          />
+        }
+        @if (leadsService.repliedList().length === 0) {
+          <p class="kanban__empty">None yet</p>
+        }
+      </div>
 
-    <div class="kanban__col">
-      <p class="kanban__col-title">Converted ({{ leadsService.convertedList().length }})</p>
-      @for (lead of leadsService.convertedList(); track lead.id) {
-        <app-pipeline-card
-          #card
-          [lead]="lead"
-          (statusChange)="onStatusChange(lead.id, $event, card)"
-        />
-      }
-      @if (leadsService.convertedList().length === 0) {
-        <p class="kanban__empty">None yet</p>
+      <div class="kanban__col">
+        <p class="kanban__col-title">Converted ({{ leadsService.convertedList().length }})</p>
+        @for (lead of leadsService.convertedList(); track lead.id) {
+          <app-pipeline-card
+            #card
+            [lead]="lead"
+            (statusChange)="onStatusChange(lead.id, $event, card)"
+          />
+        }
+        @if (leadsService.convertedList().length === 0) {
+          <p class="kanban__empty">None yet</p>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="kanban" aria-busy="true">
+      @for (col of [1, 2, 3, 4]; track col) {
+        <div class="kanban__col">
+          <app-skeleton variant="title" width="50%" />
+          @for (card of [1, 2, 3, 4]; track card) {
+            <div class="kanban__card skeleton-card">
+              <app-skeleton variant="title" width="70%" />
+              <app-skeleton width="45%" />
+              <div class="skeleton-row">
+                <app-skeleton variant="circle" width="48px" height="18px" />
+                <app-skeleton width="80px" height="24px" />
+              </div>
+            </div>
+          }
+        </div>
       }
     </div>
-  </div>
+  }
 </div>

@@ -19,7 +19,28 @@
     }
   </div>
 
-  @if (emailService.sent().length > 0) {
+  @if (!emailService.loaded()) {
+    <div class="section-card" style="padding:0; overflow:hidden;" aria-busy="true">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>TO</th>
+            <th>Subject</th>
+            <th>Sent</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of [1, 2, 3, 4, 5, 6]; track row) {
+            <tr>
+              <td><app-skeleton width="160px" /></td>
+              <td><app-skeleton width="220px" /></td>
+              <td><app-skeleton width="130px" /></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else if (emailService.sent().length > 0) {
     <div class="section-card" style="padding:0; overflow:hidden;">
       <table class="data-table">
         <thead>

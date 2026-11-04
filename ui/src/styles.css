@@ -1140,6 +1140,11 @@ html.light {
   transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 .splash--hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+/* Pre-bootstrap (index.html) splash: invisible unless load exceeds delay. Sync with SPLASH_SHOW_DELAY_MS. */
+.splash--delayed {
+  --splash-delay: 300ms;
+  animation: splash-fade-in 0.25s ease var(--splash-delay) both;
+}
 
 /* Spinning conic ring = glowing border; logo sits on top, inset by ring width */
 .splash__ring {
@@ -1182,6 +1187,7 @@ html.light {
 }
 
 @keyframes splash-spin { to { transform: rotate(360deg); } }
+@keyframes splash-fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes splash-glow {
   0%, 100% { box-shadow: 0 0 12px 0 hsl(var(--accent) / 0.25); }
   50%      { box-shadow: 0 0 32px 6px hsl(var(--accent) / 0.55); }
@@ -1192,3 +1198,37 @@ html.light {
   .splash__ring { box-shadow: 0 0 20px 2px hsl(var(--accent) / 0.4); }
   .splash__ring::before { background: hsl(var(--accent)); }
 }
+
+/* ─── Skeleton loaders (SkeletonComponent + page skeleton layouts) ────────── */
+.skeleton {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: hsl(var(--bg-4));
+  border-radius: 6px;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.06), transparent);
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+.skeleton--text   { height: 12px; width: 100%; }
+.skeleton--title  { height: 14px; width: 60%; }
+.skeleton--stat   { height: 34px; width: 56px; margin-top: 2px; }
+.skeleton--block  { height: 64px; width: 100%; border-radius: 8px; }
+.skeleton--circle { height: 24px; width: 24px; border-radius: 999px; }
+
+.skeleton-list { display: flex; flex-direction: column; gap: 8px; }
+.skeleton-list--spaced { gap: 14px; padding: 4px 0; }
+.skeleton-card { display: flex; flex-direction: column; gap: 8px; }
+.skeleton-row  { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+
+@keyframes skeleton-shimmer { to { transform: translateX(100%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after { animation: none; display: none; }
+}
+.kanban__col > .skeleton:first-child { margin-bottom: 12px; }

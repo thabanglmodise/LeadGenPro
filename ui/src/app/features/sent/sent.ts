@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { AuthService } from '../../core/services/auth.service';
 import { EmailService } from '../../core/services/email.service';
 import { DatePipe } from '@angular/common';
+import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
 
 @Component({
   selector: 'app-sent',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe],
+  imports: [DatePipe, SkeletonComponent],
   templateUrl: './sent.html',
 })
 export class SentComponent implements OnInit {

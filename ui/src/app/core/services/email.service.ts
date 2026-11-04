@@ -2,18 +2,26 @@ import { PLATFORM_ID, Injectable, computed, inject, signal } from '@angular/core
 import { isPlatformBrowser } from '@angular/common';
 import { SentEmail } from '../models/sent-email.model';
 import { trpc } from '../trpc.client';
+import { LoadTracker } from '../utils/load-tracker';
 
 @Injectable({ providedIn: 'root' })
 export class EmailService {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly _sent = signal<SentEmail[]>([]);
+  private readonly tracker = new LoadTracker();
+
+  // false until first load settles → pages show skeletons
+  readonly loaded = this.tracker.loaded;
   readonly sent = this._sent.asReadonly();
   readonly sentCount = computed(() => this._sent().length);
 
   async load(): Promise<void> {
+    const _sentSignal = this._sent;
     try {
-      const data = await trpc.email.list.query();
-      this._sent.set(data as SentEmail[]);
+      await this.tracker.run(async function fetchSent() {
+        const data = await trpc.email.list.query();
+        _sentSignal.set(data as SentEmail[]);
+      });
     } catch {
       /* non-fatal — dashboard degrades gracefully if query fails */
     }

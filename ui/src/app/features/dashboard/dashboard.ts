@@ -6,12 +6,13 @@ import { AuthService } from '../../core/services/auth.service';
 import { OnboardingWidgetComponent } from '../../shared/components/onboarding-widget/onboarding-widget';
 import { LeadScoreBadgeComponent } from '../../shared/components/lead-score-badge/lead-score-badge';
 import { DatePipe } from '@angular/common';
+import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [LeadScoreBadgeComponent, DatePipe, OnboardingWidgetComponent],
+  imports: [LeadScoreBadgeComponent, DatePipe, OnboardingWidgetComponent, SkeletonComponent],
   templateUrl: './dashboard.html',
 })
 export class DashboardComponent implements OnInit {

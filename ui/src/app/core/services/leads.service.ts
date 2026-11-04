@@ -1,10 +1,15 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { Lead, LeadStatus } from '../models/lead.model';
 import { trpc } from '../trpc.client';
+import { LoadTracker } from '../utils/load-tracker';
 
 @Injectable({ providedIn: 'root' })
 export class LeadsService {
   private readonly _leads = signal<Lead[]>([]);
+  private readonly tracker = new LoadTracker();
+
+  // false until first load settles → pages show skeletons
+  readonly loaded = this.tracker.loaded;
 
   readonly leads = this._leads.asReadonly();
   readonly totalLeads = computed(() => this._leads().length);
@@ -15,9 +20,12 @@ export class LeadsService {
   readonly repliedList = computed(() => this._leads().filter(l => l.status === 'replied'));
   readonly convertedList = computed(() => this._leads().filter(l => l.status === 'converted'));
 
-  async loadLeads(): Promise<void> {
-    const data = await trpc.leads.list.query();
-    this._leads.set(data as Lead[]);
+  loadLeads(): Promise<void> {
+    const _leadsSignal = this._leads;
+    return this.tracker.run(async function fetchLeads() {
+      const data = await trpc.leads.list.query();
+      _leadsSignal.set(data as Lead[]);
+    });
   }
 
   async addLeads(_leads: Omit<Lead, 'id' | 'user_id' | 'created_at'>[]): Promise<void> {

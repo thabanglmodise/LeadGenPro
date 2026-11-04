@@ -5,12 +5,18 @@ import {
   Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router,
 } from '@angular/router';
 
-// Later navigations only show the splash if they take longer than this (avoids flash on fast clicks).
-export const SPLASH_SHOW_DELAY_MS = 150;
+// Splash only appears if loading takes longer than this. Keep in sync with --splash-delay in styles.css.
+export const SPLASH_SHOW_DELAY_MS = 300;
 
 // Prerendered pages already show content → skip the initial splash.
 export function isServerRendered(doc: Document): boolean {
   return !!doc.querySelector('app-root[ng-server-context]');
+}
+
+// Static index.html splash fades in after the delay; if boot took that long it's already
+// on screen, so start visible to hand off without a gap.
+export function shouldShowInitially(elapsedMs: number, serverRendered: boolean): boolean {
+  return !serverRendered && elapsedMs >= SPLASH_SHOW_DELAY_MS;
 }
 
 function isNavigationDone(event: Event): boolean {
@@ -29,8 +35,7 @@ export class SplashComponent {
   private readonly router = inject(Router);
   private readonly doc = inject(DOCUMENT);
 
-  // Initial navigation (incl. guard redirects) is covered from the start.
-  readonly visible = signal(!isServerRendered(this.doc));
+  readonly visible = signal(shouldShowInitially(performance.now(), isServerRendered(this.doc)));
 
   private showTimer: ReturnType<typeof setTimeout> | null = null;
 
