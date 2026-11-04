@@ -1,5 +1,6 @@
 // Generates environment.prod.ts from env vars at Netlify build time. Not committed with real values.
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const _supabaseUrl = process.env.SUPABASE_URL;
@@ -10,14 +11,25 @@ if (!_supabaseUrl || !_supabaseAnonKey) {
   process.exit(1);
 }
 
-const _outPath = fileURLToPath(new URL('../src/environments/environment.prod.ts', import.meta.url));
+// environments/ is gitignored → absent on fresh CI clones; create it.
+const _envDir = fileURLToPath(new URL('../src/environments/', import.meta.url));
+mkdirSync(_envDir, { recursive: true });
 
-const _contents = `export const environment = {
-  production: true,
+function buildEnvContents(production) {
+  return `export const environment = {
+  production: ${production},
   supabaseUrl: '${_supabaseUrl}',
   supabaseAnonKey: '${_supabaseAnonKey}',
 };
 `;
+}
 
-writeFileSync(_outPath, _contents);
+writeFileSync(path.join(_envDir, 'environment.prod.ts'), buildEnvContents(true));
 console.log('write-env.js: wrote environment.prod.ts');
+
+// angular.json fileReplacements needs environment.ts to exist; don't clobber a local dev copy.
+const _devPath = path.join(_envDir, 'environment.ts');
+if (!existsSync(_devPath)) {
+  writeFileSync(_devPath, buildEnvContents(false));
+  console.log('write-env.js: wrote environment.ts');
+}
