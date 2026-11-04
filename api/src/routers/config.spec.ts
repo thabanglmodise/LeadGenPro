@@ -107,7 +107,7 @@ describe('config.save', () => {
   it('writes gm_email only, never keys', async () => {
     const { ctx, _values } = makeCtx();
     const _caller = configRouter.createCaller(ctx as never);
-    await _caller.save({ gp_key: 'leak', cl_key: 'leak', gm_email: 'me@gmail.com' });
+    await _caller.save({ gm_email: 'me@gmail.com' });
     const _written = _values.mock.calls[0][0];
     expect(_written.gm_email).toBe('me@gmail.com');
     expect(_written.gp_key).toBeUndefined();

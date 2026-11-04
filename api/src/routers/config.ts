@@ -19,11 +19,7 @@ export const configRouter = router({
   }),
 
   save: protectedProcedure
-    .input(z.object({
-      gp_key: z.string().optional(),
-      cl_key: z.string().optional(),
-      gm_email: z.string().email().optional(),
-    }))
+    .input(z.object({ gm_email: z.string().email().optional() }))
     .mutation(async ({ ctx, input }) => {
       // keys live in user_api_keys (userApiKeys.save); user_config holds gm_email only
       const _patch = { gm_email: input.gm_email, updated_at: new Date() };
