@@ -2,7 +2,7 @@
 
 ## Objective
 
-Deploy UI + API to Render as **one web service**. Express serves `/api/*` (tRPC) and the static Angular build from same origin → UI's relative `/api/trpc` works unchanged, no CORS/rewrite changes. Supersedes phase 7 (Netlify, UI only) — Netlify config kept, marked archived.
+Deploy UI + API to Render as **one web service**. Express serves `/api/*` (tRPC) and the static Angular build from same origin → UI's relative `/api/trpc` works unchanged, no CORS/rewrite changes. Supersedes phase 7 (Netlify, UI only) — Netlify config removed (Stage 6).
 
 ---
 
@@ -48,7 +48,7 @@ Express (api/src/index.ts)
 - `api/src/lib/serve-ui.spec.ts` — new, vitest
 - `api/src/index.ts` — wire `serveUi`
 - `render.yaml` — new
-- `netlify.toml`, `DOCS/phase7-netlify-deploy.md` — marked archived
+- `netlify.toml` — deleted; `DOCS/phase7-netlify-deploy.md` — marked removed
 - `README.md` — deploy section
 
 ---
@@ -60,3 +60,4 @@ Express (api/src/index.ts)
 - [x] **Stage 3** — `render.yaml` Blueprint
 - [x] **Stage 4** — Archive Netlify (`netlify.toml` header, phase7 doc status) + README deploy section
 - [x] **Stage 5** — Verify: run render build command locally, start api, curl `/api/health`, `/`, deep route, `/api/trpc`
+- [x] **Stage 6** — Remove Netlify: delete `netlify.toml`, drop README note, update phase7 doc status + write-env.js comment

@@ -11,5 +11,3 @@ Single web service via `render.yaml` Blueprint — Express serves `/api` + stati
 3. Migrations run locally, not on deploy: `cd api && npm run db:migrate`
 
 Free plan sleeps when idle → first request slow.
-
-> Netlify (`netlify.toml`, phase 7) is archived.

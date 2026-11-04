@@ -1,6 +1,6 @@
 # Phase 7: Netlify Deployment (UI only)
 
-> **Status: ARCHIVED** — superseded by [phase 8 Render deploy](phase8-render-deploy.md). `netlify.toml` kept for reference only.
+> **Status: REMOVED** — superseded by [phase 8 Render deploy](phase8-render-deploy.md). `netlify.toml` deleted; doc kept as history.
 
 ## Objective
 

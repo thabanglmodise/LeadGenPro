@@ -1,4 +1,4 @@
-// Generates environment.prod.ts from env vars at Netlify build time. Not committed with real values.
+// Generates environment.prod.ts from env vars at deploy build time (Render). Not committed with real values.
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
