@@ -37,21 +37,29 @@ export class SetupComponent implements OnInit {
   async save() {
     if (!this.auth.user()?.id) return;
     this.saving.set(true);
-    const v = this.form.value;
-    await this.config.save({
-      ...(v.gp_key ? { gp_key: v.gp_key } : {}),
-      ...(v.cl_key ? { cl_key: v.cl_key } : {}),
-      ...(v.gm_email ? { gm_email: v.gm_email } : {}),
-    });
-    this.form.patchValue({ gp_key: '', cl_key: '' });
-    this.saving.set(false);
+    const _gp = this.form.value.gp_key?.trim();
+    const _cl = this.form.value.cl_key?.trim();
+    const _gm = this.form.value.gm_email?.trim();
+    try {
+      if (_gp || _cl) {
+        await trpc.userApiKeys.save.mutate({
+          ...(_gp ? { gp_key: _gp } : {}),
+          ...(_cl ? { cl_key: _cl } : {}),
+        });
+      }
+      if (_gm) await this.config.save({ gm_email: _gm });
+      await this.config.load();
+      this.form.patchValue({ gp_key: '', cl_key: '' });
+    } finally {
+      this.saving.set(false);
+    }
   }
 
   async testGoogle() {
     this.testingGoogle.set(true);
     this.googleStatus.set('');
     try {
-      const result = await trpc.config.testGoogle.query();
+      const result = await trpc.config.testGoogle.query({ key: this.form.value.gp_key?.trim() || undefined });
       this.googleStatus.set(result.ok ? '✓ Connected' : `❌ ${result.status}`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Request failed';
@@ -64,7 +72,7 @@ export class SetupComponent implements OnInit {
     this.testingClaude.set(true);
     this.claudeStatus.set('');
     try {
-      const result = await trpc.config.testClaude.query();
+      const result = await trpc.config.testClaude.query({ key: this.form.value.cl_key?.trim() || undefined });
       this.claudeStatus.set(result.ok ? '✓ Connected' : '❌ Invalid key');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Request failed';

@@ -22,11 +22,11 @@ export class ConfigService {
     this._config.set(data);
   }
 
-  async save(patch: { gp_key?: string; cl_key?: string; gm_email?: string }): Promise<void> {
+  async save(patch: { gm_email?: string }): Promise<void> {
     await trpc.config.save.mutate(patch);
     this._config.update(c => ({
-      hasGpKey: patch.gp_key ? true : (c?.hasGpKey ?? false),
-      hasClKey: patch.cl_key ? true : (c?.hasClKey ?? false),
+      hasGpKey: c?.hasGpKey ?? false,
+      hasClKey: c?.hasClKey ?? false,
       gmEmail: patch.gm_email ?? (c?.gmEmail ?? ''),
     }));
   }
