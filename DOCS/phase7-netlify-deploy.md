@@ -1,5 +1,7 @@
 # Phase 7: Netlify Deployment (UI only)
 
+> **Status: ARCHIVED** — superseded by [phase 8 Render deploy](phase8-render-deploy.md). `netlify.toml` kept for reference only.
+
 ## Objective
 
 Deploy `ui/` to Netlify as a static build. No secrets committed to repo — Supabase URL/anon key injected at Netlify build time from Netlify env vars. API deploy is out of scope, addressed in a later phase.
@@ -40,7 +42,7 @@ Static build note: `angular.json` currently defaults `outputMode` to `"server"` 
 
 ## Implementation stages
 
-- [ ] Create DOCS/phase7-netlify-deploy.md (this file)
+- [x] Create DOCS/phase7-netlify-deploy.md (this file)
 - [x] **Stage 1** — `ui/scripts/write-env.js`: reads `SUPABASE_URL`/`SUPABASE_ANON_KEY` from env, writes `ui/src/environments/environment.prod.ts`; fails loudly if vars missing
 - [x] **Stage 2** — `netlify.toml`: base/command/publish wiring, static output mode
 - [x] **Stage 3** — Verify: ran the Netlify build command locally with test env vars, confirmed `dist/leadGenPro/browser` output contains real (non-placeholder) Supabase values baked into the bundle and 27 routes prerendered. `ui/dist` is gitignored so no artifact left behind.

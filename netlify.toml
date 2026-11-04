@@ -1,3 +1,4 @@
+# ARCHIVED — superseded by render.yaml (see DOCS/phase8-render-deploy.md). Kept for reference only.
 [build]
   base = "ui"
   command = "node scripts/write-env.js && npm run build -- --output-mode=static"
