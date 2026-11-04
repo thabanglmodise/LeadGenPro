@@ -2,17 +2,18 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import { router, protectedProcedure } from '../trpc.js';
 import { user_config } from '../db/schema.js';
-import { resolveKey } from '../lib/resolve-key.js';
+import { resolveKey, type KeyType } from '../lib/resolve-key.js';
+import type { DB } from '../db/index.js';
 
 export const configRouter = router({
   load: protectedProcedure.query(async ({ ctx }) => {
     const [config] = await ctx.db
-      .select()
+      .select({ gm_email: user_config.gm_email })
       .from(user_config)
       .where(eq(user_config.id, ctx.user.id));
     return {
-      hasGpKey: !!config?.gp_key,
-      hasClKey: !!config?.cl_key,
+      hasGpKey: await canResolve(ctx.db, ctx.user.id, 'gp'),
+      hasClKey: await canResolve(ctx.db, ctx.user.id, 'cl'),
       gmEmail: config?.gm_email ?? '',
     };
   }),
@@ -24,13 +25,12 @@ export const configRouter = router({
       gm_email: z.string().email().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
+      // keys live in user_api_keys (userApiKeys.save); user_config holds gm_email only
+      const _patch = { gm_email: input.gm_email, updated_at: new Date() };
       await ctx.db
         .insert(user_config)
-        .values({ id: ctx.user.id, ...input, updated_at: new Date() })
-        .onConflictDoUpdate({
-          target: user_config.id,
-          set: { ...input, updated_at: new Date() },
-        });
+        .values({ id: ctx.user.id, ..._patch })
+        .onConflictDoUpdate({ target: user_config.id, set: _patch });
     }),
 
   testGoogle: protectedProcedure
@@ -71,4 +71,13 @@ async function pingClaude(key: string): Promise<{ ok: boolean; status: number }>
     }),
   });
   return { ok: _res.ok, status: _res.status };
+}
+
+async function canResolve(db: DB, userId: string, keyType: KeyType): Promise<boolean> {
+  try {
+    await resolveKey(db, userId, keyType);
+    return true;
+  } catch {
+    return false;
+  }
 }

@@ -18,6 +18,6 @@ Goal: all key reads/writes go via `user_api_keys` / `resolveKey()`. `user_config
 
 ## To-do
 - [x] **Stage 1** — API: testGoogle/testClaude use resolveKey + optional input key
-- [ ] **Stage 2** — API: config.load flags via resolveKey; config.save gm_email only; config.spec.ts
+- [x] **Stage 2** — API: config.load flags via resolveKey; config.save gm_email only; config.spec.ts
 - [ ] **Stage 3** — UI: Setup page save via userApiKeys, Test passes typed key, ConfigService.save narrowed
 - [ ] **Stage 4** — UI: verify Find Leads banners reflect resolvable keys
